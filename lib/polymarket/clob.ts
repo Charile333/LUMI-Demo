@@ -332,8 +332,8 @@ export class PolymarketCLOBClient {
       ]
     };
 
-    // 签名
-    const signature = await signer._signTypedData(domain, types, order);
+    // 签名（类型断言：ethers.Signer 的具体实现都有 _signTypedData 方法）
+    const signature = await (signer as any)._signTypedData(domain, types, order);
 
     return {
       ...order,

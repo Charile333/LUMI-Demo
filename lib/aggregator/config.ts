@@ -21,7 +21,10 @@ export const priorityWeights = {
   // 数据源基础分
   source: {
     polymarket: 100,  // Polymarket
+    blockchain: 80,   // 区块链市场
     custom: 50,       // 自定义市场
+    kalshi: 90,       // Kalshi
+    metaculus: 70,    // Metaculus
     other: 10,        // 其他来源
   },
   

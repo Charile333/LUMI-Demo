@@ -115,6 +115,16 @@ export class BlockchainProvider implements IDataProvider {
       return {
         id: market.questionId,
         title: market.title || '未命名市场',
+        category: category, // 必需字段
+        probability: 50, // 默认概率50%（未解析市场）
+        volume: `${reward.toFixed(2)} USDC`, // 使用奖励作为成交量
+        volumeNum: reward, // 数值型成交量
+        endDate: 'TBD', // 链上市场没有固定结束时间
+        trend: 'up' as const, // 默认趋势
+        change: '+0%', // 默认变化
+        description: market.description || market.title || '暂无描述',
+        resolutionCriteria: [], // 链上市场的解析标准
+        relatedMarkets: [], // 相关市场
         question: market.description || market.title || '暂无描述',
         image: '/image/default-market.png', // 默认图片
         options: [
@@ -141,7 +151,7 @@ export class BlockchainProvider implements IDataProvider {
           market.resolved ? 'resolved' : 'active',
           'usdc'
         ],
-        source: 'blockchain',
+        source: 'blockchain' as const,
         sourceUrl: marketUrl,
         externalUrl: `https://www.oklink.com/amoy/address/${CONTRACTS.testAdapter}`,
         createdAt: new Date(market.requestTimestamp.toNumber() * 1000).toISOString(),

@@ -160,7 +160,7 @@ export class TemplateProvider implements IDataProvider {
         isActive: true,
         
         // 数据源标识
-        source: 'your-api', // 👈 改成你的 API 名称
+        source: 'other', // 👈 使用 'other' 或在 Market 类型中添加你的 API 名称
         
         // 优先级（默认普通）
         priorityLevel: 'normal',

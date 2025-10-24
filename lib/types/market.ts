@@ -18,8 +18,21 @@ export interface Market {
   isActive?: boolean; // 是否激活显示
   categoryType?: string; // 所属分类类型（automotive, tech-ai, etc.）
   
+  // 扩展字段（用于不同数据源）
+  question?: string; // 市场问题（可选，某些来源使用）
+  image?: string; // 市场图片
+  options?: Array<{
+    name: string;
+    probability: string;
+    totalValue: string;
+  }>; // 市场选项
+  tags?: string[]; // 标签
+  sourceUrl?: string; // 来源URL（内部链接）
+  externalUrl?: string; // 外部链接
+  metadata?: any; // 元数据（来源特定数据）
+  
   // 数据来源
-  source?: 'custom' | 'polymarket' | 'kalshi' | 'metaculus' | 'other';
+  source?: 'custom' | 'polymarket' | 'kalshi' | 'metaculus' | 'blockchain' | 'other';
   
   // 优先级控制（新增）
   priorityLevel?: 'normal' | 'recommended' | 'featured' | 'pinned';
