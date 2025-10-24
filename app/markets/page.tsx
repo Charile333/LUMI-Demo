@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '../../components/Navbar'
 import Link from 'next/link'
@@ -14,17 +14,22 @@ import SportsGamingPage from '../sports-gaming/page'
 import EconomySocialPage from '../economy-social/page'
 import EmergingPage from '../emerging/page'
 
-const HomePage = () => {
+// 处理 URL 参数的组件
+function CategoryFromURL({ onCategoryChange }: { onCategoryChange: (category: string) => void }) {
   const searchParams = useSearchParams()
-  const [activeCategory, setActiveCategory] = useState<string>('automotive')
-
-  // 从 URL 参数读取分类
+  
   useEffect(() => {
     const category = searchParams.get('category')
     if (category) {
-      setActiveCategory(category)
+      onCategoryChange(category)
     }
-  }, [searchParams])
+  }, [searchParams, onCategoryChange])
+
+  return null
+}
+
+const HomePage = () => {
+  const [activeCategory, setActiveCategory] = useState<string>('automotive')
 
   // 清理cascading waves背景
   useEffect(() => {
@@ -276,6 +281,11 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      {/* URL 参数处理（包裹在 Suspense 中） */}
+      <Suspense fallback={null}>
+        <CategoryFromURL onCategoryChange={setActiveCategory} />
+      </Suspense>
+
       {/* 导航栏 */}
       <Navbar 
         activeCategory={activeCategory}
