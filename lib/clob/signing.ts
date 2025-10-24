@@ -68,7 +68,8 @@ export function getOrderHash(order: Order): string {
  */
 export async function signOrder(order: Order, signer: ethers.Signer): Promise<string> {
   try {
-    const signature = await signer._signTypedData(
+    // 类型断言：ethers.Signer 的具体实现（如 JsonRpcSigner, Wallet）都有 _signTypedData 方法
+    const signature = await (signer as any)._signTypedData(
       ORDER_DOMAIN,
       ORDER_TYPES,
       {
