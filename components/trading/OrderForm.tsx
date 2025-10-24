@@ -66,7 +66,7 @@ export default function OrderForm({
       
       // 2. 构造订单（使用市场价）
       const order: Order = {
-        orderId: generateOrderId(address),
+        orderId: generateOrderId(),
         marketId,
         questionId,
         maker: address,
