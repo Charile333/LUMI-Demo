@@ -1,5 +1,6 @@
 # 排除管理页面（开发环境专用）
 app/admin/
+app/api/admin/
 
 # 排除测试页面
 app/test-*/

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const createdMarkets = [];
+    const createdMarkets: any[] = [];
     
     // 使用事务批量插入
     await db.transaction(async (client) => {
