@@ -17,6 +17,8 @@ export interface Market {
   image_url?: string;
   resolutionCriteria?: string;
   relatedMarkets?: any[];
+  priorityLevel?: 'normal' | 'recommended' | 'featured' | 'pinned';
+  source?: 'custom' | 'polymarket' | 'kalshi' | 'metaculus' | 'other';
 }
 
 export function useMarketsWithRealTimePrices(category: string) {
@@ -96,7 +98,9 @@ export function useMarketsWithRealTimePrices(category: string) {
               change: `${probability > 50 ? '+' : ''}${probability - 50}%`,
               image_url: market.image_url,
               resolutionCriteria: market.description,
-              relatedMarkets: []
+              relatedMarkets: [],
+              priorityLevel: market.priority_level || 'normal',
+              source: market.source || 'custom'
             };
           })
         );

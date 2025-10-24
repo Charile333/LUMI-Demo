@@ -17,6 +17,8 @@ export interface Market {
   image_url?: string;
   resolutionCriteria?: string;
   relatedMarkets?: any[];
+  priorityLevel?: 'normal' | 'recommended' | 'featured' | 'pinned';
+  source?: 'custom' | 'polymarket' | 'kalshi' | 'metaculus' | 'other';
 }
 
 export function useMarketsByCategory(category: string) {
@@ -66,7 +68,9 @@ export function useMarketsByCategory(category: string) {
           change: '0%', // 默认值，将由 WebSocket 更新
           image_url: market.image_url,
           resolutionCriteria: market.description,
-          relatedMarkets: []
+          relatedMarkets: [],
+          priorityLevel: market.priority_level || 'normal',
+          source: market.source || 'custom'
         }));
 
         setMarkets(formattedMarkets);
