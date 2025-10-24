@@ -7,6 +7,7 @@
     "dev:ws": "node server-with-websocket.js",
     "dev:old": "next dev",
     "build": "next build",
+    "postinstall": "npm list tailwindcss autoprefixer postcss || echo 'CSS dependencies check'",
     "start": "NODE_ENV=production node server.js",
     "start:ws": "NODE_ENV=production node server-with-websocket.js",
     "start:old": "next start",
