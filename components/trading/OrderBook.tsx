@@ -6,12 +6,13 @@ import { useEffect, useState } from 'react';
 
 interface OrderBookProps {
   marketId: number;
+  outcome?: number;
 }
 
-export default function OrderBook({ marketId }: OrderBookProps) {
+export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBookProps) {
   const [orderBook, setOrderBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [outcome, setOutcome] = useState(1); // 1 = YES, 0 = NO
+  const [outcome, setOutcome] = useState(initialOutcome || 1); // 1 = YES, 0 = NO
   
   useEffect(() => {
     loadOrderBook();
