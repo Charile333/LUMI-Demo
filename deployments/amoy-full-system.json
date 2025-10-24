@@ -1,0 +1,31 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "deployer": "0x6830271111dc9814b3bEd0E4a8307E75AC571f95",
+  "version": "full-polymarket-v1",
+  "contracts": {
+    "fullConditionalTokens": {
+      "address": "0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2",
+      "deployTx": "0x3e6808a965a2b97fccf661c25c33f4052fa8c2c8514221b365b01b6fea5c0a94",
+      "version": "full-erc1155"
+    },
+    "ctfExchange": {
+      "address": "0x213F1F4Fa93f4079BB24FAB7eAA891e603dB2E2d",
+      "deployTx": "0x0a2655f57623083c705a2dabecc0af84d483813a599369e98e9dfb6d9a53d61b",
+      "version": "polymarket-orderbook-v2"
+    },
+    "collateral": {
+      "address": "0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a",
+      "symbol": "USDC",
+      "decimals": 6,
+      "type": "Mock"
+    },
+    "config": {
+      "feeRecipient": "0x6830271111dc9814b3bEd0E4a8307E75AC571f95",
+      "paused": false
+    }
+  },
+  "timestamp": "2025-10-23T15:26:34.942Z",
+  "balance": "1.649632151649141075 POL",
+  "note": "完整版 Polymarket 系统 - 支持 Token 铸造和订单薄交易"
+}

@@ -1,0 +1,16 @@
+# 排除管理页面（开发环境专用）
+app/admin/
+
+# 排除测试页面
+app/test-*/
+app/*-test/
+app/simple-test/
+app/unified-test/
+
+# 排除开发文档
+*.md
+!README.md
+
+# 排除脚本
+scripts/
+

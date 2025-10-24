@@ -1,0 +1,30 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "deployer": "0xCf759Fc97Db9E5642D8B0905419e8719f59faa47",
+  "version": "ctf-exchange-v1",
+  "contracts": {
+    "conditionalTokens": {
+      "address": "0xeB4F3700FE422c1618B449763d423687D5ad0950",
+      "version": "standard"
+    },
+    "ctfExchange": {
+      "address": "0x41AE309fAb269adF729Cfae78E6Ef741F6a8E3AE",
+      "deployTx": "0xcf4696dc896860f9a1db1a27b91f9371a7c2cffe799b89604a6b98e1c323c91d",
+      "blockNumber": null,
+      "version": "1.0"
+    },
+    "collateral": {
+      "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+      "symbol": "USDC",
+      "decimals": 6
+    }
+  },
+  "config": {
+    "feeRecipient": "0xCf759Fc97Db9E5642D8B0905419e8719f59faa47",
+    "paused": false
+  },
+  "timestamp": "2025-10-23T08:20:59.698Z",
+  "balance": "1.04886647 POL",
+  "note": "基于 Polymarket 架构的 CTF 订单簿交易所"
+}

@@ -1,0 +1,15 @@
+{
+  "chainId": 80002,
+  "name": "Polygon Amoy Testnet",
+  "contracts": {
+    "UMAOracleAdapter": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "blockNumber": 0
+    },
+    "CTFExchange": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "blockNumber": 0
+    }
+  },
+  "deployedAt": "2024-01-01T00:00:00.000Z"
+}

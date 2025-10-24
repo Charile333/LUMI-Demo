@@ -39,7 +39,8 @@ build/
 artifacts/
 cache/
 deployment-local.json
-deployments/
+# deployments/ - 改为包含配置文件
+_dev_only_admin/
 
 # TypeScript
 *.tsbuildinfo

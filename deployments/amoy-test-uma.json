@@ -1,0 +1,27 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "deployer": "0xCf759Fc97Db9E5642D8B0905419e8719f59faa47",
+  "version": "test-uma-mock",
+  "contracts": {
+    "conditionalTokens": {
+      "address": "0xeB4F3700FE422c1618B449763d423687D5ad0950",
+      "version": "standard"
+    },
+    "testUmaCTFAdapter": {
+      "address": "0x5D440c98B55000087a8b0C164f1690551d18CfcC",
+      "deployTx": "0x1826a68b5f14330bbf26232b90907287856293e7e7260364503443efc9636f82",
+      "blockNumber": null,
+      "version": "test-with-mock-oracle"
+    },
+    "mockOptimisticOracle": {
+      "address": "0x378fA22104E4c735680772Bf18C5195778a55b33",
+      "deployTx": "0x980b733fd67c6beafd4cdf95efd9f65e68f08f2b8febcbdf91bf295646a10adb",
+      "blockNumber": null,
+      "version": "mock"
+    }
+  },
+  "timestamp": "2025-10-23T09:55:06.779Z",
+  "balance": "0.847312869582842292 POL",
+  "note": "测试版 - 使用 Mock Oracle，支持任意 ERC20 代币作为奖励"
+}

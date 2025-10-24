@@ -1,0 +1,22 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "deployer": "0xCf759Fc97Db9E5642D8B0905419e8719f59faa47",
+  "version": "ctf-exchange-mock-usdc",
+  "contracts": {
+    "conditionalTokens": {
+      "address": "0xeB4F3700FE422c1618B449763d423687D5ad0950"
+    },
+    "ctfExchange": {
+      "address": "0x08642C2B3B8144f281A9e9ddAB8740A57B6b4C4e",
+      "deployTx": "0xa8455665dfe415bcb187b92dee5a6035a5cb9b49a955cc1bef6f368dddb7929d"
+    },
+    "mockUSDC": {
+      "address": "0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a",
+      "symbol": "USDC",
+      "decimals": 6
+    }
+  },
+  "timestamp": "2025-10-23T09:15:53.669Z",
+  "note": "使用 Mock USDC 的 CTF Exchange"
+}
