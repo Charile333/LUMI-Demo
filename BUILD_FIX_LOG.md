@@ -66,6 +66,21 @@ Type error: Module '@fortawesome/free-solid-svg-icons' has no exported member 'f
 
 ---
 
+#### 5. 组件 Props 类型错误
+**错误**:
+```
+Type error: Type '{ marketId: number; }' is not assignable to type 'IntrinsicAttributes'.
+Property 'marketId' does not exist on type 'IntrinsicAttributes'.
+```
+
+**修复**:
+- 在 `components/trading/MyOrders.tsx` 中添加 `MyOrdersProps` 接口
+- 定义 `marketId?: number` 为可选参数
+
+**状态**: ✅ 已解决
+
+---
+
 ## 📋 修改的文件清单
 
 ### 配置文件
@@ -84,6 +99,7 @@ Type error: Module '@fortawesome/free-solid-svg-icons' has no exported member 'f
 ```
 ✅ app/api/admin/markets/batch-create/route.ts  - 添加类型注解
 ✅ app/economy-social/page.tsx                   - 移除错误的图标导入
+✅ components/trading/MyOrders.tsx               - 添加 Props 接口定义
 ```
 
 ### 删除的文件
@@ -222,9 +238,10 @@ Build completed successfully!
 
 1. **第一轮**: 模块解析错误 → ✅ 已修复
 2. **第二轮**: PostCSS 配置错误 → ✅ 已修复
-3. **第三轮**: TypeScript 类型错误 → ✅ 已修复
+3. **第三轮**: TypeScript 类型错误 (Admin API) → ✅ 已修复
 4. **第四轮**: FontAwesome 图标错误 → ✅ 已修复
-5. **最终**: 等待 Vercel 部署成功 → ⏳ 进行中
+5. **第五轮**: 组件 Props 类型错误 → ✅ 已修复
+6. **最终**: 等待 Vercel 部署成功 → ⏳ 进行中
 
 ---
 

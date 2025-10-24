@@ -5,7 +5,11 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
-export default function MyOrders() {
+interface MyOrdersProps {
+  marketId?: number;
+}
+
+export default function MyOrders({ marketId }: MyOrdersProps) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState<string | null>(null);
