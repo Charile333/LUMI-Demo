@@ -1,0 +1,76 @@
+/* 动态背景样式 - 直接内联 */
+html, body, .wrap {
+  height: 100%;
+}
+
+body.landing-page {
+  background: black !important;
+  background-image: radial-gradient(circle at center, #0a0a0a 0%, #050505 20%, black 60%) !important;
+}
+
+.wrap {
+  transform-style: preserve-3d;
+  perspective: 800px;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 只在landing页面显示 */
+body:not(:has([data-page="landing"])) .wrap {
+  display: none !important;
+}
+
+.tri {
+  height: 0;
+  width: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+  border-top: 20px solid #222222;
+  border-right: 20px solid transparent;
+  border-left: 20px solid transparent;
+  margin-left: -10px;
+  margin-top: -10px;
+}
+
+/* 简单的三角形动画 - 每个三角形都会动 */
+.tri {
+  animation: triangleFloat 10s infinite linear;
+  opacity: 0;
+}
+
+@keyframes triangleFloat {
+  0% {
+    opacity: 0.1;
+    transform: rotate(0deg) translate3d(0, 0, 1000px) scale(1);
+  }
+  50% {
+    opacity: 0.08;
+    transform: rotate(180deg) translate3d(300px, 300px, 0px) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(360deg) translate3d(0, 0, -1500px) scale(0);
+  }
+}
+
+/* 让每个三角形有不同的延迟 */
+.tri:nth-child(1) { animation-delay: 0s; }
+.tri:nth-child(2) { animation-delay: -0.1s; }
+.tri:nth-child(3) { animation-delay: -0.2s; }
+.tri:nth-child(4) { animation-delay: -0.3s; }
+.tri:nth-child(5) { animation-delay: -0.4s; }
+.tri:nth-child(10n+1) { animation-delay: -1s; border-top-color: #222222; }
+.tri:nth-child(10n+2) { animation-delay: -1.2s; border-top-color: #222222; }
+.tri:nth-child(10n+3) { animation-delay: -1.4s; border-top-color: #333333; }
+.tri:nth-child(10n+4) { animation-delay: -1.6s; border-top-color: #222222; }
+.tri:nth-child(10n+5) { animation-delay: -1.8s; border-top-color: #111111; }
+

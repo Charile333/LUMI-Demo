@@ -109,7 +109,7 @@ const HomePage = () => {
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-10">
               <h2 className="text-3xl font-bold text-accent">Featured Markets</h2>
-              <Link href="/market" className="text-secondary hover:text-accent transition-colors duration-200 flex items-center">
+              <Link href="/LUMI" className="text-secondary hover:text-accent transition-colors duration-200 flex items-center">
                 View All Markets
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -176,7 +176,7 @@ const HomePage = () => {
             <p className="text-xl mb-8 text-primary/80 max-w-2xl mx-auto">
               Join thousands of traders predicting the outcomes of global events and potentially earn profits based on your insights.
             </p>
-            <Link href="/market" className="btn bg-primary text-secondary hover:bg-primary-800 transition-colors duration-200 text-lg py-3 px-8 rounded-md font-bold inline-block">
+            <Link href="/LUMI" className="btn bg-primary text-secondary hover:bg-primary-800 transition-colors duration-200 text-lg py-3 px-8 rounded-md font-bold inline-block">
               Get Started Now
             </Link>
           </div>

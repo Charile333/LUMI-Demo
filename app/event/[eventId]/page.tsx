@@ -338,16 +338,16 @@ const EventDetailPage = ({ params }: { params: { eventId: string } }) => {
       {/* 使用统一的导航栏，传递当前分类 */}
       <Navbar activeCategory={currentCategory} />
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
+      {/* Main Content - 增加顶部间距以避免与导航栏重叠 */}
+      <main className="container mx-auto px-4 pt-36 pb-6">
         {/* Breadcrumb */}
         <div className="mb-4 flex items-center text-sm text-gray-600">
-          <button 
-            onClick={() => router.back()}
+          <Link 
+            href={`/LUMI?category=${currentCategory}`}
             className="hover:text-purple-600 transition-colors"
           >
             {isAutomotiveMarket ? '返回' : 'Back'}
-          </button>
+          </Link>
           <span className="mx-2">/</span>
           {isAutomotiveMarket && marketData.category && (
             <>
@@ -406,7 +406,7 @@ const EventDetailPage = ({ params }: { params: { eventId: string } }) => {
               <div className="flex items-center px-4 py-2 bg-red-500/20 rounded-lg border border-red-500/40">
                 <div className="w-3 h-3 rounded-full mr-2 bg-red-500"></div>
                 <span className="text-sm font-medium">NO</span>
-                <span className="ml-2 text-red-400 font-bold">{(100 - marketData.probability).toFixed(1)}%</span>
+                <span className="ml-2 text-red-400 font-bold">{(100 - (marketData.probability || 0)).toFixed(1)}%</span>
               </div>
               {marketData.trend && (
                 <div className={`flex items-center px-3 py-1.5 bg-white rounded-lg border border-gray-300 text-sm ${
@@ -620,7 +620,7 @@ const EventDetailPage = ({ params }: { params: { eventId: string } }) => {
                           </div>
                           
                           {/* Replies */}
-                          {comment.replies && comment.replies.map((reply) => (
+                          {comment.replies && comment.replies.map((reply: any) => (
                             <div key={reply.id} className="mt-3 ml-6 pl-3 border-l-2 border-gray-200">
                               <div className="flex items-start">
                                 <div className="w-6 h-6 rounded-full overflow-hidden mr-2">
@@ -702,10 +702,10 @@ const EventDetailPage = ({ params }: { params: { eventId: string } }) => {
                 
                 <div className="grid grid-cols-2 gap-4 mb-5">
                   <button className="py-3 bg-green-500/20 text-green-400 rounded-lg font-medium border border-green-500/30">
-                    Yes ({isAutomotiveMarket ? marketData.probability : leadingCandidate?.probability}¢)
+                    Yes ({isAutomotiveMarket ? (marketData.probability || 0) : leadingCandidate?.probability}¢)
                   </button>
                   <button className="py-3 bg-gray-100 rounded-lg font-medium border border-gray-300 hover:border-gray-500 transition-colors">
-                    No ({isAutomotiveMarket ? (100 - marketData.probability).toFixed(1) : (100 - (leadingCandidate?.probability || 0)).toFixed(1)}¢)
+                    No ({isAutomotiveMarket ? (100 - (marketData.probability || 0)).toFixed(1) : (100 - (leadingCandidate?.probability || 0)).toFixed(1)}¢)
                   </button>
                 </div>
                 

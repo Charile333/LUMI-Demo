@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
 
 interface QuickTradeModalProps {
   isOpen: boolean;
@@ -71,51 +72,27 @@ export default function QuickTradeModal({
       const signer = provider.getSigner();
       const userAddress = await signer.getAddress();
 
-      // 3. 创建订单数据（符合 Order 接口）
+      // 3. 创建订单数据（使用标准Order接口）
       const outcome = side === 'YES' ? 1 : 0;
-      const orderData = {
-        orderId: `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      const orderData: Order = {
+        orderId: generateOrderId(),
         marketId: market.id,
-        questionId: market.questionId,
         maker: userAddress,
-        side: 'buy' as const, // 小写
+        side: 'buy' as const,
         outcome: outcome,
-        price: currentPrice.toString(), // 字符串
-        amount: amount, // 字符串
-        remainingAmount: amount, // 字符串
-        salt: Math.floor(Math.random() * 1000000).toString(), // 字符串
+        price: currentPrice.toString(),
+        amount: amount,
+        salt: generateSalt(),
         nonce: Date.now(),
-        expiration: Math.floor(Date.now() / 1000) + 86400 // 不是 expiry
+        expiration: Math.floor(Date.now() / 1000) + 86400 // 24小时有效期
       };
 
-      // 4. 生成 EIP-712 签名（必须与后端 ORDER_DOMAIN 和 ORDER_TYPES 完全一致）
-      const domain = {
-        name: 'Market CLOB',
-        version: '1',
-        chainId: 80002, // Amoy 测试网
-        verifyingContract: '0x0000000000000000000000000000000000000000'
-      };
-
-      const types = {
-        Order: [
-          { name: 'orderId', type: 'string' },
-          { name: 'marketId', type: 'uint256' },
-          { name: 'questionId', type: 'string' },
-          { name: 'maker', type: 'address' },
-          { name: 'side', type: 'string' },
-          { name: 'outcome', type: 'uint256' },  // 注意：uint256，不是 uint8
-          { name: 'price', type: 'string' },
-          { name: 'amount', type: 'string' },
-          { name: 'salt', type: 'string' },
-          { name: 'nonce', type: 'uint256' },
-          { name: 'expiration', type: 'uint256' }
-        ]
-      };
-
-      const signature = await signer._signTypedData(domain, types, orderData);
+      // 4. 使用标准签名函数签名
+      const signature = await signOrder(orderData, signer);
       
       const order = {
         ...orderData,
+        questionId: market.questionId, // 添加questionId用于API
         signature
       };
 

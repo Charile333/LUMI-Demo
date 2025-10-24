@@ -27,17 +27,17 @@ export async function GET(request: NextRequest) {
     if (orderBook.bids.length > 0 && orderBook.asks.length > 0) {
       const bestBid = parseFloat(orderBook.bids[0].price);
       const bestAsk = parseFloat(orderBook.asks[0].price);
-      spread = (bestAsk - bestBid).toFixed(4);
+      spread = parseFloat((bestAsk - bestBid).toFixed(4));
     }
     
     return NextResponse.json({
       success: true,
-      marketId: parseInt(marketId),
-      outcome: parseInt(outcome),
-      bids: orderBook.bids,
-      asks: orderBook.asks,
-      spread,
-      timestamp: Date.now()
+      orderBook: {
+        bids: orderBook.bids,
+        asks: orderBook.asks,
+        spread,
+        updatedAt: Date.now()
+      }
     });
     
   } catch (error: any) {

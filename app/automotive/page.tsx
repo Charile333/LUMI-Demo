@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import QuickTradeModal from '@/components/trading/QuickTradeModal';
 import { useMarketsByCategory } from '@/lib/hooks/useMarketsByCategory';
 import { useMarketListWebSocket } from '@/hooks/useWebSocket';
-import QuickTradeModal from '@/components/trading/QuickTradeModal';
 import { 
   faCar, 
   faBolt, 
@@ -24,13 +24,7 @@ import {
 const AutomotivePage = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  // 📊 使用 hook 加载市场数据（自动按分类过滤）
-  const { markets: automotiveMarkets, loading, error } = useMarketsByCategory('automotive');
-  
-  // 🔥 使用 WebSocket 获取实时价格
-  const marketIds = automotiveMarkets.map(m => m.id);
-  const { pricesMap, connected: wsConnected } = useMarketListWebSocket(marketIds);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // 🎯 快速交易弹窗状态
   const [quickTradeModal, setQuickTradeModal] = useState<{
@@ -42,6 +36,13 @@ const AutomotivePage = () => {
     market: null,
     side: null
   });
+  
+  // 📊 使用 hook 从 Supabase 加载市场数据（自动按分类过滤）
+  const { markets: automotiveMarkets, loading, error } = useMarketsByCategory('automotive');
+
+  // 🔥 使用 WebSocket 获取实时价格
+  const marketIds = automotiveMarkets.map(m => m.id);
+  const { pricesMap, connected: wsConnected } = useMarketListWebSocket(marketIds);
 
   const categories = [
     { id: 'all', name: '全部分类' },
@@ -75,12 +76,12 @@ const AutomotivePage = () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDays <= daysLimit && diffDays >= 0;
       } catch {
-        return true; // 如果日期解析失败，保留该市场
+        return true;
       }
     });
   };
 
-  // 先按分类筛选，再按时间筛选
+  // 先按分类筛选
   let filteredMarkets = selectedCategory === 'all' 
     ? automotiveMarkets 
     : automotiveMarkets.filter(market => 
@@ -92,9 +93,16 @@ const AutomotivePage = () => {
         (selectedCategory === 'tech-innovation' && market.category === '技术创新')
       );
   
-  // 应用时间筛选
-  filteredMarkets = filterByTimeRange(filteredMarkets);
+  // 再按搜索筛选
+  if (searchQuery) {
+    filteredMarkets = filteredMarkets.filter(market =>
+      market.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
   
+  // 最后应用时间筛选
+  filteredMarkets = filterByTimeRange(filteredMarkets);
+
   // 🔥 合并 WebSocket 实时价格到市场数据
   const marketsWithRealtimePrices = filteredMarkets.map(market => {
     const wsPrice = pricesMap.get(market.id);
@@ -110,10 +118,42 @@ const AutomotivePage = () => {
     return market;
   });
 
+  // 加载状态
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faCar} className="text-6xl text-purple-600 mb-4 animate-pulse" />
+          <p className="text-xl text-gray-600">加载中...</p>
+          <p className="text-sm text-gray-500 mt-2">正在获取最新的汽车市场数据</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faCar} className="text-6xl text-red-400 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">加载失败</h3>
+          <p className="text-gray-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            重新加载
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-6 mt-0">
+      <div className="container mx-auto px-4 pb-6">
         {/* Filters */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           {/* Search Box */}
@@ -121,6 +161,8 @@ const AutomotivePage = () => {
             <input
               type="text"
               placeholder="搜索市场..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
             />
             <svg
@@ -169,14 +211,12 @@ const AutomotivePage = () => {
         </div>
 
         {/* Markets Grid */}
-        {/* WebSocket 连接状态 */}
         {wsConnected && (
           <div className="mb-4 flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg w-fit">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-green-700">实时价格已连接</span>
           </div>
         )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {marketsWithRealtimePrices.map((market) => (
             <div
@@ -277,8 +317,8 @@ const AutomotivePage = () => {
         {filteredMarkets.length === 0 && (
           <div className="text-center py-12">
             <FontAwesomeIcon icon={faCar} className="text-6xl text-gray-600 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-500 mb-2">No markets found</h3>
-            <p className="text-gray-500">Try adjusting your filters to see more results.</p>
+            <h3 className="text-xl font-semibold text-gray-500 mb-2">暂无市场</h3>
+            <p className="text-gray-500">请尝试调整筛选条件查看更多结果</p>
           </div>
         )}
       </div>

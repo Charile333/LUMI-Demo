@@ -289,12 +289,14 @@ export class MatchingEngine {
    * 获取订单簿
    */
   async getOrderBook(marketId: number, outcome: number): Promise<{
-    bids: Array<{ price: string; amount: string }>;
-    asks: Array<{ price: string; amount: string }>;
+    bids: Array<{ price: string; total_amount: string; order_count: number }>;
+    asks: Array<{ price: string; total_amount: string; order_count: number }>;
   }> {
     // 买单（bids）
     const bidsResult = await db.query(
-      `SELECT price, SUM(remaining_amount) as total_amount
+      `SELECT price, 
+              SUM(remaining_amount) as total_amount,
+              COUNT(*) as order_count
        FROM orders
        WHERE market_id = $1
          AND outcome = $2
@@ -310,7 +312,9 @@ export class MatchingEngine {
     
     // 卖单（asks）
     const asksResult = await db.query(
-      `SELECT price, SUM(remaining_amount) as total_amount
+      `SELECT price, 
+              SUM(remaining_amount) as total_amount,
+              COUNT(*) as order_count
        FROM orders
        WHERE market_id = $1
          AND outcome = $2
@@ -327,11 +331,13 @@ export class MatchingEngine {
     return {
       bids: bidsResult.rows.map(r => ({
         price: r.price,
-        amount: r.total_amount
+        total_amount: r.total_amount,
+        order_count: parseInt(r.order_count)
       })),
       asks: asksResult.rows.map(r => ({
         price: r.price,
-        amount: r.total_amount
+        total_amount: r.total_amount,
+        order_count: parseInt(r.order_count)
       }))
     };
   }

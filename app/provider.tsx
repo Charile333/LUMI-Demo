@@ -59,7 +59,7 @@ export default function WalletProvider({ children }: WalletProviderProps) {
             
             // 初始化ClobClient
             try {
-              // 创建ethers提供者和签名器
+              // 创建ethers提供者和签名器 (ethers v5)
               const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
               const signer = ethProvider.getSigner();
 
@@ -94,7 +94,7 @@ export default function WalletProvider({ children }: WalletProviderProps) {
           
           // 重新初始化ClobClient
           try {
-            // 创建ethers提供者和签名器
+            // 创建ethers提供者和签名器 (ethers v5)
             const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = ethProvider.getSigner();
               
@@ -141,7 +141,7 @@ export default function WalletProvider({ children }: WalletProviderProps) {
         
         // 初始化ClobClient
           try {
-            // 创建ethers提供者和签名器
+            // 创建ethers提供者和签名器 (ethers v5)
             const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = ethProvider.getSigner();
             
