@@ -81,7 +81,7 @@ export default function LumiSoonPage() {
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
                 <div className="text-white font-medium mt-8 mb-1">2026-Q3</div>
-                <div className="text-gray-400 text-sm text-center max-w-[120px]">Soon</div>
+                <div className="text-gray-400 text-sm text-center max-w-[180px]">Financial Quantitative</div>
               </div>
             </div>
           </div>
