@@ -21,12 +21,12 @@ export default function LumiSoonPage() {
       <Script src="/cascading-waves.js" strategy="afterInteractive" />
       <div className="font-sans relative min-h-screen bg-black" data-page="landing">
       {/* 左上角Logo */}
-      <div className="absolute top-4 left-4 z-30">
+      <div className="fixed top-4 left-4 z-30">
         <Image 
           src="/image/lumi1 (1).png" 
           alt="LUMI Logo" 
-          width={128} 
-          height={128}
+          width={248} 
+          height={248}
         />
       </div>
 
