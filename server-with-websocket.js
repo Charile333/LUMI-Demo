@@ -4,6 +4,9 @@ const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
 const { Server } = require('socket.io');
+const WebSocket = require('ws');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
@@ -34,9 +37,9 @@ app.prepare().then(() => {
     }
   });
 
-  // WebSocket 连接处理
+  // WebSocket 连接处理 (Socket.IO for markets)
   io.on('connection', (socket) => {
-    console.log('✅ WebSocket 客户端连接:', socket.id);
+    console.log('✅ Socket.IO 客户端连接:', socket.id);
 
     // 订阅特定市场
     socket.on('subscribe:market', (marketId) => {
@@ -54,12 +57,150 @@ app.prepare().then(() => {
 
     // 断开连接
     socket.on('disconnect', () => {
-      console.log('❌ WebSocket 客户端断开:', socket.id);
+      console.log('❌ Socket.IO 客户端断开:', socket.id);
     });
   });
 
   // 将 io 实例存储到全局，供 API 路由使用
   global.io = io;
+
+  // 创建原生 WebSocket 服务器用于 /ws/alerts
+  const wss = new WebSocket.Server({ noServer: true });
+  const alertClients = new Set();
+
+  // 处理 WebSocket 升级请求
+  server.on('upgrade', (request, socket, head) => {
+    const pathname = parse(request.url).pathname;
+
+    if (pathname === '/ws/alerts') {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
+    } else {
+      socket.destroy();
+    }
+  });
+
+  // WebSocket 连接处理 (Native WebSocket for alerts)
+  wss.on('connection', (ws) => {
+    console.log('🦢 Alert WebSocket 客户端连接');
+    alertClients.add(ws);
+
+    // 发送欢迎消息
+    ws.send(JSON.stringify({
+      type: 'welcome',
+      message: 'Connected to Black Swan alert system'
+    }));
+
+    // 处理客户端消息
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message);
+        console.log('收到客户端消息:', data);
+      } catch (e) {
+        console.error('解析消息出错:', e);
+      }
+    });
+
+    // 处理断开连接
+    ws.on('close', () => {
+      console.log('🦢 Alert WebSocket 客户端断开');
+      alertClients.delete(ws);
+    });
+
+    // 处理错误
+    ws.on('error', (error) => {
+      console.error('WebSocket 错误:', error);
+      alertClients.delete(ws);
+    });
+  });
+
+  // 广播警报到所有连接的客户端
+  function broadcastAlert(alert) {
+    const alertData = JSON.stringify({
+      type: 'alert',
+      data: alert
+    });
+
+    alertClients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(alertData);
+      }
+    });
+
+    console.log(`🦢 广播警报到 ${alertClients.size} 个客户端`);
+  }
+
+  // 设置数据库监视器（如果数据库存在）
+  function setupDatabaseWatcher() {
+    const dbFile = path.join(__dirname, '..', 'duolume-master', 'utils', 'database', 'app.db');
+    let lastAlertId = null;
+
+    // 检查数据库是否存在
+    const fs = require('fs');
+    if (!fs.existsSync(dbFile)) {
+      console.log('⚠️  警报数据库未找到，跳过数据库监视器');
+      return;
+    }
+
+    // 获取最新的警报ID
+    const getLastAlertId = () => {
+      const db = new sqlite3.Database(dbFile);
+      db.get('SELECT id FROM alerts ORDER BY id DESC LIMIT 1', (err, row) => {
+        if (!err && row) {
+          lastAlertId = row.id;
+          console.log(`🦢 初始化警报监视器。最新警报ID: ${lastAlertId}`);
+        }
+        db.close();
+      });
+    };
+
+    // 定期检查新警报
+    const checkForNewAlerts = () => {
+      const db = new sqlite3.Database(dbFile);
+
+      if (lastAlertId !== null) {
+        db.all('SELECT * FROM alerts WHERE id > ? ORDER BY id ASC', [lastAlertId], (err, rows) => {
+          if (!err && rows && rows.length > 0) {
+            rows.forEach(row => {
+              if (row.id > lastAlertId) {
+                lastAlertId = row.id;
+              }
+
+              let details = null;
+              if (row.details) {
+                try {
+                  details = JSON.parse(row.details);
+                } catch (parseErr) {
+                  console.error('解析详情字段出错:', parseErr.message);
+                }
+              }
+
+              const alert = {
+                symbol: row.symbol,
+                type: row.type,
+                message: row.message,
+                timestamp: row.timestamp,
+                details: details
+              };
+
+              broadcastAlert(alert);
+            });
+          }
+          db.close();
+        });
+      } else {
+        getLastAlertId();
+        db.close();
+      }
+    };
+
+    getLastAlertId();
+    setInterval(checkForNewAlerts, 2000);
+  }
+
+  // 启动数据库监视器
+  setupDatabaseWatcher();
 
   // 启动服务器
   server.listen(port, (err) => {
@@ -67,7 +208,8 @@ app.prepare().then(() => {
     console.log('\n' + '='.repeat(60));
     console.log(`🚀 服务器已启动`);
     console.log(`📍 地址: http://${hostname}:${port}`);
-    console.log(`🔌 WebSocket: ws://${hostname}:${port}`);
+    console.log(`🔌 Socket.IO: ws://${hostname}:${port}`);
+    console.log(`🦢 Alert WebSocket: ws://${hostname}:${port}/ws/alerts`);
     console.log(`🌍 环境: ${dev ? 'development' : 'production'}`);
     console.log('='.repeat(60) + '\n');
   });

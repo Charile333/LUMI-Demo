@@ -1,103 +1,113 @@
 /**
- * 自动创建 Supabase 数据库表
+ * 设置LUMI独立数据库
+ * 创建数据库并初始化表结构
  */
 
-require('dotenv').config({ path: '.env.local' });
-const { createClient } = require('@supabase/supabase-js');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// LUMI数据库路径
+const dbDir = path.join(__dirname, '..', 'database');
+const dbPath = path.join(dbDir, 'alerts.db');
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ 请先配置 .env.local 文件');
-  process.exit(1);
+console.log('\n╔════════════════════════════════════════════════════════════╗');
+console.log('║     LUMI Database Setup                                    ║');
+console.log('║     设置LUMI独立数据库                                      ║');
+console.log('╚════════════════════════════════════════════════════════════╝\n');
+
+// 创建database目录
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log('✅ Created database directory:', dbDir);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('📍 Database location:', dbPath);
+console.log('');
 
-async function setupDatabase() {
-  console.log('🔧 开始设置 Supabase 数据库...\n');
-
-  try {
-    // 创建表的 SQL
-    const createTableSQL = `
-      -- 创建预测市场数据表
-      CREATE TABLE IF NOT EXISTS markets (
-        id BIGSERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        category TEXT,
-        categoryType TEXT NOT NULL,
-        probability DECIMAL(5,2) DEFAULT 50.0,
-        volume TEXT DEFAULT '$0',
-        volumeNum DECIMAL DEFAULT 0,
-        participants INTEGER DEFAULT 0,
-        endDate TEXT NOT NULL,
-        trend TEXT DEFAULT 'up',
-        change TEXT DEFAULT '+0%',
-        description TEXT NOT NULL,
-        resolutionCriteria TEXT[] DEFAULT '{}',
-        relatedMarkets TEXT[] DEFAULT '{}',
-        isActive BOOLEAN DEFAULT true,
-        source TEXT DEFAULT 'custom',
-        priorityLevel TEXT DEFAULT 'normal',
-        customWeight INTEGER DEFAULT 50,
-        isHomepage BOOLEAN DEFAULT false,
-        isHot BOOLEAN DEFAULT false,
-        isTrending BOOLEAN DEFAULT false,
-        createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        updatedAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
-
-      -- 创建索引
-      CREATE INDEX IF NOT EXISTS idx_markets_categoryType ON markets(categoryType);
-      CREATE INDEX IF NOT EXISTS idx_markets_isActive ON markets(isActive);
-      CREATE INDEX IF NOT EXISTS idx_markets_createdAt ON markets(createdAt DESC);
-      CREATE INDEX IF NOT EXISTS idx_markets_source ON markets(source);
-      CREATE INDEX IF NOT EXISTS idx_markets_priorityLevel ON markets(priorityLevel);
-    `;
-
-    console.log('📊 创建 markets 表...');
-    
-    const { error } = await supabase.rpc('exec_sql', { sql: createTableSQL });
-
-    if (error) {
-      // 如果 rpc 方法不存在，提示用户手动创建
-      console.log('⚠️  无法通过 API 自动创建表\n');
-      console.log('请手动在 Supabase 中创建表：\n');
-      console.log('1. 打开 Supabase 项目：https://supabase.com/dashboard');
-      console.log('2. 点击左侧 "SQL Editor"');
-      console.log('3. 点击 "New Query"');
-      console.log('4. 复制以下 SQL 并执行：\n');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log(createTableSQL);
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-      console.log('5. 点击 "Run" 执行');
-      console.log('6. 看到 "Success" 后，重新运行：node scripts/import-sports-data.js\n');
-      
-      // 或者直接使用文件
-      console.log('💡 提示：SQL 语句已保存在 scripts/create-table.sql 文件中');
-      
+// 创建或打开数据库
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('❌ Error creating database:', err.message);
+    return;
+  }
+  
+  console.log('✅ Database connection established');
+  console.log('');
+  
+  // 创建alerts表
+  const createTableSQL = `
+    CREATE TABLE IF NOT EXISTS alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      message TEXT NOT NULL,
+      severity TEXT NOT NULL,
+      details TEXT,
+      type TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+  
+  db.run(createTableSQL, (err) => {
+    if (err) {
+      console.error('❌ Error creating table:', err.message);
+      db.close();
       return;
     }
-
-    console.log('✅ 数据库表创建成功！\n');
-    console.log('📍 下一步：运行导入脚本');
-    console.log('   node scripts/import-sports-data.js\n');
-
-  } catch (error) {
-    console.error('❌ 错误:', error.message);
-    console.log('\n请手动在 Supabase SQL Editor 中执行 scripts/create-table.sql\n');
-  }
-}
-
-setupDatabase();
-
-
-
-
-
-
-
-
-
-
+    
+    console.log('✅ Table "alerts" created/verified');
+    
+    // 创建索引以提高查询性能
+    const createIndexes = [
+      'CREATE INDEX IF NOT EXISTS idx_timestamp ON alerts(timestamp)',
+      'CREATE INDEX IF NOT EXISTS idx_severity ON alerts(severity)',
+      'CREATE INDEX IF NOT EXISTS idx_symbol ON alerts(symbol)',
+      'CREATE INDEX IF NOT EXISTS idx_type ON alerts(type)'
+    ];
+    
+    let indexCount = 0;
+    createIndexes.forEach((indexSQL, i) => {
+      db.run(indexSQL, (err) => {
+        if (err) {
+          console.error(`❌ Error creating index ${i + 1}:`, err.message);
+        } else {
+          indexCount++;
+          if (indexCount === createIndexes.length) {
+            console.log(`✅ Created ${indexCount} indexes for better performance`);
+            
+            // 检查表结构
+            db.all("PRAGMA table_info(alerts)", (err, columns) => {
+              if (!err) {
+                console.log('\n📊 Table structure:');
+                columns.forEach(col => {
+                  console.log(`   • ${col.name.padEnd(12)} : ${col.type}`);
+                });
+              }
+              
+              // 检查数据
+              db.get("SELECT COUNT(*) as count FROM alerts", (err, row) => {
+                if (!err) {
+                  console.log(`\n📈 Current records: ${row.count}`);
+                }
+                
+                console.log('\n════════════════════════════════════════════════════════════');
+                console.log('✅ Database setup complete!');
+                console.log('════════════════════════════════════════════════════════════');
+                console.log('\n💡 Next steps:');
+                console.log('   1. Import historical crashes:');
+                console.log('      node scripts/import-historical-crashes.js');
+                console.log('   2. Start LUMI server:');
+                console.log('      npm run dev');
+                console.log('   3. Start alert monitoring (optional):');
+                console.log('      cd ../duolume-master && python main.py\n');
+                
+                db.close();
+              });
+            });
+          }
+        }
+      });
+    });
+  });
+});

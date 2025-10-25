@@ -2,177 +2,175 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
 
-/* 全局样式 */
-html {
-  scroll-behavior: smooth;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
 }
 
 body {
-  background-color: #ffffff;
-  color: #1f2937;
-  font-family: 'Inter', system-ui, sans-serif;
-  padding-top: 9rem; /* 增加到2rem的顶部间距，使页面进一步下移 */
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
-/* 链接样式 */
-a {
-  color: var(--color-secondary);
-  transition: color 0.2s ease-in-out;
-}
-
-a:hover {
-  color: var(--color-accent);
-}
-
-/* 按钮样式 */
-.btn {
-  background-color: var(--color-secondary);
-  color: var(--color-primary);
-  font-weight: bold;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.btn:hover {
-  background-color: var(--color-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(254, 215, 0, 0.3);
-}
-
-/* 导航栏样式 */
-.navbar {
-  background-color: #ffffff;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* 滚动条隐藏样式 */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* 搜索框样式优化 */
-input[type="text"] {
-  background-color: #f8f9fa;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #1f2937;
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s ease-in-out;
-}
-
-input[type="text"]:focus {
-  outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-}
-
-input[type="text"]::placeholder {
-  color: rgba(31, 41, 55, 0.5);
-}
-
-/* 卡片样式 */
-.card {
-  background-color: #ffffff;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
-}
-
-/* 输入框通用样式 */
-textarea,
-select {
-  background-color: var(--color-primary-800);
-  border: 1px solid var(--color-secondary);
-  color: var(--color-accent);
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-}
-
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(254, 215, 0, 0.2);
-}
-
-/* 自定义工具类 */
 @layer utilities {
-  .content-auto {
-    content-visibility: auto;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .bg-gradient-gold {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
-  }
-  .bg-gradient-purple {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
-/* 动画效果 */
-@keyframes blob {
+/* ════════════════════════════════════════════════════ */
+/* Terminal Scrollbar Styles - 终端风格滚动条           */
+/* ════════════════════════════════════════════════════ */
+
+/* 全局滚动条样式 (WebKit: Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+  border: 1px solid #1a4d2e;
+  border-radius: 0; /* 方形，更符合终端风格 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0f5132 0%, #16a34a 100%);
+  border: 1px solid #00ff00;
+  border-radius: 0;
+  box-shadow: inset 0 0 6px rgba(0, 255, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #16a34a 0%, #22c55e 100%);
+  border-color: #22c55e;
+  box-shadow: inset 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #22c55e;
+  border-color: #4ade80;
+}
+
+::-webkit-scrollbar-corner {
+  background: #000000;
+  border: 1px solid #1a4d2e;
+}
+
+/* Firefox 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #0f5132 #000000;
+}
+
+/* 细滚动条变体 */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thumb-green-900 {
+  scrollbar-color: #14532d transparent;
+}
+
+.scrollbar-track-black {
+  scrollbar-color: #14532d #000000;
+}
+
+/* Terminal Text Effects */
+.terminal-glow {
+  text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+}
+
+/* Blinking Cursor Effect */
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink::after {
+  content: '▋';
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+/* Terminal Typing Effect */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.typing-effect {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(40, end);
+}
+
+/* CRT Monitor Effect (Optional) */
+.crt-effect {
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
   0% {
-    transform: translate(0px, 0px) scale(1);
+    opacity: 0.97;
   }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
+  5% {
+    opacity: 1;
   }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
+  10% {
+    opacity: 0.97;
   }
   100% {
-    transform: translate(0px, 0px) scale(1);
+    opacity: 1;
   }
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
+/* Terminal Scanlines Effect */
+.scanlines {
+  position: relative;
+  overflow: hidden;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* 渐变文字效果 */
-.bg-clip-text {
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  body {
-    padding-top: 80px;
-  }
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
 }

@@ -192,9 +192,26 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
                 <span className="text-sm font-bold text-[#d4a017] group-hover:text-[#ffcc00] transition-colors">
                   彩票博彩平台
                 </span>
-                <span className="text-xs text-gray-500">2026 Q1 推出</span>
+                <span className="text-xs text-gray-500">2026-Q1 推出</span>
               </div>
               <span className="text-xs px-2 py-1 bg-[#ffcc00] text-black rounded-full font-semibold whitespace-nowrap">
+                SOON
+              </span>
+            </Link>
+
+            {/* 市场趋势预测 */}
+            <Link 
+              href="/market-trends" 
+              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/30 rounded-lg hover:border-emerald-400/60 hover:shadow-lg hover:shadow-emerald-400/20 transition-all group min-w-[240px]"
+            >
+              <div className="text-2xl">📊</div>
+              <div className="flex flex-col flex-1">
+                <span className="text-sm font-bold text-emerald-600 group-hover:text-emerald-500 transition-colors">
+                  市场趋势预测
+                </span>
+                <span className="text-xs text-gray-500">2026-Q2 推出</span>
+              </div>
+              <span className="text-xs px-2 py-1 bg-emerald-500 text-white rounded-full font-semibold whitespace-nowrap">
                 SOON
               </span>
             </Link>
@@ -209,8 +226,11 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
                 <span className="text-sm font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
                   AI量化交易
                 </span>
-                <span className="text-xs text-gray-500">2026 Q3 推出</span>
+                <span className="text-xs text-gray-500">2026-Q3 推出</span>
               </div>
+              <span className="text-xs px-2 py-1 bg-blue-500 text-white rounded-full font-semibold whitespace-nowrap">
+                SOON
+              </span>
             </Link>
           </div>
         </div>

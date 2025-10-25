@@ -1,11 +1,161 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Script from 'next/script'
 
+// 实时警报数据类型
+interface RealtimeAlert {
+  id: string;
+  timestamp: string;
+  asset: string;
+  severity: 'critical' | 'high' | 'medium';
+  message: string;
+  change: number;
+}
+
 export default function LumiSoonPage() {
+  const [realtimeData, setRealtimeData] = useState<RealtimeAlert[]>([]);
+  const [stats, setStats] = useState({ totalAlerts: 0, monitoredAssets: 0 });
+  const [wsConnected, setWsConnected] = useState(false);
+
+  // 连接 WebSocket
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    let reconnectTimer: NodeJS.Timeout;
+    let isUnmounting = false;
+
+    const connectWebSocket = () => {
+      if (isUnmounting) return;
+      
+      try {
+        ws = new WebSocket('ws://localhost:3000/ws/alerts');
+
+        ws.onopen = () => {
+          console.log('✅ 已连接到预警系统');
+          setWsConnected(true);
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'alert' && data.data) {
+              const alert = data.data;
+              
+              let change = 0;
+              if (alert.details && alert.details.price_change) {
+                change = alert.details.price_change * 100;
+              }
+              
+              let severity: 'critical' | 'high' | 'medium' = 'medium';
+              if (Math.abs(change) > 5) {
+                severity = 'critical';
+              } else if (Math.abs(change) > 2) {
+                severity = 'high';
+              }
+              
+              const newAlert: RealtimeAlert = {
+                id: Date.now().toString(),
+                timestamp: new Date(alert.timestamp).toLocaleTimeString('zh-CN'),
+                asset: alert.symbol.replace('USDT', '/USDT'),
+                severity: severity,
+                message: alert.message,
+                change: change
+              };
+              
+              setRealtimeData(prev => [newAlert, ...prev].slice(0, 10));
+            }
+          } catch (e) {
+            console.error('解析预警数据出错:', e);
+          }
+        };
+
+        ws.onerror = () => {
+          setWsConnected(false);
+        };
+
+        ws.onclose = () => {
+          setWsConnected(false);
+          if (!isUnmounting) {
+            reconnectTimer = setTimeout(connectWebSocket, 5000);
+          }
+        };
+
+      } catch (error) {
+        console.error('连接预警系统失败:', error);
+        if (!isUnmounting) {
+          reconnectTimer = setTimeout(connectWebSocket, 5000);
+        }
+      }
+    };
+
+    // 获取历史数据
+    const fetchHistoricalAlerts = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/alerts');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          const alerts: RealtimeAlert[] = result.data.slice(0, 5).map((item: any, index: number) => {
+            let change = 0;
+            if (item.details && item.details.price_change) {
+              change = item.details.price_change * 100;
+            }
+            
+            let severity: 'critical' | 'high' | 'medium' = 'medium';
+            if (Math.abs(change) > 5) severity = 'critical';
+            else if (Math.abs(change) > 2) severity = 'high';
+            
+            return {
+              id: `${item.timestamp}-${item.symbol}-${index}`,
+              timestamp: new Date(item.timestamp).toLocaleTimeString('zh-CN'),
+              asset: item.symbol.replace('USDT', '/USDT'),
+              severity: severity,
+              message: item.message,
+              change: change
+            };
+          });
+          
+          setRealtimeData(alerts);
+        }
+      } catch (error) {
+        console.error('获取历史预警失败:', error);
+      }
+    };
+
+    // 获取统计数据
+    const loadStats = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/alerts/stats');
+        const result = await response.json();
+        if (result.success && result.data) {
+          setStats({
+            totalAlerts: result.data.total_alerts || 0,
+            monitoredAssets: result.data.monitored_assets || 0
+          });
+        }
+      } catch (error) {
+        console.error('加载统计数据失败:', error);
+      }
+    };
+
+    fetchHistoricalAlerts();
+    loadStats();
+    connectWebSocket();
+
+    return () => {
+      isUnmounting = true;
+      if (ws) {
+        ws.close();
+      }
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     // 页面卸载时清理canvas
     return () => {
@@ -102,7 +252,7 @@ export default function LumiSoonPage() {
                   <div className="text-3xl text-white mb-3">
                     <i className="fa fa-line-chart"></i>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">DuoLume</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">LUMI</h3>
                   <p className="text-gray-300/70 text-sm">
                     Advanced trading platform with real-time analytics
                   </p>
@@ -172,25 +322,144 @@ export default function LumiSoonPage() {
             </div>
               </div>
               
-              {/* 右侧警报信息显示区 - 命令行风格 */}
+              {/* 右侧警报信息显示区 - 黑天鹅终端风格 */}
               <div className="flex-1">
-                <div className="terminal-bg rounded-lg p-5 h-full overflow-y-auto border border-gray-500 w-full">
-                  <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-500">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <h3 className="text-lg font-semibold terminal-gold terminal-font ml-2">
-                      crypto-alert@terminal
-                    </h3>
+                <div className="bg-black rounded-lg overflow-hidden border-2 border-green-500/50 h-full flex flex-col">
+                  {/* 终端顶部栏 */}
+                  <div className="bg-gray-900 border-b border-green-500 px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-400 font-mono text-sm font-bold">
+                        ═══ LIVE ALERT STREAM ═══
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
+                      <span className={`font-mono text-xs ${wsConnected ? 'text-green-400' : 'text-red-400'}`}>
+                        {wsConnected ? 'MONITORING' : 'OFFLINE'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="terminal-font terminal-text">
-                    <div className="space-y-2 mt-2">
-                      <div className="terminal-font terminal-text text-center text-gray-300/60">
-                        Alert system coming soon...
+
+                  {/* 终端内容区 */}
+                  <div className="bg-black p-4 flex-1 flex flex-col">
+                    {/* 实时数据流 - 终端样式 */}
+                    <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs">
+                      {realtimeData.length === 0 ? (
+                        <div className="text-center py-10 text-gray-600">
+                          <div className="text-2xl mb-2">[ STANDBY ]</div>
+                          <p className="text-xs">Waiting for alert stream...</p>
+                          <div className="mt-2 text-green-500 animate-pulse">█</div>
+                        </div>
+                      ) : (
+                        realtimeData.map((alert, index) => (
+                          <div
+                            key={`alert-${alert.id}-${index}`}
+                            className="hover:bg-gray-900/50 px-2 py-1.5 rounded transition-colors border-l-2 border-transparent hover:border-green-500"
+                          >
+                            <div className="flex items-start gap-2">
+                              {/* 时间戳 */}
+                              <span className="text-gray-600 shrink-0 text-[10px]">
+                                [{alert.timestamp}]
+                              </span>
+                              
+                              {/* 严重程度 */}
+                              <span className={`font-bold shrink-0 w-16 text-[10px] ${
+                                alert.severity === 'critical'
+                                  ? 'text-red-500'
+                                  : alert.severity === 'high'
+                                  ? 'text-orange-500'
+                                  : 'text-yellow-500'
+                              }`}>
+                                {alert.severity === 'critical' ? 'CRIT' : 
+                                 alert.severity === 'high' ? 'HIGH' : 'MED'}
+                              </span>
+                              
+                              {/* 资产 */}
+                              <span className="text-cyan-400 shrink-0 w-20 text-[10px]">
+                                {alert.asset}
+                              </span>
+                              
+                              {/* 变化 */}
+                              <span className={`shrink-0 w-14 text-[10px] ${
+                                alert.change < 0 ? 'text-red-400' : 'text-green-400'
+                              }`}>
+                                {alert.change > 0 ? '+' : ''}{alert.change.toFixed(2)}%
+                              </span>
+                              
+                              {/* 消息 */}
+                              <span className="text-gray-400 flex-1 truncate text-[10px]">
+                                {alert.message}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    {/* 终端底部状态 */}
+                    <div className="mt-3 pt-3 border-t border-green-900">
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* 左侧：统计 */}
+                        <div className="border border-green-900 p-2 rounded">
+                          <div className="text-green-400 font-mono text-[10px] mb-1 font-bold">
+                            ╔═ STATS ═╗
+                          </div>
+                          <div className="space-y-0.5 text-[9px] font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Recent:</span>
+                              <span className="text-white">{realtimeData.length}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Critical:</span>
+                              <span className="text-red-500">
+                                {realtimeData.filter(a => a.severity === 'critical').length}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Total:</span>
+                              <span className="text-cyan-400">{stats.totalAlerts}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 右侧：系统状态 */}
+                        <div className="border border-green-900 p-2 rounded">
+                          <div className="text-green-400 font-mono text-[10px] mb-1 font-bold">
+                            ╔═ SYSTEM ═╗
+                          </div>
+                          <div className="space-y-0.5 text-[9px] font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">WS:</span>
+                              <span className={wsConnected ? 'text-green-400' : 'text-red-400'}>
+                                {wsConnected ? '✓ ONLINE' : '✗ OFFLINE'}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Monitor:</span>
+                              <span className="text-green-400">✓ ACTIVE</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Assets:</span>
+                              <span className="text-cyan-400">{stats.monitoredAssets}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 查看完整终端链接 */}
+                      <div className="mt-2 text-center">
+                        <Link 
+                          href="/black-swan"
+                          className="inline-flex items-center gap-1 text-green-400 hover:text-green-300 font-mono text-[10px] transition-colors"
+                        >
+                          <span>→</span>
+                          <span>Open Full Terminal</span>
+                          <span>←</span>
+                        </Link>
                       </div>
                     </div>
                   </div>
-              </div>
+                </div>
               </div>
               </div>
             </div>
@@ -273,30 +542,36 @@ export default function LumiSoonPage() {
           font-family: 'Courier New', Courier, monospace;
         }
 
-        .terminal-bg {
-          background-color: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+        /* 终端风格滚动条 */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
         }
 
-        .terminal-text {
-          color: #ffffff;
+        ::-webkit-scrollbar-track {
+          background: #000000;
+          border: 1px solid #1a4d2e;
         }
 
-        .terminal-green {
-          color: #00ff00;
+        ::-webkit-scrollbar-thumb {
+          background: #0f5132;
+          border: 1px solid #00ff00;
+          border-radius: 0;
         }
 
-        .terminal-yellow {
-          color: #ffff00;
+        ::-webkit-scrollbar-thumb:hover {
+          background: #16a34a;
+          border-color: #22c55e;
         }
 
-        .terminal-red {
-          color: #ff0000;
+        ::-webkit-scrollbar-corner {
+          background: #000000;
         }
 
-        .terminal-gold {
-          color: #ffd700;
+        /* Firefox 滚动条 */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: #0f5132 #000000;
         }
       `}</style>
       </div>
