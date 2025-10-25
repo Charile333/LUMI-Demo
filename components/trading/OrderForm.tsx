@@ -128,22 +128,22 @@ export default function OrderForm({
     <div>
       {/* 钱包状态提示 */}
       {!isConnected ? (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800 text-center">
-            ⚠️ 请先在页面顶部连接钱包
+        <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <p className="text-sm text-purple-800 text-center">
+            请先在页面顶部连接钱包
           </p>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="text-sm text-green-800">
-            ✅ 已连接: {account?.substring(0, 6)}...{account?.substring(38)}
+        <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+          <div className="text-sm text-purple-800">
+            已连接: {account?.substring(0, 6)}...{account?.substring(38)}
           </div>
         </div>
       )}
       
       {/* 市场实时价格 */}
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="text-xs font-semibold text-blue-900 mb-2">📊 实时市场价格</div>
+      <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+        <div className="text-xs font-semibold text-purple-900 mb-2">实时市场价格</div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
             <div className="text-gray-600 text-xs">买价 (Bid)</div>
@@ -218,7 +218,7 @@ export default function OrderForm({
         <label className="block text-sm font-semibold mb-2">
           成交价格（市价）
         </label>
-        <div className="w-full px-4 py-3 bg-gray-50 border-2 border-blue-200 rounded-lg">
+        <div className="w-full px-4 py-3 bg-gray-50 border-2 border-purple-200 rounded-lg">
           <div className="flex justify-between items-center">
             <span className="text-2xl font-bold text-gray-900">
               ${marketPrice.toFixed(2)}
@@ -229,7 +229,7 @@ export default function OrderForm({
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          💡 价格固定为市场价，保证立即成交
+          价格固定为市场价，保证立即成交
         </p>
       </div>
       
@@ -258,13 +258,13 @@ export default function OrderForm({
           min="1"
           step="1"
           disabled={submitting || !isConnected}
-          className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           placeholder="输入数量"
         />
       </div>
       
       {/* 交易摘要 */}
-      <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg space-y-2">
+      <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-200 rounded-lg space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">成交价格:</span>
           <span className="font-bold text-gray-900">${marketPrice.toFixed(2)} / 股</span>
@@ -278,15 +278,15 @@ export default function OrderForm({
           <span className="text-gray-700 font-semibold">
             {side === 'buy' ? '需支付:' : '将收到:'}
           </span>
-          <span className="font-bold text-lg text-blue-600">
+          <span className="font-bold text-lg text-purple-600">
             ${estimatedCost} USDC
           </span>
         </div>
         {side === 'buy' && (
           <div className="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-300">
-            💰 预测正确可获得: ${(parseFloat(amount) * 1).toFixed(2)} USDC
+            预测正确可获得: ${(parseFloat(amount) * 1).toFixed(2)} USDC
             <br />
-            📈 潜在收益: <span className="text-green-600 font-semibold">+${potentialProfit} USDC</span>
+            潜在收益: <span className="text-green-600 font-semibold">+${potentialProfit} USDC</span>
           </div>
         )}
       </div>
@@ -310,7 +310,7 @@ export default function OrderForm({
       </button>
       
       <p className="text-xs text-gray-500 mt-3 text-center">
-        💡 订单将在链下匹配，成交后批量结算到链上<br />
+        订单将在链下匹配，成交后批量结算到链上<br />
         订单有效期 7 天，未成交可随时取消
       </p>
     </div>

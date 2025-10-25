@@ -40,7 +40,7 @@ const HomePage = () => {
     // 重置body样式
     document.body.style.background = '#ffffff'
     document.body.style.overflow = 'visible'
-    document.body.style.paddingTop = '9rem'
+    document.body.style.paddingTop = '14rem'
   }, [])
 
   // 处理分类切换
@@ -126,7 +126,7 @@ const HomePage = () => {
       <main>
         {/* Hero Section */}
         <section className="hero-section bg-primary relative overflow-hidden">
-          <div className="container mx-auto px-4 pt-0 pb-20 md:pt-0 md:pb-32">
+          <div className="container mx-auto px-4 pt-8 pb-20 md:pt-12 md:pb-32">
             <div className="max-w-3xl">
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button 

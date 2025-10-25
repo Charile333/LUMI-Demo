@@ -165,7 +165,7 @@ export default function QuickTradeModal({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
-                  {side === 'YES' ? '✅' : '❌'}
+                  {side === 'YES' ? 'YES' : 'NO'}
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-xl">
@@ -251,9 +251,9 @@ export default function QuickTradeModal({
             </div>
 
             {/* 提示信息 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-xs text-blue-800">
-                💡 <strong>Quick trade:</strong> This will create a market order at the best available price.
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+              <p className="text-xs text-purple-800">
+                <strong>Quick trade:</strong> This will create a market order at the best available price.
                 For advanced options, visit the market page.
               </p>
             </div>

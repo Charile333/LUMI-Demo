@@ -131,7 +131,7 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
             onClick={() => setFilter(f)}
             className={`px-3 py-1 rounded-lg text-sm font-semibold whitespace-nowrap ${
               filter === f
-                ? 'bg-blue-500 text-white'
+                ? 'bg-purple-500 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
@@ -160,7 +160,7 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
                 </div>
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${
                   order.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
-                  order.status === 'partial' ? 'bg-blue-100 text-blue-800' :
+                  order.status === 'partial' ? 'bg-purple-100 text-purple-800' :
                   order.status === 'filled' ? 'bg-green-100 text-green-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>

@@ -69,7 +69,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
             onClick={() => setOutcome(1)}
             className={`px-3 py-1 rounded-lg text-sm font-semibold ${
               outcome === 1
-                ? 'bg-blue-500 text-white'
+                ? 'bg-purple-500 text-white'
                 : 'bg-gray-100 text-gray-600'
             }`}
           >
@@ -79,7 +79,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
             onClick={() => setOutcome(0)}
             className={`px-3 py-1 rounded-lg text-sm font-semibold ${
               outcome === 0
-                ? 'bg-blue-500 text-white'
+                ? 'bg-purple-500 text-white'
                 : 'bg-gray-100 text-gray-600'
             }`}
           >
@@ -126,9 +126,9 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       
       {/* 价差 */}
       {orderBook.spread !== null && (
-        <div className="py-2 px-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg text-center mb-4 border border-blue-100">
+        <div className="py-2 px-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg text-center mb-4 border border-purple-200">
           <div className="text-xs text-gray-600 mb-1">价差</div>
-          <div className="text-lg font-bold text-blue-600">
+          <div className="text-lg font-bold text-purple-600">
             {orderBook.spread.toFixed(4)}
           </div>
           <div className="text-xs text-gray-500">

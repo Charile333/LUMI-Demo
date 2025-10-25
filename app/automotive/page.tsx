@@ -154,8 +154,9 @@ const AutomotivePage = () => {
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-6">
-        {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-6">
+        {/* Filters - 固定在顶部 */}
+        <div className="sticky top-[14rem] z-40 bg-gray-50 pt-4 pb-4 -mx-4 px-4 mb-2 shadow-sm">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Search Box */}
           <div className="relative w-full lg:w-64">
             <input
@@ -209,6 +210,7 @@ const AutomotivePage = () => {
             ))}
           </div>
         </div>
+        </div>
 
         {/* Markets Grid */}
         {wsConnected && (
@@ -217,7 +219,7 @@ const AutomotivePage = () => {
             <span className="text-sm text-green-700">实时价格已连接</span>
           </div>
         )}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
           {marketsWithRealtimePrices.map((market) => (
             <div
               key={market.id}

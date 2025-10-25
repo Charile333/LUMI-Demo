@@ -20,13 +20,13 @@ export default function LumiSoonPage() {
     <>
       <Script src="/cascading-waves.js" strategy="afterInteractive" />
       <div className="font-sans relative min-h-screen bg-black" data-page="landing">
-      {/* 左上角Logo */}
-      <div className="fixed top-4 left-4 z-30">
+      {/* 左上角Logo - 固定在顶部 */}
+      <div className="fixed top-2 left-4 z-30">
         <Image 
           src="/image/lumi1 (1).png" 
           alt="LUMI Logo" 
-          width={248} 
-          height={248}
+          width={200} 
+          height={200}
         />
       </div>
 
@@ -59,29 +59,29 @@ export default function LumiSoonPage() {
             <div className="flex justify-between relative z-10">
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1">2025-Q4</div>
-                <div className="text-gray-400 text-xl font-semibold text-center max-w-[200px]">
+                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2025-Q4</div>
+                <div className="text-gray-400 text-xl font-semibold text-center max-w-[200px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
                   黑天鹅预测<br/>预测市场
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q1</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]">
-                  彩票 - 一站式链上博彩平台
+                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q1</div>
+                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
+                  彩票 -<br/>一站式链上博彩平台
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q2</div>
-                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">
+                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q2</div>
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
                   市场趋势预测
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q3</div>
-                <div className="text-gray-400 text-xs font-semibold text-center max-w-[180px]">大模型量化</div>
+                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q3</div>
+                <div className="text-gray-400 text-xs font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>大模型量化</div>
               </div>
             </div>
           </div>
