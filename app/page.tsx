@@ -59,29 +59,29 @@ export default function LumiSoonPage() {
             <div className="flex justify-between relative z-10">
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-medium mt-8 mb-1">2025-Q4</div>
-                <div className="text-gray-400 text-sm text-center max-w-[200px]">
-                  Prediction&Black Swan Alert
+                <div className="text-white font-bold text-lg mt-8 mb-1">2025-Q4</div>
+                <div className="text-gray-400 text-xl font-semibold text-center max-w-[200px]">
+                  黑天鹅预测<br/>预测市场
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-medium mt-8 mb-1">2026-Q1</div>
-                <div className="text-gray-400 text-sm text-center max-w-[180px]">
-                  Prediction Market
+                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q1</div>
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">
+                彩票 - 一站式链上博彩平台
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-medium mt-8 mb-1">2026-Q2</div>
-                <div className="text-gray-400 text-sm text-center max-w-[180px]">
-                  Market Trend Forecasting
+                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q2</div>
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">
+                市场趋势预测
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-medium mt-8 mb-1">2026-Q3</div>
-                <div className="text-gray-400 text-sm text-center max-w-[180px]">Financial Quantitative</div>
+                <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q3</div>
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">大模型量化</div>
               </div>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function LumiSoonPage() {
                     href="/markets"
                     className="mt-4 w-full py-2 bg-[#d4af37] hover:bg-[#e6c553] text-black rounded-md text-sm font-medium transition-colors flex items-center justify-center"
                   >
-                    <i className="fa fa-external-link mr-2"></i> View All Markets
+                    <i className="fa fa-external-link mr-2"></i> 进入LUMI
                   </Link>
             </div>
               </div>
