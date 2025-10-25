@@ -68,20 +68,20 @@ export default function LumiSoonPage() {
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
                 <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q1</div>
                 <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]">
-                彩票 -<br/> 一站式链上博彩平台
+                  彩票 - 一站式链上博彩平台
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
                 <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q2</div>
-                <div className="text-gray-400 text-sm font-semibold text-center max-w-[180px]">
-                市场趋势预测
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">
+                  市场趋势预测
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
                 <div className="text-white font-bold text-lg mt-8 mb-1">2026-Q3</div>
-                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]">大模型量化</div>
+                <div className="text-gray-400 text-xs font-semibold text-center max-w-[180px]">大模型量化</div>
               </div>
             </div>
           </div>
