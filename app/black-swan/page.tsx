@@ -14,10 +14,16 @@ declare global {
 interface CrashEvent {
   id: string;
   date: string;
+  timestamp: string;
   asset: string;
   crashPercentage: number;
   duration: string;
   description: string;
+  details?: {
+    previous_price?: number;
+    current_price?: number;
+    price_change?: number;
+  };
 }
 
 // 实时数据类型
