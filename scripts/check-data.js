@@ -54,3 +54,4 @@ db.get('SELECT COUNT(*) as count FROM alerts', (err, row) => {
 
 
 
+

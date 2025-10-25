@@ -134,7 +134,7 @@ export default function BlackSwanTerminal() {
     // 加载历史数据
     const fetchHistoricalAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/alerts');
+        const response = await fetch('/api/alerts');
         const result = await response.json();
         
         if (result.success && result.data) {

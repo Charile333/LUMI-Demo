@@ -53,8 +53,8 @@ export default function BlackSwanPage() {
   useEffect(() => {
     const loadCrashEvents = async () => {
       try {
-        // 使用真实的历史数据API
-        const response = await fetch('http://localhost:3000/api/alerts/real-crash-events');
+        // 使用相对路径的 API（兼容 Vercel 部署）
+        const response = await fetch('/api/alerts/real-crash-events');
         const result = await response.json();
         if (result.success && result.data) {
           setCrashEvents(result.data);
@@ -70,7 +70,7 @@ export default function BlackSwanPage() {
 
     const loadStats = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/alerts/stats');
+        const response = await fetch('/api/alerts/stats');
         const result = await response.json();
         if (result.success && result.data) {
           setStats({
@@ -98,9 +98,21 @@ export default function BlackSwanPage() {
     const connectWebSocket = () => {
       if (isUnmounting) return;
       
+      // 检测是否在生产环境（Vercel）- 跳过 WebSocket 连接
+      const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+      
+      if (isProduction) {
+        console.log('⚠️  生产环境：WebSocket 功能已禁用，使用静态数据');
+        return;
+      }
+      
       try {
-        // 连接到集成的预警服务器
-        ws = new WebSocket('ws://localhost:3000/ws/alerts');
+        // 仅在本地开发环境连接 WebSocket
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsHost = window.location.hostname === 'localhost' ? 'localhost:3000' : window.location.host;
+        const wsUrl = `${wsProtocol}//${wsHost}/ws/alerts`;
+        
+        ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
           console.log('✅ 已连接到预警系统');
@@ -166,7 +178,7 @@ export default function BlackSwanPage() {
     // 首次加载时获取历史预警数据
     const fetchHistoricalAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/alerts');
+        const response = await fetch('/api/alerts');
         const result = await response.json();
         
         if (result.success && result.data) {

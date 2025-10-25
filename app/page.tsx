@@ -29,8 +29,21 @@ export default function LumiSoonPage() {
     const connectWebSocket = () => {
       if (isUnmounting) return;
       
+      // 检测是否在生产环境（Vercel）- 跳过 WebSocket 连接
+      const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+      
+      if (isProduction) {
+        console.log('⚠️  生产环境：WebSocket 功能已禁用');
+        return;
+      }
+      
       try {
-        ws = new WebSocket('ws://localhost:3000/ws/alerts');
+        // 仅在本地开发环境连接 WebSocket
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsHost = window.location.hostname === 'localhost' ? 'localhost:3000' : window.location.host;
+        const wsUrl = `${wsProtocol}//${wsHost}/ws/alerts`;
+        
+        ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
           console.log('✅ 已连接到预警系统');
@@ -94,7 +107,7 @@ export default function LumiSoonPage() {
     // 获取历史数据
     const fetchHistoricalAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/alerts');
+        const response = await fetch('/api/alerts');
         const result = await response.json();
         
         if (result.success && result.data) {
@@ -128,7 +141,7 @@ export default function LumiSoonPage() {
     // 获取统计数据
     const loadStats = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/alerts/stats');
+        const response = await fetch('/api/alerts/stats');
         const result = await response.json();
         if (result.success && result.data) {
           setStats({
