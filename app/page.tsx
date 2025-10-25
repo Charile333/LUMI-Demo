@@ -34,15 +34,15 @@ export default function LumiSoonPage() {
         <div className="text-center w-full">
           {/* Logo */}
           <div className="mb-10 flex justify-center">
-            <h1 className="text-5xl md:text-6xl font-black text-white text-glow tracking-tight">
+            <h1 className="text-5xl md:text-6xl font-black text-white text-glow tracking-tight" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>
               LUMI
             </h1>
           </div>
 
           {/* 核心 "SOON" 区域 */}
           <div className="animate-breathe max-w-4xl mx-auto">
-            <p className="text-6xl md:text-9xl font-black text-white mb-6 text-glow">SOON</p>
-            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-6xl md:text-9xl font-black text-white mb-6 text-glow" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>SOON</p>
+            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', fontWeight: '400'}}>
               Crypto market tool—focuses on on-chain Black Swan risk signals,
               <br />
               quantitative uncertainty measurement, betting platform and
@@ -59,29 +59,29 @@ export default function LumiSoonPage() {
             <div className="flex justify-between relative z-10">
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2025-Q4</div>
-                <div className="text-gray-400 text-xl font-semibold text-center max-w-[200px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
+                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2025-Q4</div>
+                <div className="text-gray-400 text-xl font-semibold text-center max-w-[200px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   黑天鹅预测<br/>预测市场
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q1</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
+                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q1</div>
+                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   彩票 -<br/>一站式链上博彩平台
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q2</div>
-                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>
+                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q2</div>
+                <div className="text-gray-400 text-base font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   市场趋势预测
                 </div>
               </div>
               <div className="flex flex-col items-center relative">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 font-mono">2026-Q3</div>
-                <div className="text-gray-400 text-xs font-semibold text-center max-w-[180px] tracking-wide" style={{fontFamily: 'Helvetica Neue, Arial, sans-serif'}}>大模型量化</div>
+                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q3</div>
+                <div className="text-gray-400 text-xs font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>大模型量化</div>
               </div>
             </div>
           </div>

@@ -141,21 +141,43 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
         </div>
         
         {/* 即将推出的产品横幅 */}
-        <div className="py-3 border-b border-secondary/20 bg-gradient-to-r from-[#ff4444]/5 via-transparent to-[#ffcc00]/5">
-          <div className="flex items-center justify-center gap-8 overflow-x-auto">
+        <div className="py-3 border-b border-secondary/20 bg-gradient-to-r from-purple-500/5 via-transparent to-blue-500/5">
+          <div className="flex items-center justify-center gap-6 overflow-x-auto">
+            {/* 预测市场 */}
+            <Link 
+              href="/markets" 
+              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-500/10 to-purple-600/10 border border-purple-400/30 rounded-lg hover:border-purple-400/60 hover:shadow-lg hover:shadow-purple-400/20 transition-all group min-w-[240px]"
+            >
+              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <Image 
+                  src="/image/create.png" 
+                  alt="LUMI" 
+                  width={40} 
+                  height={40}
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <span className="text-sm font-bold text-purple-600 group-hover:text-purple-500 transition-colors">
+                  预测市场平台
+                </span>
+                <span className="text-xs text-gray-500">已上线</span>
+              </div>
+            </Link>
+
             {/* 黑天鹅预警 */}
             <Link 
               href="/black-swan" 
-              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#ff4444]/10 to-[#ff6644]/10 border border-[#ff4444]/30 rounded-lg hover:border-[#ff4444]/60 hover:shadow-lg hover:shadow-[#ff4444]/20 transition-all group"
+              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#ff4444]/10 to-[#ff6644]/10 border border-[#ff4444]/30 rounded-lg hover:border-[#ff4444]/60 hover:shadow-lg hover:shadow-[#ff4444]/20 transition-all group min-w-[240px]"
             >
               <div className="text-2xl">🦢</div>
-              <div className="flex flex-col">
+              <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-[#ff4444] group-hover:text-[#ff6666] transition-colors">
                   黑天鹅预警
                 </span>
                 <span className="text-xs text-gray-500">2025 Q4 推出</span>
               </div>
-              <span className="ml-2 text-xs px-2 py-1 bg-[#ff4444] text-white rounded-full font-semibold">
+              <span className="text-xs px-2 py-1 bg-[#ff4444] text-white rounded-full font-semibold whitespace-nowrap">
                 NEW
               </span>
             </Link>
@@ -163,18 +185,32 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
             {/* 彩票 - 一站式链上博彩平台 */}
             <Link 
               href="/lottery" 
-              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#ffcc00]/10 to-[#ffd700]/10 border border-[#ffcc00]/30 rounded-lg hover:border-[#ffcc00]/60 hover:shadow-lg hover:shadow-[#ffcc00]/20 transition-all group"
+              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#ffcc00]/10 to-[#ffd700]/10 border border-[#ffcc00]/30 rounded-lg hover:border-[#ffcc00]/60 hover:shadow-lg hover:shadow-[#ffcc00]/20 transition-all group min-w-[240px]"
             >
               <div className="text-2xl">🎰</div>
-              <div className="flex flex-col">
+              <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-[#d4a017] group-hover:text-[#ffcc00] transition-colors">
-                  彩票 - 一站式链上博彩平台
+                  彩票博彩平台
                 </span>
                 <span className="text-xs text-gray-500">2026 Q1 推出</span>
               </div>
-              <span className="ml-2 text-xs px-2 py-1 bg-[#ffcc00] text-black rounded-full font-semibold">
+              <span className="text-xs px-2 py-1 bg-[#ffcc00] text-black rounded-full font-semibold whitespace-nowrap">
                 SOON
               </span>
+            </Link>
+
+            {/* 量化 */}
+            <Link 
+              href="/quant" 
+              className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-400/30 rounded-lg hover:border-blue-400/60 hover:shadow-lg hover:shadow-blue-400/20 transition-all group min-w-[240px]"
+            >
+              <div className="text-2xl">📈</div>
+              <div className="flex flex-col flex-1">
+                <span className="text-sm font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
+                  AI量化交易
+                </span>
+                <span className="text-xs text-gray-500">2026 Q3 推出</span>
+              </div>
             </Link>
           </div>
         </div>
