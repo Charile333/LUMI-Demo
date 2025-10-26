@@ -1,0 +1,14 @@
+# GitLab CI/CD - 市场监控
+# 每10分钟运行一次（可调整为 */15 或 */30）
+
+market-monitor:
+  image: node:18
+  only:
+    - schedules  # 只在计划任务触发时运行
+  script:
+    - echo "🔍 开始市场监控..."
+    - node scripts/monitor-market.js
+  variables:
+    SUPABASE_URL: $SUPABASE_URL
+    SUPABASE_KEY: $SUPABASE_KEY
+
