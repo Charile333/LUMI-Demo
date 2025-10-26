@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegitChain | Premium Blockchain Gaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        },
+                        success: '#10b981',
+                        danger: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+            .gold-gradient {
+                background: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
+            }
+            .game-card-hover {
+                @apply transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-1;
+            }
+            .bet-button {
+                @apply px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200;
+            }
+        }
+    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased">
+    <!-- Responsible Gambling Notice -->
+    <div class="bg-dark-light border-b border-gold/30 py-2">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+            <p class="text-xs text-gray-300 flex items-center justify-center md:justify-start">
+                <i class="fa fa-info-circle text-gold mr-2"></i>
+                18+ Gamble Responsibly. This platform operates under license number GL-2023-004. Terms apply.
+            </p>
+            <div class="flex space-x-4 mt-2 md:mt-0">
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Help Center</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">LegitChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-white hover:text-gold transition-colors border-b-2 border-gold pb-1">Games</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Live Casino</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Tournaments</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Promotions</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-300 hover:text-white transition-colors relative">
+                            <i class="fa fa-bell-o"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-gold text-dark text-xs rounded-full flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-gray-700"></div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Balance</p>
+                                <p class="text-sm font-medium">4.872 ETH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Welcome Banner -->
+        <div class="relative rounded-xl overflow-hidden mb-6">
+            <div class="absolute inset-0 bg-gradient-to-r from-dark-darker via-dark/70 to-transparent z-10"></div>
+            <img src="https://picsum.photos/id/1048/1600/400" alt="Premium Gaming Experience" class="w-full h-48 md:h-64 object-cover">
+            <div class="absolute inset-0 z-20 flex flex-col justify-center p-6 md:p-10">
+                <h1 class="text-2xl md:text-4xl font-display font-bold text-white text-shadow mb-2 max-w-lg">Premium Blockchain Gaming Experience</h1>
+                <p class="text-gray-300 mb-4 max-w-md">Provably fair games with instant payouts and transparent operations on the blockchain</p>
+                <div class="flex flex-wrap gap-3">
+                    <button class="gold-gradient text-dark font-semibold px-5 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                        Explore Games
+                    </button>
+                    <button class="bg-transparent border border-gray-600 text-white font-medium px-5 py-2 rounded-lg hover:border-gold/50 transition-colors">
+                        Deposit Funds
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Column - Game Categories & Games -->
+            <div class="lg:col-span-3 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-hide pr-2">
+                <!-- Game Categories -->
+                <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Game Categories</h2>
+                    </div>
+                    
+                    <div class="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <button class="flex flex-col items-center justify-center p-4 bg-dark rounded-lg border border-gold/30 game-card-hover">
+                            <div class="w-10 h-10 rounded-full gold-gradient flex items-center justify-center mb-3">
+                                <i class="fa fa-dice text-dark"></i>
+                            </div>
+                            <span class="text-sm font-medium">Slots</span>
+                            <span class="text-xs text-gray-500 mt-1">48 Games</span>
+                        </button>
+                        
+                        <button class="flex flex-col items-center justify-center p-4 bg-dark rounded-lg border border-gray-700 game-card-hover">
+                            <div class="w-10 h-10 rounded-full bg-dark-light flex items-center justify-center mb-3">
+                                <i class="fa fa-play-circle-o text-gold"></i>
+                            </div>
+                            <span class="text-sm font-medium">Live Casino</span>
+                            <span class="text-xs text-gray-500 mt-1">12 Tables</span>
+                        </button>
+                        
+                        <button class="flex flex-col items-center justify-center p-4 bg-dark rounded-lg border border-gray-700 game-card-hover">
+                            <div class="w-10 h-10 rounded-full bg-dark-light flex items-center justify-center mb-3">
+                                <i class="fa fa-trophy text-gold"></i>
+                            </div>
+                            <span class="text-sm font-medium">Sportsbook</span>
+                            <span class="text-xs text-gray-500 mt-1">24 Sports</span>
+                        </button>
+                        
+                        <button class="flex flex-col items-center justify-center p-4 bg-dark rounded-lg border border-gray-700 game-card-hover">
+                            <div class="w-10 h-10 rounded-full bg-dark-light flex items-center justify-center mb-3">
+                                <i class="fa fa-users text-gold"></i>
+                            </div>
+                            <span class="text-sm font-medium">Tournaments</span>
+                            <span class="text-xs text-gray-500 mt-1">7 Active</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Featured Games -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Featured Games</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Featured Game 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden game-card-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1050/600/300" alt="Crypto Riches Slot" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-1 rounded">HOT</div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">Crypto Riches</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-star text-gold text-xs"></i>
+                                        <span class="text-xs ml-1">4.8/5</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-3">Slot • 243 Ways • 96.5% RTP</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Max Win: 10,000x</span>
+                                    <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                        Play Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Game 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden game-card-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1053/600/300" alt="Blockchain Blackjack" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 right-2 bg-dark text-gold text-xs font-bold px-2 py-1 rounded border border-gold/30">LIVE</div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">Blockchain Blackjack</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-star text-gold text-xs"></i>
+                                        <span class="text-xs ml-1">4.9/5</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-3">Table • Live Dealer • 99.5% RTP</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Min Bet: 0.001 ETH</span>
+                                    <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                        Play Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Game 3 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden game-card-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1054/600/300" alt="Esports Betting" class="w-full h-40 object-cover">
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">Esports Arena</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-star text-gold text-xs"></i>
+                                        <span class="text-xs ml-1">4.7/5</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-3">Sportsbook • 12 Leagues • Live Bets</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">148 Events Today</span>
+                                    <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                        Bet Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Live Sports Events -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Live Sports Events</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Sport Category -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                            <div class="p-3 bg-dark border-b border-gray-800 flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                    <i class="fa fa-futbol-o text-xs text-white"></i>
+                                </div>
+                                <span class="font-medium">Football</span>
+                                <span class="ml-2 text-xs text-gray-500">(24 Live Events)</span>
+                            </div>
+                            
+                            <div class="divide-y divide-gray-800">
+                                <!-- Event 1 -->
+                                <div class="p-4 hover:bg-dark/50 transition-colors">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-400">Premier League • Live</span>
+                                        <span class="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">1-1</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                                <span class="text-xs">MU</span>
+                                            </div>
+                                            <span class="text-sm font-medium">Manchester United</span>
+                                        </div>
+                                        
+                                        <div class="text-xs text-gray-500">63'</div>
+                                        
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-right">Liverpool</span>
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center ml-2">
+                                                <span class="text-xs">LIV</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            2.45
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            3.20
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            2.85
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-3 text-center">
+                                        <a href="#" class="text-xs text-gold hover:text-gold-light">+42 More Markets</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Event 2 -->
+                                <div class="p-4 hover:bg-dark/50 transition-colors">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-400">La Liga • Live</span>
+                                        <span class="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">0-2</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                                <span class="text-xs">BAR</span>
+                                            </div>
+                                            <span class="text-sm font-medium">Barcelona</span>
+                                        </div>
+                                        
+                                        <div class="text-xs text-gray-500">37'</div>
+                                        
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-right">Real Madrid</span>
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center ml-2">
+                                                <span class="text-xs">RM</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            3.75
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            3.50
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            1.90
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-3 text-center">
+                                        <a href="#" class="text-xs text-gold hover:text-gold-light">+38 More Markets</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Another Sport Category -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                            <div class="p-3 bg-dark border-b border-gray-800 flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                    <i class="fa fa-basketball-ball text-xs text-white"></i>
+                                </div>
+                                <span class="font-medium">Basketball</span>
+                                <span class="ml-2 text-xs text-gray-500">(18 Live Events)</span>
+                            </div>
+                            
+                            <div class="divide-y divide-gray-800">
+                                <!-- Event 1 -->
+                                <div class="p-4 hover:bg-dark/50 transition-colors">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-gray-400">NBA • Live</span>
+                                        <span class="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">87-93</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                                <span class="text-xs">LAL</span>
+                                            </div>
+                                            <span class="text-sm font-medium">Lakers</span>
+                                        </div>
+                                        
+                                        <div class="text-xs text-gray-500">Q3 04:25</div>
+                                        
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-right">Warriors</span>
+                                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center ml-2">
+                                                <span class="text-xs">GSW</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            2.10
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            -
+                                        </button>
+                                        <button class="bet-button bg-dark border border-gray-700 hover:border-gold/50">
+                                            1.75
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-3 text-center">
+                                        <a href="#" class="text-xs text-gold hover:text-gold-light">+56 More Markets</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Provably Fair Section -->
+                <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Provably Fair Gaming</h2>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-300 mb-4">
+                                    All our games operate on a provably fair system utilizing blockchain technology. This ensures every outcome is random, transparent, and verifiable by anyone.
+                                </p>
+                                
+                                <div class="space-y-3 mb-4">
+                                    <div class="flex items-start">
+                                        <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                            <i class="fa fa-check text-dark text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium">Transparent Outcomes</h3>
+                                            <p class="text-xs text-gray-400">Every game result is recorded on the blockchain for full transparency.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                            <i class="fa fa-check text-dark text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium">Verifiable Results</h3>
+                                            <p class="text-xs text-gray-400">Players can independently verify the fairness of each game outcome.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-start">
+                                        <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                            <i class="fa fa-check text-dark text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium">Instant Payouts</h3>
+                                            <p class="text-xs text-gray-400">Winnings are automatically sent to your wallet without delays.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <a href="#" class="text-gold hover:text-gold-light text-sm flex items-center">
+                                    <i class="fa fa-link mr-1"></i>
+                                    Learn More About Our Fairness
+                                </a>
+                            </div>
+                            
+                            <div class="w-full md:w-48 h-48 md:h-auto">
+                                <div class="bg-dark rounded-lg border border-gray-800 p-4 h-full flex flex-col justify-center items-center">
+                                    <div class="w-16 h-16 rounded-full gold-gradient flex items-center justify-center mb-3">
+                                        <i class="fa fa-shield text-dark text-2xl"></i>
+                                    </div>
+                                    <h3 class="font-medium mb-1 text-center">Licensed & Regulated</h3>
+                                    <p class="text-xs text-gray-400 text-center mb-3">Operating under gaming license GL-2023-004</p>
+                                    <div class="flex space-x-2">
+                                        <img src="https://picsum.photos/id/101/60/30" alt="Regulatory Body" class="h-6 opacity-70">
+                                        <img src="https://picsum.photos/id/102/60/30" alt="Regulatory Body" class="h-6 opacity-70">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Bet Slip & Account -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 space-y-6">
+                    <!-- Bet Slip -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                            <h2 class="text-lg font-semibold">Bet Slip</h2>
+                            <button id="clear-betslip" class="text-sm text-gray-400 hover:text-gold transition-colors">Clear All</button>
+                        </div>
+                        
+                        <div id="empty-betslip" class="p-8 text-center">
+                            <div class="w-16 h-16 rounded-full bg-dark mx-auto flex items-center justify-center mb-3">
+                                <i class="fa fa-ticket text-gray-600 text-2xl"></i>
+                            </div>
+                            <p class="text-gray-500 mb-2">Your bet slip is empty</p>
+                            <p class="text-xs text-gray-600">Add selections to get started</p>
+                        </div>
+                        
+                        <div id="active-betslip" class="hidden">
+                            <div class="divide-y divide-gray-800 max-h-64 overflow-y-auto scrollbar-hide">
+                                <!-- Bet 1 -->
+                                <div class="p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <p class="text-xs text-gray-400">Premier League</p>
+                                            <p class="text-sm font-medium">Manchester United vs Liverpool</p>
+                                        </div>
+                                        <button class="text-gray-600 hover:text-gray-400">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm bg-dark px-2 py-1 rounded border border-gray-700">Draw</span>
+                                        <span class="text-sm font-medium">3.20</span>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <label class="block text-xs text-gray-500 mb-1">Stake (ETH)</label>
+                                        <div class="flex items-center">
+                                            <button class="w-8 h-8 flex items-center justify-center bg-dark border border-gray-700 rounded-l-md hover:border-gold/50 transition-colors">
+                                                <i class="fa fa-minus text-xs"></i>
+                                            </button>
+                                            <input type="text" value="0.1" class="flex-1 bg-dark border-y border-gray-700 py-2 px-3 text-center text-sm focus:outline-none focus:border-gold">
+                                            <button class="w-8 h-8 flex items-center justify-center bg-dark border border-gray-700 rounded-r-md hover:border-gold/50 transition-colors">
+                                                <i class="fa fa-plus text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 border-t border-gray-800">
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-400">Total Stake</span>
+                                        <span class="font-medium">0.1 ETH</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-400">Potential Win</span>
+                                        <span class="text-success font-medium">0.32 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2.5 gold-gradient text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                    Place Bet
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Balance -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">My Account</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm text-gray-400">Available Balance</span>
+                                <span class="text-xl font-bold">4.872 ETH</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-5">
+                                <button class="flex items-center justify-center space-x-1 py-2.5 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    <i class="fa fa-plus text-gold"></i>
+                                    <span>Deposit</span>
+                                </button>
+                                <button class="flex items-center justify-center space-x-1 py-2.5 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    <i class="fa fa-minus text-gray-400"></i>
+                                    <span>Withdraw</span>
+                                </button>
+                            </div>
+                            
+                            <div class="border-t border-gray-800 pt-4">
+                                <h3 class="text-sm font-medium mb-3">Recent Transactions</h3>
+                                
+                                <div class="space-y-3 max-h-48 overflow-y-auto scrollbar-hide">
+                                    <!-- Transaction 1 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-arrow-down text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Deposit</p>
+                                                <p class="text-xs text-gray-500">Today, 14:32</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-success">+2.50 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 2 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-danger/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-arrow-up text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Bet Placement</p>
+                                                <p class="text-xs text-gray-500">Yesterday, 20:15</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-danger">-0.25 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 3 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-trophy text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Winnings</p>
+                                                <p class="text-xs text-gray-500">Yesterday, 18:47</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-success">+0.87 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 4 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-danger/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-arrow-up text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Withdrawal</p>
+                                                <p class="text-xs text-gray-500">Jun 10, 11:23</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-danger">-1.50 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <a href="#" class="text-center block text-sm text-gold hover:text-gold-light mt-3">
+                                    View All Transactions
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Promotions -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Current Promotions</h2>
+                        </div>
+                        
+                        <div class="divide-y divide-gray-800">
+                            <div class="p-4 hover:bg-dark/50 transition-colors">
+                                <div class="relative rounded-lg overflow-hidden mb-3">
+                                    <img src="https://picsum.photos/id/1060/400/200" alt="Welcome Bonus" class="w-full h-32 object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-darker to-transparent"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <h3 class="font-medium text-white">Welcome Bonus</h3>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-2">100% up to 5 ETH on your first deposit</p>
+                                <button class="w-full py-1.5 bg-dark rounded-lg border border-gold/30 text-gold text-xs font-medium hover:bg-gold/10 transition-colors">
+                                    Claim Now
+                                </button>
+                            </div>
+                            
+                            <div class="p-4 hover:bg-dark/50 transition-colors">
+                                <div class="relative rounded-lg overflow-hidden mb-3">
+                                    <img src="https://picsum.photos/id/1062/400/200" alt="Weekly Cashback" class="w-full h-32 object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-dark-darker to-transparent"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <h3 class="font-medium text-white">Weekly Cashback</h3>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-2">Get 10% cashback on net losses every week</p>
+                                <button class="w-full py-1.5 bg-dark rounded-lg border border-gray-700 text-gray-300 text-xs font-medium hover:border-gold/30 hover:text-gold transition-colors">
+                                    Learn More
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Responsible Gambling Footer Bar -->
+    <div class="bg-dark-light border-t border-gray-800 py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Gambling Addiction Help</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Self-Exclusion</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Age Verification</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-gray-500">18+ Only</span>
+                    <div class="flex space-x-3">
+                        <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/105/40/20" alt="Fair Gaming" class="h-5 opacity-70">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div class="md:col-span-2">
+                    <div class="text-gold text-2xl font-display font-bold mb-4">LegitChain</div>
+                    <p class="text-gray-400 text-sm mb-4 max-w-md">
+                        A licensed blockchain gambling platform offering provably fair games, transparent operations, and instant payouts. Gamble responsibly.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Games</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Slots</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Live Casino</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Sports Betting</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Esports</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Tournaments</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">License Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Jurisdiction Restrictions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-xs">© 2023 LegitChain. All rights reserved.</p>
+                <p class="text-gray-500 text-xs mt-2 md:mt-0">
+                    Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bet selection functionality
+            const betButtons = document.querySelectorAll('.bet-button:not(#clear-betslip)');
+            const emptyBetslip = document.getElementById('empty-betslip');
+            const activeBetslip = document.getElementById('active-betslip');
+            const clearBetslipBtn = document.getElementById('clear-betslip');
+            
+            // When a bet button is clicked
+            betButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Show active betslip and hide empty state
+                    emptyBetslip.classList.add('hidden');
+                    activeBetslip.classList.remove('hidden');
+                    
+                    // Visual feedback for selected bet
+                    this.classList.remove('border-gray-700');
+                    this.classList.add('border-gold/50', 'bg-gold/5');
+                    
+                    // Add slight delay before removing highlight (visual feedback)
+                    setTimeout(() => {
+                        this.classList.remove('border-gold/50', 'bg-gold/5');
+                        this.classList.add('border-gray-700');
+                    }, 1000);
+                });
+            });
+            
+            // Clear betslip functionality
+            clearBetslipBtn.addEventListener('click', function() {
+                // Show empty betslip and hide active state
+                activeBetslip.classList.add('hidden');
+                emptyBetslip.classList.remove('hidden');
+                
+                // Reset all bet buttons
+                betButtons.forEach(button => {
+                    button.classList.remove('border-gold/50', 'bg-gold/5');
+                    button.classList.add('border-gray-700');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

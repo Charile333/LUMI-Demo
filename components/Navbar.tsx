@@ -170,7 +170,9 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               href="/black-swan" 
               className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-[#ff4444]/10 to-[#ff6644]/10 border border-[#ff4444]/30 rounded-lg hover:border-[#ff4444]/60 hover:shadow-lg hover:shadow-[#ff4444]/20 transition-all group min-w-[240px]"
             >
-              <div className="text-2xl">🦢</div>
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img src="/image/black-swan.png" alt="Black Swan" className="w-8 h-8 object-contain" />
+              </div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-[#ff4444] group-hover:text-[#ff6666] transition-colors">
                   黑天鹅预警

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortuneChain | Blockchain Lottery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+            .gold-gradient {
+                background: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
+            }
+            .number-ball {
+                @apply w-12 h-12 rounded-full flex items-center justify-center font-bold text-dark transition-all duration-300 cursor-pointer;
+            }
+            .number-ball-selected {
+                @apply bg-gold scale-110 shadow-lg shadow-gold/20;
+            }
+            .number-ball-unselected {
+                @apply bg-dark-light border border-gray-700 hover:border-gold/50 text-white;
+            }
+        }
+    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-dark/90 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">FortuneChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-white hover:text-gold transition-colors">Lottery</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">Jackpots</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">Winners</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">How It Works</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">Support</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="hidden md:flex items-center space-x-2 bg-dark-light border border-gray-700 rounded-md px-3 py-1.5 text-sm hover:border-gold/50 transition-colors">
+                    <i class="fa fa-wallet text-gold"></i>
+                    <span>Connect Wallet</span>
+                </button>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Lottery Header -->
+        <div class="mb-6 text-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-display font-bold text-white mb-2">Fortune Chain Lottery</h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">Provably fair blockchain lottery with transparent draws and instant payouts directly to your wallet</p>
+            
+            <!-- Countdown Timer -->
+            <div class="mt-6 bg-dark-light rounded-xl p-4 border border-gray-800 inline-block">
+                <p class="text-sm text-gray-400 mb-2">Next Draw In</p>
+                <div class="flex space-x-3">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-dark rounded-lg w-14 h-14 flex items-center justify-center text-xl font-bold border border-gray-700">12</div>
+                        <span class="text-xs text-gray-500 mt-1">Hours</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-dark rounded-lg w-14 h-14 flex items-center justify-center text-xl font-bold border border-gray-700">45</div>
+                        <span class="text-xs text-gray-500 mt-1">Mins</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-dark rounded-lg w-14 h-14 flex items-center justify-center text-xl font-bold border border-gray-700">33</div>
+                        <span class="text-xs text-gray-500 mt-1">Secs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Ticket Purchase -->
+            <div class="lg:col-span-2 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-hide pr-2">
+                <!-- Jackpot Display -->
+                <div class="relative overflow-hidden rounded-xl border border-gold/30">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gold/20 to-transparent"></div>
+                    <div class="relative p-6 text-center">
+                        <h2 class="text-gray-400 text-sm mb-1">Current Jackpot</h2>
+                        <div class="flex items-baseline justify-center">
+                            <span class="text-4xl md:text-5xl font-display font-bold text-white text-shadow">23.8</span>
+                            <span class="text-2xl md:text-3xl font-display font-bold text-gold ml-1"> ETH</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">≈ $48,725.43 USD</p>
+                        
+                        <div class="mt-4 flex justify-center space-x-4">
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs">Total Tickets</p>
+                                <p class="text-white font-medium">14,872</p>
+                            </div>
+                            <div class="h-6 w-px bg-gray-700"></div>
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs">Players</p>
+                                <p class="text-white font-medium">3,241</p>
+                            </div>
+                            <div class="h-6 w-px bg-gray-700"></div>
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs">Draw Number</p>
+                                <p class="text-white font-medium">#1,287</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ticket Selection -->
+                <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Select Your Numbers</h2>
+                        <p class="text-sm text-gray-400 mt-1">Choose 5 numbers from 1-50</p>
+                    </div>
+                    
+                    <div class="p-5">
+                        <!-- Number Selection Grid -->
+                        <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-6">
+                            <!-- Generate numbers 1-50 -->
+                            <script>
+                                for (let i = 1; i <= 50; i++) {
+                                    document.write(`<div class="number-ball number-ball-unselected" data-number="${i}">${i}</div>`);
+                                }
+                            </script>
+                        </div>
+                        
+                        <!-- Selected Numbers -->
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-medium">Your Numbers</h3>
+                                <button id="clear-selection" class="text-xs text-gray-400 hover:text-gold transition-colors">Clear Selection</button>
+                            </div>
+                            <div id="selected-numbers" class="flex flex-wrap gap-2 min-h-[5rem] items-center justify-center bg-dark rounded-lg p-3 border border-gray-800">
+                                <p class="text-gray-500 text-sm">Select 5 numbers to get started</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Pick Option -->
+                        <button id="quick-pick" class="w-full py-2.5 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors mb-6">
+                            <i class="fa fa-random mr-2 text-gold"></i> Quick Pick (Random Numbers)
+                        </button>
+                        
+                        <!-- Ticket Quantity & Price -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Ticket Quantity</label>
+                                <div class="flex items-center">
+                                    <button id="decrease-quantity" class="w-10 h-10 flex items-center justify-center bg-dark border border-gray-700 rounded-l-md hover:border-gold/50 transition-colors">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <input type="text" id="ticket-quantity" value="1" class="flex-1 bg-dark border-y border-gray-700 py-3 px-4 text-center focus:outline-none focus:border-gold">
+                                    <button id="increase-quantity" class="w-10 h-10 flex items-center justify-center bg-dark border border-gray-700 rounded-r-md hover:border-gold/50 transition-colors">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex justify-center space-x-2 mt-2">
+                                    <button class="quantity-btn px-2 py-1 bg-dark border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">5</button>
+                                    <button class="quantity-btn px-2 py-1 bg-dark border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">10</button>
+                                    <button class="quantity-btn px-2 py-1 bg-dark border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">20</button>
+                                    <button class="quantity-btn px-2 py-1 bg-dark border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">50</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Price Per Ticket</label>
+                                <div class="bg-dark rounded-lg border border-gray-700 p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm">Standard</span>
+                                        <span class="text-sm font-medium">0.05 ETH</span>
+                                    </div>
+                                    <div class="w-full bg-dark-darker rounded-full h-1.5 mb-1">
+                                        <div class="gold-gradient h-1.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500">≈ $102.35 USD at current rates</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total & Purchase Button -->
+                        <div class="border-t border-gray-800 pt-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-400">Total Amount</span>
+                                <span class="text-xl font-bold">0.05 ETH</span>
+                            </div>
+                            
+                            <button id="purchase-tickets" class="w-full py-3 gold-gradient text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity transform hover:-translate-y-0.5 transition-transform mb-3 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                Purchase Tickets
+                            </button>
+                            
+                            <button class="w-full py-2.5 bg-dark rounded-lg border border-gray-700 text-sm hover:border-gold/50 transition-colors">
+                                <i class="fa fa-wallet mr-2 text-gold"></i> Connect Wallet to Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- How to Play -->
+                <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">How It Works</h2>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="text-center">
+                                <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-ticket text-dark text-xl"></i>
+                                </div>
+                                <h3 class="font-medium mb-2">1. Buy Tickets</h3>
+                                <p class="text-sm text-gray-400">Select 5 numbers or use Quick Pick. Each ticket costs 0.05 ETH.</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-random text-dark text-xl"></i>
+                                </div>
+                                <h3 class="font-medium mb-2">2. Provably Fair Draw</h3>
+                                <p class="text-sm text-gray-400">Smart contract automatically selects winning numbers at scheduled times.</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center mx-auto mb-3">
+                                    <i class="fa fa-money text-dark text-xl"></i>
+                                </div>
+                                <h3 class="font-medium mb-2">3. Instant Payouts</h3>
+                                <p class="text-sm text-gray-400">Winnings are automatically distributed to your wallet after each draw.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-dark rounded-lg border border-gray-800">
+                            <h3 class="font-medium mb-3 flex items-center">
+                                <i class="fa fa-info-circle text-gold mr-2"></i>
+                                Provably Fair
+                            </h3>
+                            <p class="text-sm text-gray-400 mb-3">
+                                Our lottery uses verifiable random number generation (VRNG) on the Ethereum blockchain. Every draw is transparent and can be independently verified through the smart contract.
+                            </p>
+                            <a href="#" class="text-gold hover:text-gold-light text-sm flex items-center">
+                                <i class="fa fa-link mr-1"></i>
+                                View Smart Contract
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Lottery Info & History -->
+            <div class="lg:col-span-1">
+                <div class="space-y-6">
+                    <!-- Recent Winners -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                            <h2 class="text-lg font-semibold">Recent Winners</h2>
+                            <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                        </div>
+                        
+                        <div class="divide-y divide-gray-800">
+                            <!-- Winner 1 -->
+                            <div class="p-4 hover:bg-dark/50 transition-colors">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-medium">Draw #1,286</h3>
+                                        <p class="text-sm text-gray-400">2 days ago</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-gold font-bold">8.45 ETH</p>
+                                        <p class="text-xs text-gray-500">≈ $17,241.35</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mt-3">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-gray-700 border-2 border-dark-light flex items-center justify-center text-xs font-medium">
+                                            0x7a...f92
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex space-x-1">
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">5</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">12</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">22</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">31</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">47</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Winner 2 -->
+                            <div class="p-4 hover:bg-dark/50 transition-colors">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-medium">Draw #1,285</h3>
+                                        <p class="text-sm text-gray-400">4 days ago</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-gold font-bold">12.72 ETH</p>
+                                        <p class="text-xs text-gray-500">≈ $25,987.42</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mt-3">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-gray-700 border-2 border-dark-light flex items-center justify-center text-xs font-medium">
+                                            0x3f...e45
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex space-x-1">
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">9</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">15</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">28</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">33</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">41</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Winner 3 -->
+                            <div class="p-4 hover:bg-dark/50 transition-colors">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-medium">Draw #1,284</h3>
+                                        <p class="text-sm text-gray-400">6 days ago</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-gold font-bold">5.31 ETH</p>
+                                        <p class="text-xs text-gray-500">≈ $10,842.19</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mt-3">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-8 h-8 rounded-full bg-gray-700 border-2 border-dark-light flex items-center justify-center text-xs font-medium">
+                                            0x9d...a17
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex space-x-1">
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">2</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">18</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">25</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">37</div>
+                                        <div class="w-7 h-7 rounded-full bg-gold text-dark text-xs font-bold flex items-center justify-center">49</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lottery Statistics -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Lottery Statistics</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <!-- Total Distributed -->
+                            <div class="mb-5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-400">Total Distributed</span>
+                                    <span class="text-sm font-medium">1,287.45 ETH</span>
+                                </div>
+                                <div class="w-full bg-dark rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Total Players -->
+                            <div class="mb-5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-400">Total Players</span>
+                                    <span class="text-sm font-medium">24,871</span>
+                                </div>
+                                <div class="w-full bg-dark rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 62%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Average Jackpot -->
+                            <div class="mb-5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-400">Average Jackpot</span>
+                                    <span class="text-sm font-medium">14.28 ETH</span>
+                                </div>
+                                <div class="w-full bg-dark rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Jackpot Growth -->
+                            <div>
+                                <h3 class="text-sm font-medium mb-3">Jackpot Growth (Last 7 Days)</h3>
+                                <div class="h-40">
+                                    <canvas id="jackpotChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Draw Info -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Next Draw Details</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm text-gray-400">Draw Date & Time</span>
+                                <span class="text-sm font-medium">June 15, 2023 • 20:00 UTC</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm text-gray-400">Ticket Sales Close</span>
+                                <span class="text-sm font-medium">June 15, 2023 • 19:59 UTC</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm text-gray-400">Minimum Jackpot</span>
+                                <span class="text-sm font-medium">5.00 ETH</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-400">Jackpot Distribution</span>
+                                <button class="text-sm text-gold hover:text-gold-light">View Breakdown</button>
+                            </div>
+                            
+                            <div class="mt-5 pt-4 border-t border-gray-800">
+                                <h3 class="text-sm font-medium mb-3">Jackpot Distribution</h3>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-3 h-3 rounded-full bg-gold mr-2"></div>
+                                            <span class="text-xs text-gray-400">5 Correct Numbers</span>
+                                        </div>
+                                        <span class="text-xs font-medium">70%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
+                                            <span class="text-xs text-gray-400">4 Correct Numbers</span>
+                                        </div>
+                                        <span class="text-xs font-medium">20%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-3 h-3 rounded-full bg-gray-600 mr-2"></div>
+                                            <span class="text-xs text-gray-400">3 Correct Numbers</span>
+                                        </div>
+                                        <span class="text-xs font-medium">10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 mt-12">
+        <div class="container mx-auto px-4 py-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-gold text-2xl font-display font-bold mb-4">FortuneChain</div>
+                    <p class="text-gray-400 text-sm mb-4">Provably fair blockchain lottery with transparent draws and instant payouts. Play securely with your cryptocurrency wallet.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Lottery</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Current Jackpot</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Past Results</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Winners Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">How to Play</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Odds & Prizes</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Resources</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Smart Contract</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Provably Fair</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Fees</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">API</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Company</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-xs">© 2023 FortuneChain. All rights reserved.</p>
+                <p class="text-gray-500 text-xs mt-2 md:mt-0">Gambling can be addictive. Play responsibly. Not available in all jurisdictions.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Number selection functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberBalls = document.querySelectorAll('.number-ball');
+            const selectedNumbersContainer = document.getElementById('selected-numbers');
+            const clearSelectionBtn = document.getElementById('clear-selection');
+            const quickPickBtn = document.getElementById('quick-pick');
+            const purchaseBtn = document.getElementById('purchase-tickets');
+            const ticketQuantityInput = document.getElementById('ticket-quantity');
+            const decreaseQuantityBtn = document.getElementById('decrease-quantity');
+            const increaseQuantityBtn = document.getElementById('increase-quantity');
+            const quantityBtns = document.querySelectorAll('.quantity-btn');
+            
+            let selectedNumbers = [];
+            
+            // Update purchase button state
+            function updatePurchaseButton() {
+                if (selectedNumbers.length === 5) {
+                    purchaseBtn.removeAttribute('disabled');
+                } else {
+                    purchaseBtn.setAttribute('disabled', 'true');
+                }
+            }
+            
+            // Update selected numbers display
+            function updateSelectedNumbersDisplay() {
+                selectedNumbersContainer.innerHTML = '';
+                
+                if (selectedNumbers.length === 0) {
+                    selectedNumbersContainer.innerHTML = '<p class="text-gray-500 text-sm">Select 5 numbers to get started</p>';
+                } else {
+                    selectedNumbers.forEach(number => {
+                        const ball = document.createElement('div');
+                        ball.className = 'number-ball number-ball-selected';
+                        ball.textContent = number;
+                        selectedNumbersContainer.appendChild(ball);
+                    });
+                }
+                
+                updatePurchaseButton();
+            }
+            
+            // Number ball click handler
+            numberBalls.forEach(ball => {
+                ball.addEventListener('click', function() {
+                    const number = parseInt(this.getAttribute('data-number'));
+                    const index = selectedNumbers.indexOf(number);
+                    
+                    if (index === -1) {
+                        // Add number if not already selected and under 5
+                        if (selectedNumbers.length < 5) {
+                            selectedNumbers.push(number);
+                            selectedNumbers.sort((a, b) => a - b);
+                            this.classList.remove('number-ball-unselected');
+                            this.classList.add('number-ball-selected');
+                            updateSelectedNumbersDisplay();
+                        }
+                    } else {
+                        // Remove number if already selected
+                        selectedNumbers.splice(index, 1);
+                        this.classList.remove('number-ball-selected');
+                        this.classList.add('number-ball-unselected');
+                        updateSelectedNumbersDisplay();
+                    }
+                });
+            });
+            
+            // Clear selection
+            clearSelectionBtn.addEventListener('click', function() {
+                selectedNumbers = [];
+                numberBalls.forEach(ball => {
+                    ball.classList.remove('number-ball-selected');
+                    ball.classList.add('number-ball-unselected');
+                });
+                updateSelectedNumbersDisplay();
+            });
+            
+            // Quick pick - generate 5 random numbers
+            quickPickBtn.addEventListener('click', function() {
+                // Clear current selection
+                selectedNumbers = [];
+                numberBalls.forEach(ball => {
+                    ball.classList.remove('number-ball-selected');
+                    ball.classList.add('number-ball-unselected');
+                });
+                
+                // Generate 5 unique random numbers between 1-50
+                while (selectedNumbers.length < 5) {
+                    const randomNum = Math.floor(Math.random() * 50) + 1;
+                    if (!selectedNumbers.includes(randomNum)) {
+                        selectedNumbers.push(randomNum);
+                    }
+                }
+                
+                // Sort and select the numbers
+                selectedNumbers.sort((a, b) => a - b);
+                selectedNumbers.forEach(number => {
+                    const ball = document.querySelector(`.number-ball[data-number="${number}"]`);
+                    ball.classList.remove('number-ball-unselected');
+                    ball.classList.add('number-ball-selected');
+                });
+                
+                updateSelectedNumbersDisplay();
+            });
+            
+            // Ticket quantity handlers
+            decreaseQuantityBtn.addEventListener('click', function() {
+                let quantity = parseInt(ticketQuantityInput.value);
+                if (quantity > 1) {
+                    ticketQuantityInput.value = quantity - 1;
+                }
+            });
+            
+            increaseQuantityBtn.addEventListener('click', function() {
+                let quantity = parseInt(ticketQuantityInput.value);
+                ticketQuantityInput.value = quantity + 1;
+            });
+            
+            quantityBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    ticketQuantityInput.value = this.textContent;
+                });
+            });
+            
+            // Jackpot growth chart
+            const ctx = document.getElementById('jackpotChart').getContext('2d');
+            const jackpotChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jun 8', 'Jun 9', 'Jun 10', 'Jun 11', 'Jun 12', 'Jun 13', 'Jun 14'],
+                    datasets: [{
+                        label: 'Jackpot (ETH)',
+                        data: [15.2, 17.8, 19.5, 18.3, 20.1, 22.4, 23.8],
+                        borderColor: '#b8860b',
+                        backgroundColor: 'rgba(184, 134, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#b8860b',
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#121212',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            padding: 8,
+                            titleFont: {
+                                size: 11
+                            },
+                            bodyFont: {
+                                size: 11
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `Jackpot: ${context.raw} ETH`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#888',
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#888',
+                                font: {
+                                    size: 9
+                                },
+                                callback: function(value) {
+                                    return value + ' ETH';
+                                }
+                            },
+                            min: 14
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

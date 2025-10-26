@@ -220,31 +220,35 @@ export default function LumiSoonPage() {
           <div className="relative max-w-5xl mx-auto">
             <div className="absolute left-[-9999px] right-[-12000px] top-6 h-[0.5px] bg-white z-0 transform -translate-y-1/2"></div>
             <div className="flex justify-between relative z-10">
-              <div className="flex flex-col items-center relative">
-                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2025-Q4</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[200px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+              <Link href="/black-swan" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
+                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2025-Q4</div>
+                <div className="text-gray-400 text-lg font-semibold text-center max-w-[200px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   黑天鹅预测<br/>预测市场
                 </div>
-              </div>
-              <div className="flex flex-col items-center relative">
-                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q1</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+              </Link>
+              <Link href="/lottery" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
+                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q1</div>
+                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   彩票<br/>一站式链上博彩平台
                 </div>
-              </div>
-              <div className="flex flex-col items-center relative">
-                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q2</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+              </Link>
+              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title="Coming Soon in Q2 2026">
+                <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q2</div>
+                <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   市场趋势预测
+                  <div className="text-xs text-gray-600 mt-1">Coming Soon</div>
                 </div>
               </div>
-              <div className="flex flex-col items-center relative">
-                <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q3</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>大模型量化</div>
+              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title="Coming Soon in Q3 2026">
+                <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q3</div>
+                <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+                  大模型量化
+                  <div className="text-xs text-gray-600 mt-1">Coming Soon</div>
+                </div>
               </div>
             </div>
           </div>

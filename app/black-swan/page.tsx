@@ -420,7 +420,7 @@ export default function BlackSwanPage() {
             <span>BACK TO MARKETS]</span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-green-400 text-lg">🦢</span>
+            <img src="/image/black-swan.png" alt="Black Swan" className="w-6 h-6 object-contain brightness-125" />
             <h1 className="text-green-400 text-lg font-bold">BLACK SWAN DETECTION SYSTEM</h1>
             <Link 
               href="/black-swan-terminal" 
@@ -461,7 +461,9 @@ export default function BlackSwanPage() {
                 ╚═══════════════════════════════════════════════════════╝
               </div>
             </div>
-            <div className="text-6xl opacity-30 text-green-500">🦢</div>
+            <div className="opacity-30">
+              <img src="/image/black-swan.png" alt="Black Swan" className="w-24 h-24 object-contain brightness-125" />
+            </div>
           </div>
         </div>
 
