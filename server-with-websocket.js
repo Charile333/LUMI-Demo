@@ -72,13 +72,13 @@ app.prepare().then(() => {
   server.on('upgrade', (request, socket, head) => {
     const pathname = parse(request.url).pathname;
 
+    // 只处理我们的警报 WebSocket，其他请求（如 Next.js HMR）让它们通过
     if (pathname === '/ws/alerts') {
       wss.handleUpgrade(request, socket, head, (ws) => {
         wss.emit('connection', ws, request);
       });
-    } else {
-      socket.destroy();
     }
+    // 注意：不要 destroy 其他 WebSocket，让 Next.js 处理 HMR
   });
 
   // WebSocket 连接处理 (Native WebSocket for alerts)
@@ -133,7 +133,7 @@ app.prepare().then(() => {
 
   // 设置数据库监视器（如果数据库存在）
   function setupDatabaseWatcher() {
-    const dbFile = path.join(__dirname, '..', 'duolume-master', 'utils', 'database', 'app.db');
+    const dbFile = path.join(__dirname, 'database', 'alerts.db');
     let lastAlertId = null;
 
     // 检查数据库是否存在
@@ -160,7 +160,8 @@ app.prepare().then(() => {
       const db = new sqlite3.Database(dbFile);
 
       if (lastAlertId !== null) {
-        db.all('SELECT * FROM alerts WHERE id > ? ORDER BY id ASC', [lastAlertId], (err, rows) => {
+        // 只选择实时警报，排除历史崩盘事件
+        db.all('SELECT * FROM alerts WHERE id > ? AND type != \'historical_crash\' ORDER BY id ASC', [lastAlertId], (err, rows) => {
           if (!err && rows && rows.length > 0) {
             rows.forEach(row => {
               if (row.id > lastAlertId) {
@@ -202,6 +203,19 @@ app.prepare().then(() => {
   // 启动数据库监视器
   setupDatabaseWatcher();
 
+  // 启动实时市场监控
+  const MarketMonitor = require('./lib/market-monitor');
+  const dbFile = path.join(__dirname, 'database', 'alerts.db');
+  const marketMonitor = new MarketMonitor(dbFile);
+  
+  // 检查数据库是否存在后再启动监控
+  const fs = require('fs');
+  if (fs.existsSync(dbFile)) {
+    marketMonitor.start();
+  } else {
+    console.log('⚠️  数据库未找到，跳过市场监控');
+  }
+
   // 启动服务器
   server.listen(port, (err) => {
     if (err) throw err;
@@ -210,6 +224,7 @@ app.prepare().then(() => {
     console.log(`📍 地址: http://${hostname}:${port}`);
     console.log(`🔌 Socket.IO: ws://${hostname}:${port}`);
     console.log(`🦢 Alert WebSocket: ws://${hostname}:${port}/ws/alerts`);
+    console.log(`🔍 市场监控: BTC/USDT, ETH/USDT`);
     console.log(`🌍 环境: ${dev ? 'development' : 'production'}`);
     console.log('='.repeat(60) + '\n');
   });

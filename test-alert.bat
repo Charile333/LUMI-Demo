@@ -1,17 +1,13 @@
 @echo off
+chcp 65001 >nul
+cd /d "%~dp0"
 echo.
 echo ════════════════════════════════════════
-echo   启动 LUMI + 黑天鹅预警系统
+echo    实时预警系统 - 快速测试
 echo ════════════════════════════════════════
 echo.
-cd /d %~dp0
-npm run dev
-
-
-
-
-
-
-
+node test-alert.js
+echo.
+pause
 
 

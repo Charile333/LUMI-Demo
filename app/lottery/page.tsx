@@ -10,10 +10,7 @@ export default function LotteryPage() {
   const [selectedBet, setSelectedBet] = useState<any>(null);
 
   useEffect(() => {
-    document.body.style.paddingTop = '0';
-    return () => {
-      document.body.style.paddingTop = '0';
-    };
+    // 不再需要修改body样式，通过CSS处理
   }, []);
 
   const clearBetslip = () => {
@@ -46,7 +43,7 @@ export default function LotteryPage() {
           <div className="flex space-x-4 mt-2 md:mt-0">
               <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Responsible Gambling</a>
               <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Help Center</a>
-            </div>
+          </div>
         </div>
       </div>
 
@@ -794,9 +791,9 @@ export default function LotteryPage() {
                   <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Cookie Policy</a></li>
                   <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Jurisdiction Restrictions</a></li>
                 </ul>
-              </div>
             </div>
-            
+          </div>
+          
             <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
               <p className="text-gray-500 text-xs">&copy; 2023 LegitChain. All rights reserved.</p>
               <p className="text-gray-500 text-xs mt-2 md:mt-0">
@@ -807,11 +804,6 @@ export default function LotteryPage() {
       </footer>
 
       <style jsx global>{`
-        body {
-          background: #121212 !important;
-          padding-top: 0 !important;
-        }
-        
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;

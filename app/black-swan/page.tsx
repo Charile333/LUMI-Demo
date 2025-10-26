@@ -331,6 +331,8 @@ export default function BlackSwanPage() {
           hide_top_toolbar: true,
           hide_legend: false,
           save_image: false,
+          // 🔥 关键：禁用默认时间框架，让我们手动控制
+          time_frames: [],
           disabled_features: [
             'header_widget',
             'header_symbol_search',
@@ -364,25 +366,73 @@ export default function BlackSwanPage() {
               const chart = widgetInstanceRef.current.activeChart();
               console.log('📊 Got active chart');
               
-              // 多次尝试设置可见范围
-              const attempts = [3000, 5000, 7000];
-              attempts.forEach((delay) => {
-                setTimeout(() => {
-                  console.log(`🎯 Setting range (after ${delay}ms)...`);
+              // 🔥 等待数据加载完成后设置时间范围
+              let dataLoadAttempts = 0;
+              const maxAttempts = 10;
+              
+              const waitForDataAndSetRange = () => {
+                dataLoadAttempts++;
+                
+                try {
+                  console.log(`🎯 Attempt ${dataLoadAttempts}: Setting time range...`);
+                  console.log(`   Event time: ${new Date(eventTimestamp * 1000).toLocaleString()}`);
+                  console.log(`   From: ${new Date(fromTimestamp * 1000).toLocaleString()}`);
+                  console.log(`   To: ${new Date(toTimestamp * 1000).toLocaleString()}`);
+                  
+                  // 设置可见范围
                   chart.setVisibleRange({ 
                     from: fromTimestamp, 
                     to: toTimestamp 
                   }, { 
                     applyDefaultRightMargin: false 
                   }).then(() => {
-                    console.log(`✅ Range set successfully at ${delay}ms!`);
-                    console.log(`   From: ${new Date(fromTimestamp * 1000).toLocaleString()}`);
-                    console.log(`   To: ${new Date(toTimestamp * 1000).toLocaleString()}`);
+                    console.log(`✅ Range set successfully on attempt ${dataLoadAttempts}!`);
+                    
+                    // 等待一下再确认设置
+                    setTimeout(() => {
+                      chart.setVisibleRange({ 
+                        from: fromTimestamp, 
+                        to: toTimestamp 
+                      }, { 
+                        applyDefaultRightMargin: false 
+                      }).then(() => {
+                        console.log('✅ Range confirmed and locked!');
+                      });
+                    }, 1000);
                   }).catch((err: any) => {
-                    console.warn(`⚠️ setVisibleRange failed at ${delay}ms:`, err);
+                    console.warn(`⚠️ setVisibleRange failed on attempt ${dataLoadAttempts}:`, err);
+                    
+                    // 如果失败且还有重试次数，继续尝试
+                    if (dataLoadAttempts < maxAttempts) {
+                      setTimeout(waitForDataAndSetRange, 1500);
+                    }
                   });
-                }, delay);
+                } catch (err) {
+                  console.error(`❌ Error on attempt ${dataLoadAttempts}:`, err);
+                  
+                  // 如果失败且还有重试次数，继续尝试
+                  if (dataLoadAttempts < maxAttempts) {
+                    setTimeout(waitForDataAndSetRange, 1500);
+                  }
+                }
+              };
+              
+              // 订阅数据加载完成事件（如果可用）
+              try {
+                chart.onDataLoaded().subscribe(null, () => {
+                  console.log('📊 Data loaded event triggered!');
+                  setTimeout(waitForDataAndSetRange, 500);
+                });
+              } catch (e) {
+                console.log('⚠️ onDataLoaded not available, using timeout fallback');
+              }
+              
+              // 使用多个延迟时间尝试设置（fallback机制）
+              const delays = [1500, 3000, 5000, 8000];
+              delays.forEach((delay) => {
+                setTimeout(waitForDataAndSetRange, delay);
               });
+              
             } catch (err) {
               console.error('❌ Error accessing chart:', err);
             }

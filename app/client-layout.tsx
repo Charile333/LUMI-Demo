@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import WalletProvider from './provider';
 import { CreateTopicButton } from '@/components/CreateTopicButton';
+import { SuppressHMRErrors } from './suppress-hmr-errors';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -28,6 +29,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   
   return (
     <WalletProvider>
+      <SuppressHMRErrors />
       {children}
       {showCreateButton && <CreateTopicButton />}
     </WalletProvider>

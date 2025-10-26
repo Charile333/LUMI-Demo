@@ -9,10 +9,7 @@ export default function LotteryGamePage() {
   const [ticketQuantity, setTicketQuantity] = useState(1);
 
   useEffect(() => {
-    document.body.style.paddingTop = '0';
-    return () => {
-      document.body.style.paddingTop = '0';
-    };
+    // 不再需要修改body样式，通过CSS处理
   }, []);
 
   const handleNumberClick = (number: number) => {
@@ -574,11 +571,6 @@ export default function LotteryGamePage() {
         </footer>
 
         <style jsx global>{`
-          body {
-            background: #121212 !important;
-            padding-top: 0 !important;
-          }
-          
           .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;

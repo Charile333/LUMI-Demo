@@ -37,10 +37,6 @@ const HomePage = () => {
     if (canvas) {
       canvas.remove()
     }
-    // 重置body样式
-    document.body.style.background = '#ffffff'
-    document.body.style.overflow = 'visible'
-    document.body.style.paddingTop = '14rem'
   }, [])
 
   // 处理分类切换
