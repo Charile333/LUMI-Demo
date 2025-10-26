@@ -89,20 +89,65 @@ export default function BlackSwanPage() {
     loadStats();
   }, []);
 
-  // 连接真实的预警系统 WebSocket
+  // 连接真实的预警系统 WebSocket 或轮询
   useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimer: NodeJS.Timeout;
+    let pollingTimer: NodeJS.Timeout;
     let isUnmounting = false;
+
+    // 检测是否在生产环境（Vercel）
+    const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+
+    // Vercel 环境：使用轮询
+    const startPolling = () => {
+      if (isUnmounting) return;
+      
+      console.log('🔄 Vercel 环境：使用轮询模式获取实时警报');
+      
+      const fetchLatestAlerts = async () => {
+        try {
+          const response = await fetch('/api/alerts/latest');
+          const result = await response.json();
+          
+          if (result.success && result.data && result.data.length > 0) {
+            const newAlerts: RealtimeAlert[] = result.data.map((item: any) => {
+              let change = 0;
+              if (item.details && item.details.price_change) {
+                change = item.details.price_change * 100;
+              }
+              
+              let severity: 'critical' | 'high' | 'medium' = item.severity || 'medium';
+              
+              return {
+                id: item.id?.toString() || Date.now().toString(),
+                timestamp: new Date(item.timestamp).toLocaleTimeString('zh-CN'),
+                asset: item.symbol.replace('USDT', '/USDT'),
+                severity: severity,
+                message: item.message,
+                change: change
+              };
+            });
+            
+            setRealtimeData(newAlerts);
+          }
+        } catch (error) {
+          console.error('获取最新警报失败:', error);
+        }
+      };
+      
+      // 立即获取一次
+      fetchLatestAlerts();
+      
+      // 每10秒轮询一次
+      pollingTimer = setInterval(fetchLatestAlerts, 10000);
+    };
 
     const connectWebSocket = () => {
       if (isUnmounting) return;
       
-      // 检测是否在生产环境（Vercel）- 跳过 WebSocket 连接
-      const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
-      
       if (isProduction) {
-        console.log('⚠️  生产环境：WebSocket 功能已禁用，使用静态数据');
+        startPolling();
         return;
       }
       
@@ -221,6 +266,9 @@ export default function BlackSwanPage() {
       }
       if (reconnectTimer) {
         clearTimeout(reconnectTimer);
+      }
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
       }
     };
   }, []);

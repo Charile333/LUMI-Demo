@@ -4,10 +4,6 @@ const path = require('path');
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // 自定义服务器的 webpack 配置
-  webpackDevMiddleware: config => {
-    return config;
-  },
   webpack: (config, { isServer }) => {
     // 配置路径别名，确保 @ 映射到根目录
     config.resolve.alias = {
