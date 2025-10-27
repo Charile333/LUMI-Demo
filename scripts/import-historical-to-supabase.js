@@ -13,32 +13,38 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABAS
 
 // 历史闪崩事件（与 import-historical-crashes.js 相同）
 const historicalCrashes = [
-  // 2025年
+  // 2025年10月10-11日 - 史上最大规模清算潮
   {
     date: '2025-10-10',
     symbol: 'BTCUSDT',
-    crashPercentage: -25.22,
-    peakPrice: 115000,
-    bottomPrice: 86000,
-    description: 'BTC价格在数小时内暴跌25%，从$115,000跌至$86,000',
-    duration: 8,
-    trigger: '特朗普宣布重启对华100%关税'
+    crashPercentage: -14.75,
+    peakPrice: 122000,
+    bottomPrice: 104000,
+    description: 'BTC从约$122,000跌至$104,000，跌幅约15%',
+    duration: 12,
+    trigger: '全球加密市场史上最大规模清算潮',
+    liquidation_usd: 19000000000,  // 190亿美元清算
+    market_cap_loss: 370000000000   // 3700亿美元市值蒸发
   },
   {
     date: '2025-10-10',
     symbol: 'ETHUSDT',
-    crashPercentage: -45,
-    description: 'ETH跟随BTC暴跌，跌幅达40-50%',
-    duration: 8
+    crashPercentage: -20,
+    peakPrice: 4000,
+    bottomPrice: 3200,
+    description: 'ETH跌幅约20%，次主流币跌幅更大',
+    duration: 12,
+    trigger: '随BTC暴跌，杠杆清算加剧'
   },
   {
     date: '2025-10-11',
     symbol: 'BTCUSDT',
-    crashPercentage: -25.22,
-    peakPrice: 115000,
-    bottomPrice: 86000,
-    description: '闪崩期间触发大规模杠杆清算，162万账户被强制平仓',
-    duration: 8
+    crashPercentage: -14.75,
+    peakPrice: 122000,
+    bottomPrice: 104000,
+    description: '闪崩期间触发大规模杠杆清算，约190亿美元被清算，市值蒸发超3,700亿美元',
+    duration: 12,
+    liquidation_usd: 19000000000
   },
   // 2024年
   {

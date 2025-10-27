@@ -276,11 +276,38 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* URL 参数处理（包裹在 Suspense 中） */}
-      <Suspense fallback={null}>
-        <CategoryFromURL onCategoryChange={setActiveCategory} />
-      </Suspense>
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        /* 自定义滚动条样式 - 紫色 */
+        ::-webkit-scrollbar {
+          width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(240, 240, 250, 1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: rgba(168, 85, 247, 0.6);
+          border-radius: 6px;
+          border: 2px solid rgba(240, 240, 250, 1);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(168, 85, 247, 0.8);
+        }
+        
+        /* Firefox */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(168, 85, 247, 0.6) rgba(240, 240, 250, 1);
+        }
+      `}} />
+      <div className="min-h-screen bg-white text-gray-900">
+        {/* URL 参数处理（包裹在 Suspense 中） */}
+        <Suspense fallback={null}>
+          <CategoryFromURL onCategoryChange={setActiveCategory} />
+        </Suspense>
 
       {/* 导航栏 */}
       <Navbar 
@@ -288,11 +315,12 @@ const HomePage = () => {
         onCategoryChange={handleCategoryChange}
       />
 
-      {/* 主要内容区域 - 根据选中的分类动态显示 */}
-      <div>
-        {renderContent()}
+        {/* 主要内容区域 - 根据选中的分类动态显示 */}
+        <div>
+          {renderContent()}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

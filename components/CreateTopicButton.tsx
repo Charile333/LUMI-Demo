@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface Topic {
   id: number
@@ -14,6 +15,7 @@ interface Topic {
 }
 
 export function CreateTopicButton() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [topics, setTopics] = useState<Topic[]>([])
   const [newTopic, setNewTopic] = useState({ title: '', description: '' })
@@ -44,7 +46,7 @@ export function CreateTopicButton() {
     e.preventDefault()
     
     if (!newTopic.title.trim()) {
-      alert('请输入话题标题')
+      alert(t('topic.pleaseEnterTitle'))
       return
     }
 
@@ -61,16 +63,16 @@ export function CreateTopicButton() {
       })
 
       if (response.ok) {
-        alert('✅ 话题提交成功！')
+        alert(t('topic.submitSuccess'))
         setNewTopic({ title: '', description: '' })
         loadTopics()
       } else {
         const error = await response.json()
-        alert(`❌ 提交失败: ${error.error || '请稍后重试'}`)
+        alert(`${t('topic.submitFailed')}: ${error.error || ''}`)
       }
     } catch (error) {
       console.error('提交话题失败:', error)
-      alert('❌ 提交失败，请检查网络连接')
+      alert(`${t('topic.submitFailed')}，${t('topic.networkError')}`)
     } finally {
       setIsSubmitting(false)
     }
@@ -89,14 +91,14 @@ export function CreateTopicButton() {
             ? { ...topic, votes: topic.votes + 1, hasVoted: true }
             : topic
         ))
-        alert('✅ 投票成功！')
+        alert(t('topic.voteSuccess'))
       } else {
         const error = await response.json()
-        alert(`❌ ${error.error || '投票失败'}`)
+        alert(`❌ ${error.error || t('topic.voteFailed')}`)
       }
     } catch (error) {
       console.error('投票失败:', error)
-      alert('❌ 投票失败')
+      alert(t('topic.voteFailed'))
     }
   }
 
@@ -106,11 +108,11 @@ export function CreateTopicButton() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full shadow-2xl hover:scale-110 transform transition-all duration-300 hover:shadow-purple-500/50 group"
-        title="创建话题投票"
+        title={t('topic.create')}
       >
         <Image
           src="/image/create.png"
-          alt="创建话题"
+          alt={t('topic.createButton')}
           width={64}
           height={64}
           className="rounded-full group-hover:rotate-12 transition-transform duration-300"
@@ -130,14 +132,14 @@ export function CreateTopicButton() {
 
           {/* 上栏：创建投票区域 */}
           <div className="h-[280px] bg-gradient-to-br from-purple-50 to-white p-5 border-b-2 border-purple-200">
-            <h3 className="text-lg font-bold text-purple-700 mb-3">✨ 创建话题投票</h3>
+            <h3 className="text-lg font-bold text-purple-700 mb-3">✨ {t('topic.create')}</h3>
             <form onSubmit={handleSubmitTopic} className="space-y-2">
               <input
                 type="text"
                 value={newTopic.title}
                 onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
                 className="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
-                placeholder="输入话题标题..."
+                placeholder={t('topic.titlePlaceholder')}
                 maxLength={100}
                 required
               />
@@ -145,7 +147,7 @@ export function CreateTopicButton() {
                 value={newTopic.description}
                 onChange={(e) => setNewTopic({ ...newTopic, description: e.target.value })}
                 className="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white resize-none h-16"
-                placeholder="描述（可选）"
+                placeholder={t('topic.descriptionPlaceholder')}
                 maxLength={200}
               />
               <button
@@ -153,7 +155,7 @@ export function CreateTopicButton() {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
-                {isSubmitting ? '提交中...' : '🚀 发布话题'}
+                {isSubmitting ? t('topic.submitting') : t('topic.publishTopic')}
               </button>
             </form>
           </div>
@@ -161,19 +163,19 @@ export function CreateTopicButton() {
           {/* 下栏：投票列表区域 (2/3) */}
           <div className="flex-1 bg-white overflow-y-auto p-4">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-md font-bold text-gray-800">📊 所有话题 ({topics.length})</h3>
+              <h3 className="text-md font-bold text-gray-800">{t('topic.allTopics')} ({topics.length})</h3>
               <button
                 onClick={loadTopics}
                 className="text-purple-500 hover:text-purple-700 text-sm"
               >
-                🔄 刷新
+                🔄 {t('common.refresh')}
               </button>
             </div>
 
             {topics.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
-                <p className="text-sm mb-1">暂无话题</p>
-                <p className="text-xs">快来创建第一个吧！</p>
+                <p className="text-sm mb-1">{t('topic.noTopics')}</p>
+                <p className="text-xs">{t('topic.noTopicsHint')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -188,7 +190,7 @@ export function CreateTopicButton() {
                       </h4>
                       <div className="flex items-center gap-1 bg-purple-100 px-2 py-1 rounded-full">
                         <span className="text-purple-700 font-bold text-sm">{topic.votes}</span>
-                        <span className="text-purple-500 text-xs">票</span>
+                        <span className="text-purple-500 text-xs">{t('topic.votes')}</span>
                       </div>
                     </div>
                     
@@ -200,7 +202,7 @@ export function CreateTopicButton() {
 
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-xs text-gray-400">
-                        {new Date(topic.createdAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                        {new Date(topic.createdAt).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })}
                       </span>
                       <button
                         onClick={() => handleVote(topic.id)}
@@ -211,7 +213,7 @@ export function CreateTopicButton() {
                             : 'bg-purple-500 text-white hover:bg-purple-600'
                         }`}
                       >
-                        {topic.hasVoted ? '✓ 已投' : '👍 投票'}
+                        {topic.hasVoted ? t('topic.voted') : t('topic.vote')}
                       </button>
                     </div>
                   </div>

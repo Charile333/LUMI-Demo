@@ -11,6 +11,31 @@ const dbPath = path.join(__dirname, '..', 'database', 'alerts.db');
 
 // 真实历史闪崩事件数据
 const historicalCrashes = [
+  // === 2025年10月10-11日 - 史上最大规模清算潮 ===
+  {
+    date: '2025-10-10',
+    symbol: 'BTCUSDT',
+    crashPercentage: -14.75,
+    peakPrice: 122000,
+    bottomPrice: 104000,
+    description: 'BTC从约$122,000跌至$104,000，跌幅约15%。全球加密市场史上最大规模清算潮',
+    duration: 12,
+    volume_spike: 8.5,
+    liquidation_usd: 19000000000,  // 190亿美元杠杆清算
+    market_cap_loss: 370000000000,  // 3700亿美元市值蒸发
+    trigger: '全球加密资产市场史上规模最大的清算潮'
+  },
+  {
+    date: '2025-10-10',
+    symbol: 'ETHUSDT',
+    crashPercentage: -20,
+    peakPrice: 4000,
+    bottomPrice: 3200,
+    description: 'ETH跌幅约20%，次主流币跌幅更大，随BTC暴跌触发杠杆清算',
+    duration: 12,
+    volume_spike: 7.2
+  },
+  
   // === 2024年 ===
   {
     date: '2024-08-05',

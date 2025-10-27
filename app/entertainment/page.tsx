@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import QuickTradeModal from '@/components/trading/QuickTradeModal';
 import { useMarketsByCategory } from '@/lib/hooks/useMarketsByCategory';
@@ -19,9 +20,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const EntertainmentPage = () => {
+  const { t } = useTranslation();
   const [selectedTimeRange, setSelectedTimeRange] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
   
   // 🎯 快速交易弹窗状态
   const [quickTradeModal, setQuickTradeModal] = useState<{
@@ -40,6 +45,33 @@ const EntertainmentPage = () => {
   // 🔥 使用 WebSocket 获取实时价格
   const marketIds = entertainmentMarkets.map(m => m.id);
   const { pricesMap, connected: wsConnected } = useMarketListWebSocket(marketIds);
+
+  // 滚动分类列表
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = 300;
+      const newScrollLeft = categoryScrollRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+      categoryScrollRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    }
+  };
+
+  // 检查滚动位置并更新箭头显示状态
+  const checkScrollPosition = () => {
+    if (categoryScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = categoryScrollRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    const scrollContainer = categoryScrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', checkScrollPosition);
+      checkScrollPosition(); // 初始检查
+      return () => scrollContainer.removeEventListener('scroll', checkScrollPosition);
+    }
+  }, []);
 
   // 时间筛选辅助函数
   const filterByTimeRange = (markets: any[]) => {
@@ -69,13 +101,13 @@ const EntertainmentPage = () => {
   };
 
   const categories = [
-    { id: 'all', name: '全部分类' },
-    { id: 'movie-box-office', name: '电影票房' },
-    { id: 'music-chart', name: '音乐榜单' },
-    { id: 'variety-show', name: '综艺节目' },
-    { id: 'pop-culture', name: '流行文化' },
-    { id: 'influencer-trend', name: '网红趋势' },
-    { id: 'social-heat', name: '社交热度' }
+    { id: 'all', name: t('categories.all') },
+    { id: 'movie-box-office', name: t('categories.movieBoxOffice') },
+    { id: 'music-chart', name: t('categories.musicChart') },
+    { id: 'variety-show', name: t('categories.varietyShow') },
+    { id: 'pop-culture', name: t('categories.popCulture') },
+    { id: 'influencer-trend', name: t('categories.influencerTrend') },
+    { id: 'social-heat', name: t('categories.socialHeat') }
   ];
 
   // 先按分类筛选
@@ -115,18 +147,52 @@ const EntertainmentPage = () => {
     return market;
   });
 
+  // 加载状态
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faFilm} className="text-6xl text-purple-600 mb-4 animate-pulse" />
+          <p className="text-xl text-gray-600">{t('common.loading')}</p>
+          <p className="text-sm text-gray-500 mt-2">{t('common.loadingData')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faFilm} className="text-6xl text-red-400 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('common.loadFailed')}</h3>
+          <p className="text-gray-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {t('common.reload')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-6">
         {/* Filters - 固定在顶部 */}
         <div className="sticky top-[14rem] z-40 bg-gray-50 pt-4 pb-4 -mx-4 px-4 mb-2 shadow-sm">
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col gap-4">
           {/* Search Box */}
-          <div className="relative w-full lg:w-64">
+          <div className="relative w-full lg:w-80">
             <input
               type="text"
-              placeholder="搜索市场..."
+              placeholder={t('common.searchMarkets')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-pink-400 transition-colors"
             />
             <svg
@@ -139,38 +205,68 @@ const EntertainmentPage = () => {
             </svg>
           </div>
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-2 flex-1">
-            {categories.map((category) => (
+          {/* Category Filter + Time Range Filter Row */}
+          <div className="flex gap-4 items-center">
+            {/* Category Filter - Horizontal Scroll with Arrows */}
+            <div className="flex-1 relative min-w-0">
+            {showLeftArrow && (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedCategory === category.id
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:border-purple-400 hover:text-purple-600'
-                }`}
+                onClick={() => scrollCategories('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 transition-all"
               >
-                {category.name}
+                <svg className="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
-            ))}
-          </div>
-          
-          {/* Time Range Filter */}
-          <div className="flex gap-2">
-            {['1D', '1W', '1M', '3M', 'ALL'].map((range) => (
+            )}
+            <div 
+              ref={categoryScrollRef}
+              className="overflow-x-auto scrollbar-hide px-8"
+            >
+              <div className="flex gap-2 min-w-max pb-1">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                      selectedCategory === category.id
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:border-purple-400 hover:text-purple-600'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {showRightArrow && (
               <button
-                key={range}
-                onClick={() => setSelectedTimeRange(range)}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                  selectedTimeRange === range
-                    ? 'bg-purple-100 text-purple-600 border border-purple-300'
-                    : 'bg-white border border-gray-300 text-gray-600 hover:border-purple-400 hover:text-purple-600'
-                }`}
+                onClick={() => scrollCategories('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 transition-all"
               >
-                {range}
+                <svg className="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
-            ))}
+            )}
+            </div>
+            
+            {/* Time Range Filter */}
+            <div className="flex gap-2 flex-shrink-0">
+              {['1D', '1W', '1M', '3M', 'ALL'].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setSelectedTimeRange(range)}
+                  className={`w-14 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap flex items-center justify-center flex-shrink-0 ${
+                    selectedTimeRange === range
+                      ? 'bg-purple-100 text-purple-600 border border-purple-300'
+                      : 'bg-white border border-gray-300 text-gray-600 hover:border-purple-400 hover:text-purple-600'
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         </div>
@@ -186,11 +282,11 @@ const EntertainmentPage = () => {
           {marketsWithRealtimePrices.map((market) => (
             <div
               key={market.id}
-              className="bg-dark-light rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all duration-300 group overflow-hidden"
+              className="bg-white rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all duration-300 group overflow-hidden"
             >
               {/* Card Header - Title with Trend */}
               <Link href={`/market/${market.id}`} className="block p-6 pb-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors flex-1">
                     {market.title}
                   </h3>
@@ -204,6 +300,43 @@ const EntertainmentPage = () => {
                     {market.change}
                   </div>
                 </div>
+                
+                {/* 标签区域：优先级 + 数据来源 + 分类 */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* 优先级标签 */}
+                  {market.priorityLevel === 'pinned' && (
+                    <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800 font-medium">
+                      📌 置顶
+                    </span>
+                  )}
+                  {market.priorityLevel === 'featured' && (
+                    <span className="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800 font-medium">
+                      ⭐ 精选
+                    </span>
+                  )}
+                  {market.priorityLevel === 'recommended' && (
+                    <span className="px-2 py-1 text-xs rounded bg-orange-100 text-orange-800 font-medium">
+                      🔥 推荐
+                    </span>
+                  )}
+                  
+                  {/* 数据来源标签 */}
+                  {market.source === 'polymarket' && (
+                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+                      🔴 Polymarket
+                    </span>
+                  )}
+                  {market.source === 'custom' && (
+                    <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                      📝 自定义
+                    </span>
+                  )}
+                  
+                  {/* 分类标签 */}
+                  <span className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                    {market.category}
+                  </span>
+                </div>
               </Link>
 
               {/* Card Body */}
@@ -211,11 +344,11 @@ const EntertainmentPage = () => {
                 {/* Probability and Stats */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <div className="text-xs text-gray-500 mb-1">当前概率</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('market.currentProbability')}</div>
                     <div className="text-3xl font-bold text-purple-600">{market.probability}%</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-gray-500 mb-1">截止日期</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('market.deadline')}</div>
                     <div className="text-sm text-gray-900">{market.endDate}</div>
                   </div>
                 </div>

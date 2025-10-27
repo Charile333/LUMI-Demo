@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import WalletProvider from './provider';
 import { CreateTopicButton } from '@/components/CreateTopicButton';
 import { SuppressHMRErrors } from './suppress-hmr-errors';
+import I18nProvider from '@/components/I18nProvider';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -28,10 +29,12 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   );
   
   return (
-    <WalletProvider>
-      <SuppressHMRErrors />
-      {children}
-      {showCreateButton && <CreateTopicButton />}
-    </WalletProvider>
+    <I18nProvider>
+      <WalletProvider>
+        <SuppressHMRErrors />
+        {children}
+        {showCreateButton && <CreateTopicButton />}
+      </WalletProvider>
+    </I18nProvider>
   );
 }

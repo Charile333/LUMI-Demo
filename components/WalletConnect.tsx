@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { useWallet } from '@/app/provider';
+import { useTranslation } from 'react-i18next';
 
 export default function WalletConnect() {
+  const { t } = useTranslation();
   const { address, isConnected, connectWallet, disconnectWallet } = useWallet();
   const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
     if (typeof window.ethereum === 'undefined') {
-      alert('请先安装 MetaMask 钱包！\n\n访问：https://metamask.io');
+      alert(t('wallet.installMetaMask') + '\n\n' + t('wallet.visitMetaMask') + ': https://metamask.io');
       window.open('https://metamask.io', '_blank');
       return;
     }
@@ -18,11 +20,11 @@ export default function WalletConnect() {
       setIsConnecting(true);
       await connectWallet();
     } catch (error: any) {
-      console.error('连接钱包失败:', error);
+      console.error(t('wallet.connectFailed'), error);
       if (error.code === 4001) {
-        alert('用户拒绝了连接请求');
+        alert(t('wallet.userRejected'));
       } else {
-        alert('连接失败：' + error.message);
+        alert(t('wallet.connectFailedMsg') + ': ' + error.message);
       }
     } finally {
       setIsConnecting(false);
@@ -48,9 +50,9 @@ export default function WalletConnect() {
         <button
           onClick={disconnectWallet}
           className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-          title="断开连接"
+          title={t('wallet.disconnect')}
         >
-          断开
+          {t('wallet.disconnect')}
         </button>
       </div>
     );
@@ -65,7 +67,7 @@ export default function WalletConnect() {
       {isConnecting ? (
         <>
           <span className="animate-spin">⏳</span>
-          <span>连接中...</span>
+          <span>{t('wallet.connecting')}</span>
         </>
       ) : (
         <>
@@ -75,7 +77,7 @@ export default function WalletConnect() {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          <span>连接钱包</span>
+          <span>{t('wallet.connect')}</span>
         </>
       )}
     </button>

@@ -11,12 +11,9 @@
 - **Vercel生产**：币安API实时轮询
 
 ### 2. 真实市场数据
-- ✅ 直接从币安获取5个主流币种实时数据
+- ✅ 直接从币安获取主流币种实时数据
   - BTC/USDT
-  - ETH/USDT  
-  - BNB/USDT
-  - SOL/USDT
-  - XRP/USDT
+  - ETH/USDT
 
 ### 3. 智能警报筛选
 - 只显示24小时价格变化 > 1%的币种
@@ -177,8 +174,8 @@ GET https://api.binance.com/api/v3/ticker/24hr
 ```typescript
 // 在第126行
 const symbols = [
-  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT',
-  'ADAUSDT', 'DOGEUSDT', 'DOTUSDT'  // 添加更多
+  'BTCUSDT', 'ETHUSDT',
+  'BNBUSDT', 'SOLUSDT', 'ADAUSDT'  // 添加更多币种
 ];
 ```
 
@@ -218,7 +215,7 @@ else if (Math.abs(priceChange) > 5) severity = 'high';  // 原来是3
 A: 币安API有速率限制（每分钟1200次请求），但我们每10秒才请求一次，远低于限制。
 
 **Q: 能监测更多币种吗？**  
-A: 可以！最多可以一次请求100个币种。修改 `symbols` 数组即可。
+A: 可以！当前监测BTC和ETH。如需添加更多币种（如BNB、SOL等），修改第126行的 `symbols` 数组即可。最多可以一次请求100个币种。
 
 **Q: 数据准确吗？**  
 A: 是的！直接来自币安的公开API，和交易所显示的一致。

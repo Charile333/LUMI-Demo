@@ -7,24 +7,25 @@ console.log('添加 2025年10月10-11日 BTC真实闪崩事件...\n');
 
 const db = new sqlite3.Database(dbPath);
 
-// 真实的闪崩事件数据
+// 真实的闪崩事件数据（基于 Reuters、IG、纳斯达克等权威来源）
 const crashEvents = [
   {
     timestamp: '2025-10-10T14:00:00Z',
     type: 'price_jump',
     symbol: 'BTCUSDT',
     severity: 'critical',
-    message: 'BTC价格在数小时内暴跌25%，从$115,000跌至$86,000',
+    message: 'BTC价格从约$122,000跌至约$104,000，跌幅约14.75%。全球加密市场史上最大规模清算潮',
     details: JSON.stringify({
-      peak_price: 115000,
-      bottom_price: 86000,
-      price_change: -25.22,
-      duration_hours: 8,
-      liquidation_usd: 19100000000,
+      peak_price: 122000,
+      bottom_price: 104000,
+      price_change: -14.75,
+      duration_hours: 12,
+      liquidation_usd: 19000000000,  // 约190亿美元杠杆头寸清算
       liquidated_accounts: 1620000,
-      trigger: '特朗普宣布重启对华100%关税',
-      impact: '全网24小时清算191亿美元，创历史纪录',
-      source: 'real_event',
+      market_cap_loss: 370000000000,  // 超过3700亿美元市值蒸发
+      trigger: '全球加密资产市场史上规模最大的清算潮',
+      impact: '仅杠杆头寸就被清算约190亿美元，市值蒸发超3700亿美元',
+      source: 'Reuters, IG, 纳斯达克等权威报道',
       verified: true
     })
   },
@@ -33,12 +34,13 @@ const crashEvents = [
     type: 'price_jump',
     symbol: 'ETHUSDT',
     severity: 'critical',
-    message: 'ETH跟随BTC暴跌，跌幅达40-50%',
+    message: 'ETH跟随BTC下跌，跌幅约20%，次主流币跌幅更大',
     details: JSON.stringify({
-      price_change: -45,
-      duration_hours: 8,
-      trigger: 'BTC闪崩引发连锁反应',
-      source: 'real_event',
+      price_change: -20,
+      duration_hours: 12,
+      trigger: 'BTC闪崩引发加密市场连锁反应',
+      impact: '次主流币如Ethereum跌幅大约20%左右',
+      source: 'Reuters等权威报道',
       verified: true
     })
   },
@@ -47,13 +49,14 @@ const crashEvents = [
     type: 'whale_transfer',
     symbol: 'BTCUSDT',
     severity: 'critical',
-    message: '闪崩期间触发大规模杠杆清算，162万账户被强制平仓',
+    message: '闪崩期间触发大规模杠杆清算，约162万账户被强制平仓，清算规模约190亿美元',
     details: JSON.stringify({
-      liquidation_usd: 19100000000,
+      liquidation_usd: 19000000000,  // 约190亿美元
       liquidated_accounts: 1620000,
+      market_cap_loss: 370000000000,  // 市值蒸发超3700亿美元
       market_impact: 'extreme',
       leverage_cascade: true,
-      source: 'real_event',
+      source: 'Reuters等权威报道',
       verified: true
     })
   }

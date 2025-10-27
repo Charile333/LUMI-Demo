@@ -3,6 +3,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MarketActivationStatus } from './MarketActivationStatus';
 import { TradeButton } from './TradeButton';
 import { InterestedButton } from './InterestedButton';
@@ -23,6 +24,7 @@ interface MarketCardProps {
 }
 
 export function MarketCard({ market: initialMarket }: MarketCardProps) {
+  const { t } = useTranslation();
   const [market, setMarket] = useState(initialMarket);
 
   // 处理感兴趣更新
@@ -70,12 +72,12 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
           <div className="flex flex-col gap-1">
             {market.blockchain_status === 'created' && (
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap">
-                ✓ 已激活
+                ✓ {t('market.activated')}
               </span>
             )}
             {market.priority_level === 'hot' && (
               <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full whitespace-nowrap">
-                🔥 热门
+                🔥 {t('market.hot')}
               </span>
             )}
           </div>
@@ -90,15 +92,15 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
         <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
           <span className="flex items-center gap-1">
             <span>👁️</span>
-            <span>{market.views || 0} 浏览</span>
+            <span>{market.views || 0} {t('market.views')}</span>
           </span>
           <span className="flex items-center gap-1">
             <span>⭐</span>
-            <span>{market.interested_users || 0} 感兴趣</span>
+            <span>{market.interested_users || 0} {t('market.interestedCount')}</span>
           </span>
           <span className="flex items-center gap-1">
             <span>📊</span>
-            <span>活跃度 {Math.round(market.activity_score || 0)}</span>
+            <span>{t('market.activityScore')} {Math.round(market.activity_score || 0)}</span>
           </span>
         </div>
 
@@ -106,7 +108,7 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
         {market.main_category && (
           <div className="mb-4">
             <span className={`text-xs px-2 py-1 rounded ${getCategoryColor(market.main_category)}`}>
-              {market.main_category}
+              {t(`categories.${market.main_category.replace('-', '')}`) || market.main_category}
             </span>
           </div>
         )}
@@ -137,7 +139,7 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
       {/* 底部信息 */}
       <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
         <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>市场 ID: {market.id}</span>
+          <span>{t('market.marketId')}: {market.id}</span>
           {market.condition_id && (
             <span className="font-mono">
               {market.condition_id.substring(0, 8)}...

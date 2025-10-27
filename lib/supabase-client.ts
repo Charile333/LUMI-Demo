@@ -3,7 +3,27 @@
  * 用于 Vercel 环境访问云数据库
  */
 
-// 简单的 fetch 包装器，不需要 Supabase SDK
+import { createClient } from '@supabase/supabase-js';
+
+// 创建前端客户端（使用public key）
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
+
+// 创建服务端客户端（使用service role key，仅在API路由中使用）
+export const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
+
+// 简单的 fetch 包装器（保持向后兼容）
 export async function queryAlerts(limit: number = 20) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

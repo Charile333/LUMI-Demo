@@ -3,7 +3,9 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import WalletConnect from './WalletConnect'
+import LanguageSwitcher from './LanguageSwitcher'
 
 // Navigation Link Component - 修改为按钮式点击
 const NavLink = ({ 
@@ -37,18 +39,19 @@ interface NavbarProps {
 }
 
 const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps) => {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
 
   // 六大赛道分类数据
   const categories = [
-    { id: 'automotive', name: '汽车与新能源' },
-    { id: 'smart-devices', name: '手机与智能硬件' },
-    { id: 'tech-ai', name: '科技发布与AI创新' },
-    { id: 'entertainment', name: '娱乐与文化' },
-    { id: 'sports-gaming', name: '体育与电竞' },
-    { id: 'economy-social', name: '经济与社会趋势' },
-    { id: 'emerging', name: '新兴赛道' },
+    { id: 'automotive', name: t('categories.automotive') },
+    { id: 'smart-devices', name: t('categories.smartDevices') },
+    { id: 'tech-ai', name: t('categories.techAi') },
+    { id: 'entertainment', name: t('categories.entertainment') },
+    { id: 'sports-gaming', name: t('categories.sportsGaming') },
+    { id: 'economy-social', name: t('categories.economySocial') },
+    { id: 'emerging', name: t('categories.emerging') },
   ]
 
   const handleCategoryClick = (categoryId: string) => {
@@ -62,7 +65,7 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
   }
 
   return (
-    <nav className="navbar fixed top-0 left-0 right-0 z-50 bg-primary">
+    <nav className="navbar fixed top-0 left-0 right-0 z-[100] bg-primary">
       <div className="container mx-auto px-4">
         {/* Top Row with Logo, Search, and Actions */}
         <div className="flex items-center justify-between py-[0.375rem] border-b border-secondary/20 gap-4" style={{height: '80px'}}>
@@ -89,7 +92,7 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
             <div className="relative flex-grow min-w-0 hidden lg:block">
               <input
                 type="text"
-                placeholder="搜索预测市场"
+                placeholder={t('nav.searchPlaceholder')}
                 className="w-full py-[0.55rem] px-[1.1rem] bg-gray-50 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 text-[0.935rem]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -106,9 +109,12 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
           <div className="flex items-center space-x-3">
             {/* 余额显示 */}
             <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-              <span className="text-sm text-gray-600">余额:</span>
+              <span className="text-sm text-gray-600">{t('nav.balance')}:</span>
               <span className="text-sm font-bold text-gray-900">$0.00</span>
             </div>
+            
+            {/* 语言切换器 */}
+            <LanguageSwitcher theme="light" />
             
             {/* 钱包连接组件 */}
             <WalletConnect />
@@ -127,7 +133,7 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
           <div className="relative">
             <input
               type="text"
-              placeholder="搜索预测市场"
+              placeholder={t('nav.searchPlaceholder')}
               className="w-full py-2 px-4 bg-gray-50 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -159,9 +165,9 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               </div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-purple-600 group-hover:text-purple-500 transition-colors">
-                  预测市场平台
+                  {t('nav.predictionMarket')}
                 </span>
-                <span className="text-xs text-gray-500">已上线</span>
+                <span className="text-xs text-gray-500">{t('nav.launched')}</span>
               </div>
             </Link>
 
@@ -175,12 +181,12 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               </div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-[#ff4444] group-hover:text-[#ff6666] transition-colors">
-                  黑天鹅预警
+                  {t('nav.blackSwanAlert')}
                 </span>
-                <span className="text-xs text-gray-500">2025 Q4 推出</span>
+                <span className="text-xs text-gray-500">2025 Q4 {t('nav.soon')}</span>
               </div>
               <span className="text-xs px-2 py-1 bg-[#ff4444] text-white rounded-full font-semibold whitespace-nowrap">
-                NEW
+                {t('nav.new')}
               </span>
             </Link>
 
@@ -192,12 +198,12 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               <div className="text-2xl">🎰</div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-[#d4a017] group-hover:text-[#ffcc00] transition-colors">
-                  彩票博彩平台
+                  {t('nav.lotteryPlatform')}
                 </span>
-                <span className="text-xs text-gray-500">2026-Q1 推出</span>
+                <span className="text-xs text-gray-500">2026-Q1 {t('nav.soon')}</span>
               </div>
               <span className="text-xs px-2 py-1 bg-[#ffcc00] text-black rounded-full font-semibold whitespace-nowrap">
-                SOON
+                {t('nav.soon')}
               </span>
             </Link>
 
@@ -209,12 +215,12 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               <div className="text-2xl">📊</div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-emerald-600 group-hover:text-emerald-500 transition-colors">
-                  市场趋势预测
+                  {t('nav.marketTrends')}
                 </span>
-                <span className="text-xs text-gray-500">2026-Q2 推出</span>
+                <span className="text-xs text-gray-500">2026-Q2 {t('nav.soon')}</span>
               </div>
               <span className="text-xs px-2 py-1 bg-emerald-500 text-white rounded-full font-semibold whitespace-nowrap">
-                SOON
+                {t('nav.soon')}
               </span>
             </Link>
 
@@ -226,12 +232,12 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               <div className="text-2xl">📈</div>
               <div className="flex flex-col flex-1">
                 <span className="text-sm font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
-                  AI量化交易
+                  {t('nav.aiQuant')}
                 </span>
-                <span className="text-xs text-gray-500">2026-Q3 推出</span>
+                <span className="text-xs text-gray-500">2026-Q3 {t('nav.soon')}</span>
               </div>
               <span className="text-xs px-2 py-1 bg-blue-500 text-white rounded-full font-semibold whitespace-nowrap">
-                SOON
+                {t('nav.soon')}
               </span>
             </Link>
           </div>
@@ -250,7 +256,7 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
               />
             ))}
           <button className="text-gray-700 hover:text-purple-600 flex items-center whitespace-nowrap">
-            更多 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {t('nav.more')} <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Script from 'next/script'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 // 实时警报数据类型
 interface RealtimeAlert {
@@ -16,6 +18,7 @@ interface RealtimeAlert {
 }
 
 export default function LumiSoonPage() {
+  const { t } = useTranslation();
   const [realtimeData, setRealtimeData] = useState<RealtimeAlert[]>([]);
   const [stats, setStats] = useState({ totalAlerts: 0, monitoredAssets: 0 });
   const [wsConnected, setWsConnected] = useState(false);
@@ -181,16 +184,48 @@ export default function LumiSoonPage() {
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{__html: `
+        /* 自定义滚动条样式 - 白色 */
+        ::-webkit-scrollbar {
+          width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.5);
+          border-radius: 6px;
+          border: 2px solid rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Firefox */
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.3);
+        }
+      `}} />
       <Script src="/cascading-waves.js" strategy="afterInteractive" />
       <div className="font-sans relative min-h-screen bg-black" data-page="landing">
-      {/* 左上角Logo - 固定在顶部 */}
-      <div className="fixed top-2 left-4 z-30">
+      {/* 左上角Logo - 固定在顶部，与语言切换器垂直居中对齐 */}
+      <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)' }}>
         <Image 
           src="/image/lumi1 (1).png" 
           alt="LUMI Logo" 
-          width={200} 
+          width={600} 
           height={200}
+          style={{ height: '200px', width: 'auto', objectFit: 'contain', display: 'block', margin: 0, padding: 0 }}
         />
+      </div>
+      
+      {/* 右上角语言切换器 - 与Logo垂直居中对齐 */}
+      <div style={{ position: 'fixed', top: 'calc(2rem + 100px)', right: '2rem', zIndex: 50, transform: 'translateY(-50%)' }}>
+        <LanguageSwitcher />
       </div>
 
       <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
@@ -204,13 +239,9 @@ export default function LumiSoonPage() {
 
           {/* 核心 "SOON" 区域 */}
           <div className="animate-breathe max-w-4xl mx-auto">
-            <p className="text-6xl md:text-9xl font-black text-white mb-6 text-glow" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>SOON</p>
+            <p className="text-6xl md:text-9xl font-black text-white mb-6 text-glow" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>{t('landing.soon')}</p>
             <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', fontWeight: '400'}}>
-              Crypto market tool—focuses on on-chain Black Swan risk signals,
-              <br />
-              quantitative uncertainty measurement, betting platform and
-              <br />
-              Prediction Market Platform.
+              {t('landing.description')}
             </p>
           </div>
               </div>
@@ -222,32 +253,32 @@ export default function LumiSoonPage() {
             <div className="flex justify-between relative z-10">
               <Link href="/black-swan" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2025-Q4</div>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q4_2025_title')}</div>
                 <div className="text-gray-400 text-lg font-semibold text-center max-w-[200px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
-                  黑天鹅预测<br/>预测市场
+                  {t('landing.timeline.q4_2025_desc1')}<br/>{t('landing.timeline.q4_2025_desc2')}
                 </div>
               </Link>
               <Link href="/lottery" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q1</div>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q1_2026_title')}</div>
                 <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
-                  彩票<br/>一站式链上博彩平台
+                  {t('landing.timeline.q1_2026_desc1')}<br/>{t('landing.timeline.q1_2026_desc2')}
                 </div>
               </Link>
-              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title="Coming Soon in Q2 2026">
+              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title={`${t('landing.timeline.comingSoon')} in Q2 2026`}>
                 <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q2</div>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q2_2026_title')}</div>
                 <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
-                  市场趋势预测
-                  <div className="text-xs text-gray-600 mt-1">Coming Soon</div>
+                  {t('landing.timeline.q2_2026_desc')}
+                  <div className="text-xs text-gray-600 mt-1">{t('landing.timeline.comingSoon')}</div>
                 </div>
               </div>
-              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title="Coming Soon in Q3 2026">
+              <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title={`${t('landing.timeline.comingSoon')} in Q3 2026`}>
                 <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>2026-Q3</div>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q3_2026_title')}</div>
                 <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
-                  大模型量化
-                  <div className="text-xs text-gray-600 mt-1">Coming Soon</div>
+                  {t('landing.timeline.q3_2026_desc')}
+                  <div className="text-xs text-gray-600 mt-1">{t('landing.timeline.comingSoon')}</div>
                 </div>
               </div>
             </div>
@@ -259,72 +290,83 @@ export default function LumiSoonPage() {
       <section className="relative z-20 flex justify-center px-4 mt-20 py-16 sm:px-6 lg:px-8">
         <div className="w-full max-w-6xl">
           <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 md:p-8">
+            {/* 标题 */}
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
-              Our Apps
+              {t('landing.apps.title')}
             </h2>
+            
             <div className="flex flex-col md:flex-row gap-6">
               {/* 左侧应用卡片 */}
               <div className="flex flex-col gap-6 flex-1">
-                <div className="bg-[#1a1a1a]/50 rounded-lg p-5 hover:bg-[#1a1a1a]/80 transition-colors">
-                  <div className="text-3xl text-white mb-3">
-                    <i className="fa fa-line-chart"></i>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">LUMI</h3>
-                  <p className="text-gray-300/70 text-sm">
-                    Advanced trading platform with real-time analytics
-                  </p>
-                </div>
-                <div className="bg-[#1a1a1a]/50 rounded-lg p-5 hover:bg-[#1a1a1a]/80 transition-colors">
-                  <div className="text-3xl text-white mb-3">
-                    <i className="fa fa-bell"></i>
-            </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    More Apps Coming Soon
-                      </h3>
-                  <p className="text-gray-300/70 text-sm">
-                    Customizable alerts for price movements and trends
-                  </p>
-                </div>
-                {/* 预测板块 - 金色毛玻璃效果 */}
-                <div className="backdrop-blur-md bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/10 rounded-lg p-5 border border-[#d4af37]/30 hover:border-[#d4af37]/50 transition-all">
-                  <div className="text-3xl text-[#d4af37] mb-3">
-                    <i className="fa fa-bar-chart"></i>
+                <div className="backdrop-blur-xl bg-white/5 rounded-xl p-6 border-2 border-white/10 hover:border-white/20 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-2xl text-purple-400 border border-white/20">
+                      <i className="fa fa-line-chart"></i>
                     </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    PREDICTION MARKET
-                  </h3>
-                  <p className="text-gray-300/70 text-sm mb-4">
-                    Decentralized prediction platform for crypto events
+                    <h3 className="text-lg font-bold text-white tracking-tight">{t('landing.apps.lumi.title')}</h3>
+                  </div>
+                  <p className="text-gray-300/90 text-sm leading-relaxed pl-[3.75rem]">
+                    {t('landing.apps.lumi.desc')}
                   </p>
-                  <div className="space-y-3">
-                    <div className="bg-[#1a1a1a]/60 p-3 rounded-md">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-white text-sm font-medium">
-                          BTC Price at $70K by End of Year?
+                </div>
+                <div className="backdrop-blur-xl bg-white/5 rounded-xl p-6 border-2 border-white/10 hover:border-white/20 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-2xl text-purple-400 border border-white/20">
+                      <i className="fa fa-bell"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white tracking-tight">
+                      {t('landing.apps.moreApps.title')}
+                    </h3>
+                  </div>
+                  <p className="text-gray-300/90 text-sm leading-relaxed pl-[3.75rem]">
+                    {t('landing.apps.moreApps.desc')}
+                  </p>
+                </div>
+                {/* 预测板块 - 白色毛玻璃效果 + 紫色点缀 */}
+                <div className="backdrop-blur-xl bg-white/5 rounded-xl p-6 border-2 border-white/20 hover:border-white/30 transition-all duration-300 shadow-2xl hover:shadow-[0_8px_30px_rgb(255,255,255,0.12)]">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-2xl text-purple-400 border border-white/20">
+                      <i className="fa fa-bar-chart"></i>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white tracking-tight">
+                        {t('landing.apps.prediction.title')}
+                      </h3>
+                      <p className="text-gray-300/80 text-xs mt-0.5">
+                        {t('landing.apps.prediction.desc')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3 mt-5">
+                    <div className="backdrop-blur-md bg-white/5 p-4 rounded-lg border border-white/10 hover:border-white/20 transition-all">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-white text-sm font-medium leading-tight">
+                          {t('landing.apps.prediction.question1')}
                         </span>
-                        <span className="text-xs px-2 py-1 bg-[#d4af37]/20 text-[#d4af37] rounded-full">
+                        <span className="text-sm px-3 py-1 bg-white/10 text-white rounded-full font-semibold backdrop-blur-sm border border-white/20">
                           82%
                         </span>
-                          </div>
-                      <div className="w-full bg-gray-700 rounded-full h-1.5">
+                      </div>
+                      <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-[#d4af37] h-1.5 rounded-full"
+                          className="bg-purple-500 h-2 rounded-full transition-all duration-500"
                           style={{ width: '82%' }}
                         ></div>
-                        </div>
+                      </div>
                     </div>
-                    <div className="bg-[#1a1a1a]/60 p-3 rounded-md">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-white text-sm font-medium">
-                          ETH to Surpass $4K in Q4?
+                    <div className="backdrop-blur-md bg-white/5 p-4 rounded-lg border border-white/10 hover:border-white/20 transition-all">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-white text-sm font-medium leading-tight">
+                          {t('landing.apps.prediction.question2')}
                         </span>
-                        <span className="text-xs px-2 py-1 bg-[#d4af37]/20 text-[#d4af37] rounded-full">
+                        <span className="text-sm px-3 py-1 bg-white/10 text-white rounded-full font-semibold backdrop-blur-sm border border-white/20">
                           65%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-1.5">
+                      <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-[#d4af37] h-1.5 rounded-full"
+                          className="bg-purple-500 h-2 rounded-full transition-all duration-500"
                           style={{ width: '65%' }}
                         ></div>
                       </div>
@@ -332,11 +374,16 @@ export default function LumiSoonPage() {
                   </div>
                   <Link
                     href="/markets"
-                    className="mt-4 w-full py-2 bg-[#d4af37] hover:bg-[#e6c553] text-black rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+                    className="group mt-6 w-full py-3.5 bg-purple-500 text-white rounded-lg text-base font-semibold transition-all duration-300 flex items-center justify-center border-2 border-purple-400 hover:bg-purple-600 hover:border-purple-300 shadow-lg hover:shadow-[0_8px_20px_rgba(168,85,247,0.4)] transform hover:scale-[1.02]"
+                    style={{ letterSpacing: '0.5px' }}
                   >
-                    <i className="fa fa-external-link mr-2"></i> 进入LUMI
+                    <span className="relative flex items-center gap-2">
+                      <i className="fa fa-rocket text-lg transition-transform duration-300 group-hover:translate-x-[-2px]"></i>
+                      <span>{t('landing.apps.prediction.enterLumi')}</span>
+                      <i className="fa fa-arrow-right text-sm transition-all duration-300 group-hover:translate-x-1 opacity-70 group-hover:opacity-100"></i>
+                    </span>
                   </Link>
-            </div>
+                </div>
               </div>
               
               {/* 右侧警报信息显示区 - 黑天鹅终端风格 */}
@@ -346,13 +393,13 @@ export default function LumiSoonPage() {
                   <div className="bg-gray-900 border-b border-green-500 px-4 py-2 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-green-400 font-mono text-sm font-bold">
-                        ═══ LIVE ALERT STREAM ═══
+                        ═══ {t('landing.terminal.liveAlertStream')} ═══
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
                       <span className={`font-mono text-xs ${wsConnected ? 'text-green-400' : 'text-red-400'}`}>
-                        {wsConnected ? 'MONITORING' : 'OFFLINE'}
+                        {wsConnected ? t('landing.terminal.monitoring').toUpperCase() : t('landing.terminal.offline').toUpperCase()}
                       </span>
                     </div>
                   </div>
@@ -363,8 +410,8 @@ export default function LumiSoonPage() {
                     <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs">
                       {realtimeData.length === 0 ? (
                         <div className="text-center py-10 text-gray-600">
-                          <div className="text-2xl mb-2">[ STANDBY ]</div>
-                          <p className="text-xs">Waiting for alert stream...</p>
+                          <div className="text-2xl mb-2">[ {t('landing.terminal.standby').toUpperCase()} ]</div>
+                          <p className="text-xs">{t('landing.terminal.waitingForAlerts')}</p>
                           <div className="mt-2 text-green-500 animate-pulse">█</div>
                         </div>
                       ) : (
@@ -419,21 +466,21 @@ export default function LumiSoonPage() {
                         {/* 左侧：统计 */}
                         <div className="border border-green-900 p-2 rounded">
                           <div className="text-green-400 font-mono text-[10px] mb-1 font-bold">
-                            ╔═ STATS ═╗
+                            ╔═ {t('landing.terminal.stats').toUpperCase()} ═╗
                           </div>
                           <div className="space-y-0.5 text-[9px] font-mono">
                             <div className="flex justify-between">
-                              <span className="text-gray-500">Recent:</span>
+                              <span className="text-gray-500">{t('landing.terminal.recent')}:</span>
                               <span className="text-white">{realtimeData.length}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500">Critical:</span>
+                              <span className="text-gray-500">{t('landing.terminal.critical')}:</span>
                               <span className="text-red-500">
                                 {realtimeData.filter(a => a.severity === 'critical').length}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500">Total:</span>
+                              <span className="text-gray-500">{t('landing.terminal.total')}:</span>
                               <span className="text-cyan-400">{stats.totalAlerts}</span>
                             </div>
                           </div>
@@ -442,21 +489,21 @@ export default function LumiSoonPage() {
                         {/* 右侧：系统状态 */}
                         <div className="border border-green-900 p-2 rounded">
                           <div className="text-green-400 font-mono text-[10px] mb-1 font-bold">
-                            ╔═ SYSTEM ═╗
+                            ╔═ {t('landing.terminal.system').toUpperCase()} ═╗
                           </div>
                           <div className="space-y-0.5 text-[9px] font-mono">
                             <div className="flex justify-between">
-                              <span className="text-gray-500">WS:</span>
+                              <span className="text-gray-500">{t('landing.terminal.ws')}:</span>
                               <span className={wsConnected ? 'text-green-400' : 'text-red-400'}>
-                                {wsConnected ? '✓ ONLINE' : '✗ OFFLINE'}
+                                {wsConnected ? `✓ ${t('landing.terminal.online').toUpperCase()}` : `✗ ${t('landing.terminal.offline').toUpperCase()}`}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500">Monitor:</span>
-                              <span className="text-green-400">✓ ACTIVE</span>
+                              <span className="text-gray-500">{t('landing.terminal.monitor')}:</span>
+                              <span className="text-green-400">✓ {t('landing.terminal.active').toUpperCase()}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500">Assets:</span>
+                              <span className="text-gray-500">{t('landing.terminal.assets')}:</span>
                               <span className="text-cyan-400">{stats.monitoredAssets}</span>
                             </div>
                           </div>
@@ -470,7 +517,7 @@ export default function LumiSoonPage() {
                           className="inline-flex items-center gap-1 text-green-400 hover:text-green-300 font-mono text-[10px] transition-colors"
                         >
                           <span>→</span>
-                          <span>Open Full Terminal</span>
+                          <span>{t('landing.terminal.openFullTerminal')}</span>
                           <span>←</span>
                         </Link>
                       </div>
@@ -485,7 +532,7 @@ export default function LumiSoonPage() {
 
       {/* 底部信息 */}
       <footer className="relative z-20 text-center text-gray-300/40 text-sm p-8">
-        <p>© 2025 LUMI. All rights reserved.</p>
+        <p>© 2025 LUMI. {t('footer.allRightsReserved')}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <a href="#" className="hover:text-white transition-colors">
             <i className="fa fa-twitter"></i>

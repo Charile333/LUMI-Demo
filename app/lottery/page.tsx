@@ -3,8 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
+import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LotteryPage() {
+  const { t } = useTranslation();
   const [showBetslip, setShowBetslip] = useState(false);
   const [betStake, setBetStake] = useState(0.1);
   const [selectedBet, setSelectedBet] = useState<any>(null);
@@ -32,17 +36,31 @@ export default function LotteryPage() {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
       </Head>
       
-      <div className="bg-[#121212] text-white font-sans antialiased">
+      <div className="bg-[#121212] text-white font-sans antialiased -mt-56">
+      {/* SOON Banner */}
+      <div className="bg-gradient-to-r from-[#b8860b] via-[#d4af37] to-[#b8860b] py-3 border-b border-[#d4af37]/50">
+        <div className="container mx-auto px-4 flex items-center justify-center">
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl">🎰</span>
+            <div className="text-center">
+              <p className="text-[#121212] font-bold text-lg tracking-wider">SOON - 2026 Q1</p>
+              <p className="text-[#121212]/80 text-xs font-medium">Blockchain Gaming Platform Coming Soon</p>
+            </div>
+            <span className="text-2xl">🎲</span>
+          </div>
+        </div>
+      </div>
+      
       {/* Responsible Gambling Notice */}
       <div className="bg-[#1a1a1a] border-b border-[#b8860b]/30 py-2">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
           <p className="text-xs text-gray-300 flex items-center justify-center md:justify-start">
             <i className="fa fa-info-circle text-[#b8860b] mr-2"></i>
-              18+ Gamble Responsibly. This platform operates under license number GL-2023-004. Terms apply.
+              {t('lottery.responsibleGambling')}
           </p>
           <div className="flex space-x-4 mt-2 md:mt-0">
-              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Responsible Gambling</a>
-              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Help Center</a>
+              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.responsibleGamblingLink')}</a>
+              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.helpCenter')}</a>
           </div>
         </div>
       </div>
@@ -51,27 +69,30 @@ export default function LotteryPage() {
       <header className="sticky top-0 z-50 bg-[#121212]/95 backdrop-blur-md border-b border-gray-800">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-              <div className="text-[#b8860b] text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>LegitChain</div>
+              <div className="flex items-center h-6">
+                <Image 
+                  src="/image/LUMI-golden.png" 
+                  alt="LUMI" 
+                  width={180} 
+                  height={30}
+                  className="object-contain"
+                />
+              </div>
             <div className="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
             <nav className="hidden md:flex space-x-6 text-sm">
-                <a href="#" className="text-white hover:text-[#b8860b] transition-colors border-b-2 border-[#b8860b] pb-1">Games</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Live Casino</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Tournaments</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Promotions</a>
+                <a href="#" className="text-white hover:text-[#b8860b] transition-colors border-b-2 border-[#b8860b] pb-1">{t('lottery.games')}</a>
+                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.sports')}</a>
+                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.liveCasino')}</a>
+                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.tournaments')}</a>
+                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.promotions')}</a>
             </nav>
           </div>
           
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-3">
-                <Link href="/" className="flex items-center space-x-2 bg-[#1a1a1a] border border-gray-700 rounded-md px-3 py-1.5 text-sm hover:border-[#b8860b]/50 transition-colors">
+                <Link href="/markets" className="flex items-center space-x-2 bg-[#1a1a1a] border border-gray-700 rounded-md px-3 py-1.5 text-sm hover:border-[#b8860b]/50 transition-colors">
                   <i className="fa fa-arrow-left text-[#b8860b]"></i>
-                  <span>返回市场</span>
-                </Link>
-                
-                <Link href="/lottery-game" className="flex items-center space-x-2 bg-[#1a1a1a] border border-[#b8860b]/30 rounded-md px-3 py-1.5 text-sm hover:border-[#b8860b]/50 transition-colors">
-                  <i className="fa fa-ticket text-[#b8860b]"></i>
-                  <span>彩票游戏</span>
+                  <span>{t('lottery.backToMarket')}</span>
                 </Link>
                 
               <div className="relative">
@@ -83,10 +104,15 @@ export default function LotteryPage() {
               
               <div className="h-6 w-px bg-gray-700"></div>
               
+              {/* 语言切换器 */}
+              <LanguageSwitcher />
+              
+              <div className="h-6 w-px bg-gray-700"></div>
+              
                 <div className="flex items-center space-x-3">
                   <div>
                   <div className="text-right">
-                      <p className="text-xs text-gray-400">Balance</p>
+                      <p className="text-xs text-gray-400">{t('lottery.balance')}</p>
                       <p className="text-sm font-medium">4.872 ETH</p>
                     </div>
                   </div>
@@ -111,14 +137,15 @@ export default function LotteryPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#121212]/70 to-transparent z-10"></div>
             <img src="https://picsum.photos/id/1048/1600/400" alt="Premium Gaming Experience" className="w-full h-48 md:h-64 object-cover" />
             <div className="absolute inset-0 z-20 flex flex-col justify-center p-6 md:p-10">
-              <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 max-w-lg" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Premium Blockchain Gaming Experience</h1>
-              <p className="text-gray-300 mb-4 max-w-md">Provably fair games with instant payouts and transparent operations on the blockchain</p>
+              <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 max-w-lg" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{t('lottery.banner.title')}</h1>
+              <p className="text-gray-300 mb-4 max-w-md">{t('lottery.banner.description')}</p>
               <div className="flex flex-wrap gap-3">
-                <button className="bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-semibold px-5 py-2 rounded-lg hover:opacity-90 transition-opacity">
-                  Explore Games
-                </button>
+                <Link href="/lottery-game" className="bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-semibold px-5 py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2">
+                  <i className="fa fa-ticket"></i>
+                  <span>{t('lottery.banner.exploreGames')}</span>
+                </Link>
                 <button className="bg-transparent border border-gray-600 text-white font-medium px-5 py-2 rounded-lg hover:border-[#b8860b]/50 transition-colors">
-                  Deposit Funds
+                  {t('lottery.banner.depositFunds')}
                 </button>
               </div>
             </div>
@@ -131,7 +158,7 @@ export default function LotteryPage() {
               {/* Game Categories */}
               <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                 <div className="p-5 border-b border-gray-800">
-                  <h2 className="text-lg font-semibold">Game Categories</h2>
+                  <h2 className="text-lg font-semibold">{t('lottery.gameCategories.title')}</h2>
                 </div>
                 
                 <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -139,32 +166,32 @@ export default function LotteryPage() {
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center mb-3">
                       <i className="fa fa-dice text-[#121212]"></i>
                     </div>
-                    <span className="text-sm font-medium">Slots</span>
-                    <span className="text-xs text-gray-500 mt-1">48 Games</span>
+                    <span className="text-sm font-medium">{t('lottery.gameCategories.slots')}</span>
+                    <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.slotsCount')}</span>
                   </button>
                   
                   <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-play-circle-o text-[#b8860b]"></i>
                     </div>
-                    <span className="text-sm font-medium">Live Casino</span>
-                    <span className="text-xs text-gray-500 mt-1">12 Tables</span>
+                    <span className="text-sm font-medium">{t('lottery.gameCategories.liveCasinoTitle')}</span>
+                    <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.liveCasinoCount')}</span>
                   </button>
                   
                   <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-trophy text-[#b8860b]"></i>
                     </div>
-                    <span className="text-sm font-medium">Sportsbook</span>
-                    <span className="text-xs text-gray-500 mt-1">24 Sports</span>
+                    <span className="text-sm font-medium">{t('lottery.gameCategories.sportsbook')}</span>
+                    <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.sportsbookCount')}</span>
                   </button>
                   
                   <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-users text-[#b8860b]"></i>
                     </div>
-                    <span className="text-sm font-medium">Tournaments</span>
-                    <span className="text-xs text-gray-500 mt-1">7 Active</span>
+                    <span className="text-sm font-medium">{t('lottery.gameCategories.tournamentsTitle')}</span>
+                    <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.tournamentsCount')}</span>
                   </button>
                 </div>
               </div>
@@ -172,8 +199,8 @@ export default function LotteryPage() {
               {/* Featured Games */}
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Featured Games</h2>
-                  <a href="#" className="text-sm text-[#b8860b] hover:text-[#d4af37]">View All</a>
+                  <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t('lottery.featured.title')}</h2>
+                  <a href="#" className="text-sm text-[#b8860b] hover:text-[#d4af37]">{t('lottery.featured.viewAll')}</a>
         </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -181,21 +208,21 @@ export default function LotteryPage() {
                   <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="relative">
                       <img src="https://picsum.photos/id/1050/600/300" alt="Crypto Riches Slot" className="w-full h-40 object-cover" />
-                      <div className="absolute top-2 right-2 bg-[#b8860b] text-[#121212] text-xs font-bold px-2 py-1 rounded">HOT</div>
+                      <div className="absolute top-2 right-2 bg-[#b8860b] text-[#121212] text-xs font-bold px-2 py-1 rounded">{t('lottery.featured.hot')}</div>
             </div>
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">Crypto Riches</h3>
+                        <h3 className="font-medium">{t('lottery.featured.cryptoRiches')}</h3>
                         <div className="flex items-center">
                           <i className="fa fa-star text-[#b8860b] text-xs"></i>
                           <span className="text-xs ml-1">4.8/5</span>
             </div>
             </div>
-                      <p className="text-xs text-gray-400 mb-3">Slot • 243 Ways • 96.5% RTP</p>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.cryptoRichesDesc')}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">Max Win: 10,000x</span>
+                        <span className="text-xs text-gray-500">{t('lottery.featured.cryptoRichesMaxWin')}</span>
                         <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          Play Now
+                          {t('lottery.featured.playNow')}
                         </button>
             </div>
           </div>
@@ -205,21 +232,21 @@ export default function LotteryPage() {
                   <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="relative">
                       <img src="https://picsum.photos/id/1053/600/300" alt="Blockchain Blackjack" className="w-full h-40 object-cover" />
-                      <div className="absolute top-2 right-2 bg-[#121212] text-[#b8860b] text-xs font-bold px-2 py-1 rounded border border-[#b8860b]/30">LIVE</div>
+                      <div className="absolute top-2 right-2 bg-[#121212] text-[#b8860b] text-xs font-bold px-2 py-1 rounded border border-[#b8860b]/30">{t('lottery.featured.live')}</div>
                     </div>
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">Blockchain Blackjack</h3>
+                        <h3 className="font-medium">{t('lottery.featured.blockchainBlackjack')}</h3>
                         <div className="flex items-center">
                           <i className="fa fa-star text-[#b8860b] text-xs"></i>
                           <span className="text-xs ml-1">4.9/5</span>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mb-3">Table • Live Dealer • 99.5% RTP</p>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.blockchainBlackjackDesc')}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">Min Bet: 0.001 ETH</span>
+                        <span className="text-xs text-gray-500">{t('lottery.featured.blackjackMinBet')}</span>
                         <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          Play Now
+                          {t('lottery.featured.playNow')}
                         </button>
                       </div>
                     </div>
@@ -232,17 +259,17 @@ export default function LotteryPage() {
                     </div>
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">Esports Arena</h3>
+                        <h3 className="font-medium">{t('lottery.featured.esportsArena')}</h3>
                         <div className="flex items-center">
                           <i className="fa fa-star text-[#b8860b] text-xs"></i>
                           <span className="text-xs ml-1">4.7/5</span>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mb-3">Sportsbook • 12 Leagues • Live Bets</p>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.esportsArenaDesc')}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">148 Events Today</span>
+                        <span className="text-xs text-gray-500">{t('lottery.featured.esportsEvents')}</span>
                         <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          Bet Now
+                          {t('lottery.featured.betNow')}
                         </button>
                       </div>
                     </div>
@@ -253,8 +280,8 @@ export default function LotteryPage() {
       {/* Live Sports Events */}
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Live Sports Events</h2>
-                  <a href="#" className="text-sm text-[#b8860b] hover:text-[#d4af37]">View All</a>
+                  <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t('lottery.liveSports.title')}</h2>
+                  <a href="#" className="text-sm text-[#b8860b] hover:text-[#d4af37]">{t('lottery.liveSports.viewAll')}</a>
                 </div>
                 
                 <div className="space-y-4">
@@ -264,15 +291,15 @@ export default function LotteryPage() {
                       <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center mr-2">
                         <i className="fa fa-futbol-o text-xs text-white"></i>
                       </div>
-                      <span className="font-medium">Football</span>
-                      <span className="ml-2 text-xs text-gray-500">(24 Live Events)</span>
+                      <span className="font-medium">{t('lottery.liveSports.football')}</span>
+                      <span className="ml-2 text-xs text-gray-500">({t('lottery.liveSports.footballLive')})</span>
                     </div>
                     
                     <div className="divide-y divide-gray-800">
                       {/* Event 1 */}
                       <div className="p-4 hover:bg-[#121212]/50 transition-colors">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs text-gray-400">Premier League • Live</span>
+                          <span className="text-xs text-gray-400">{t('lottery.liveSports.premierLeague')} • {t('lottery.liveSports.live')}</span>
                           <span className="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">1-1</span>
                         </div>
                         
@@ -316,14 +343,14 @@ export default function LotteryPage() {
                         </div>
                         
                         <div className="mt-3 text-center">
-                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+42 More Markets</a>
+                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+42 {t('lottery.liveSports.moreMarkets')}</a>
                         </div>
                       </div>
                       
                       {/* Event 2 */}
                       <div className="p-4 hover:bg-[#121212]/50 transition-colors">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs text-gray-400">La Liga • Live</span>
+                          <span className="text-xs text-gray-400">{t('lottery.liveSports.laLiga')} • {t('lottery.liveSports.live')}</span>
                           <span className="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">0-2</span>
                         </div>
                         
@@ -367,7 +394,7 @@ export default function LotteryPage() {
                         </div>
                         
                         <div className="mt-3 text-center">
-                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+38 More Markets</a>
+                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+38 {t('lottery.liveSports.moreMarkets')}</a>
                         </div>
                       </div>
                     </div>
@@ -379,15 +406,15 @@ export default function LotteryPage() {
                       <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center mr-2">
                         <i className="fa fa-basketball-ball text-xs text-white"></i>
                       </div>
-                      <span className="font-medium">Basketball</span>
-                      <span className="ml-2 text-xs text-gray-500">(18 Live Events)</span>
+                      <span className="font-medium">{t('lottery.liveSports.basketball')}</span>
+                      <span className="ml-2 text-xs text-gray-500">({t('lottery.liveSports.basketballLive')})</span>
                     </div>
                     
                     <div className="divide-y divide-gray-800">
                       {/* Event 1 */}
                       <div className="p-4 hover:bg-[#121212]/50 transition-colors">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs text-gray-400">NBA • Live</span>
+                          <span className="text-xs text-gray-400">{t('lottery.liveSports.nba')} • {t('lottery.liveSports.live')}</span>
                           <span className="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded-full">87-93</span>
                         </div>
                         
@@ -428,7 +455,7 @@ export default function LotteryPage() {
                   </div>
                   
                         <div className="mt-3 text-center">
-                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+56 More Markets</a>
+                          <a href="#" className="text-xs text-[#b8860b] hover:text-[#d4af37]">+56 {t('lottery.liveSports.moreMarkets')}</a>
                         </div>
                       </div>
                     </div>
@@ -439,14 +466,14 @@ export default function LotteryPage() {
       {/* Provably Fair Section */}
           <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
             <div className="p-5 border-b border-gray-800">
-                  <h2 className="text-lg font-semibold">Provably Fair Gaming</h2>
+                  <h2 className="text-lg font-semibold">{t('lottery.provablyFair.title')}</h2>
                 </div>
                 
                 <div className="p-5">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-1">
                       <p className="text-sm text-gray-300 mb-4">
-                        All our games operate on a provably fair system utilizing blockchain technology. This ensures every outcome is random, transparent, and verifiable by anyone.
+                        {t('lottery.provablyFair.description')}
                       </p>
                       
                       <div className="space-y-3 mb-4">
@@ -455,8 +482,8 @@ export default function LotteryPage() {
                             <i className="fa fa-check text-[#121212] text-xs"></i>
                           </div>
                           <div>
-                            <h3 className="text-sm font-medium">Transparent Outcomes</h3>
-                            <p className="text-xs text-gray-400">Every game result is recorded on the blockchain for full transparency.</p>
+                            <h3 className="text-sm font-medium">{t('lottery.provablyFair.transparentTitle')}</h3>
+                            <p className="text-xs text-gray-400">{t('lottery.provablyFair.transparentDesc')}</p>
                           </div>
                         </div>
                         
@@ -465,8 +492,8 @@ export default function LotteryPage() {
                             <i className="fa fa-check text-[#121212] text-xs"></i>
                           </div>
                           <div>
-                            <h3 className="text-sm font-medium">Verifiable Results</h3>
-                            <p className="text-xs text-gray-400">Players can independently verify the fairness of each game outcome.</p>
+                            <h3 className="text-sm font-medium">{t('lottery.provablyFair.verifiableTitle')}</h3>
+                            <p className="text-xs text-gray-400">{t('lottery.provablyFair.verifiableDesc')}</p>
                           </div>
                         </div>
                         
@@ -475,15 +502,15 @@ export default function LotteryPage() {
                             <i className="fa fa-check text-[#121212] text-xs"></i>
                           </div>
                           <div>
-                            <h3 className="text-sm font-medium">Instant Payouts</h3>
-                            <p className="text-xs text-gray-400">Winnings are automatically sent to your wallet without delays.</p>
+                            <h3 className="text-sm font-medium">{t('lottery.provablyFair.instantTitle')}</h3>
+                            <p className="text-xs text-gray-400">{t('lottery.provablyFair.instantDesc')}</p>
                           </div>
                         </div>
                       </div>
                       
                       <a href="#" className="text-[#b8860b] hover:text-[#d4af37] text-sm flex items-center">
                         <i className="fa fa-link mr-1"></i>
-                        Learn More About Our Fairness
+                        {t('lottery.provablyFair.learnMore')}
                       </a>
                     </div>
                     
@@ -492,8 +519,8 @@ export default function LotteryPage() {
                         <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center mb-3">
                           <i className="fa fa-shield text-[#121212] text-2xl"></i>
                         </div>
-                        <h3 className="font-medium mb-1 text-center">Licensed & Regulated</h3>
-                        <p className="text-xs text-gray-400 text-center mb-3">Operating under gaming license GL-2023-004</p>
+                        <h3 className="font-medium mb-1 text-center">{t('lottery.provablyFair.licensed')}</h3>
+                        <p className="text-xs text-gray-400 text-center mb-3">{t('lottery.provablyFair.licenseNumber')}</p>
                         <div className="flex space-x-2">
                           <img src="https://picsum.photos/id/101/60/30" alt="Regulatory Body" className="h-6 opacity-70" />
                           <img src="https://picsum.photos/id/102/60/30" alt="Regulatory Body" className="h-6 opacity-70" />
@@ -511,8 +538,8 @@ export default function LotteryPage() {
                 {/* Bet Slip */}
                 <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                   <div className="p-5 border-b border-gray-800 flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">Bet Slip</h2>
-                    <button onClick={clearBetslip} className="text-sm text-gray-400 hover:text-[#b8860b] transition-colors">Clear All</button>
+                    <h2 className="text-lg font-semibold">{t('lottery.betSlip.title')}</h2>
+                    <button onClick={clearBetslip} className="text-sm text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.betSlip.clearAll')}</button>
                   </div>
                   
                   {!showBetslip ? (
@@ -520,8 +547,8 @@ export default function LotteryPage() {
                       <div className="w-16 h-16 rounded-full bg-[#121212] mx-auto flex items-center justify-center mb-3">
                         <i className="fa fa-ticket text-gray-600 text-2xl"></i>
                       </div>
-                      <p className="text-gray-500 mb-2">Your bet slip is empty</p>
-                      <p className="text-xs text-gray-600">Add selections to get started</p>
+                      <p className="text-gray-500 mb-2">{t('lottery.betSlip.empty')}</p>
+                      <p className="text-xs text-gray-600">{t('lottery.betSlip.emptyDesc')}</p>
                     </div>
                   ) : (
                     <div>
@@ -543,7 +570,7 @@ export default function LotteryPage() {
                           </div>
                           
                           <div className="mt-3">
-                            <label className="block text-xs text-gray-500 mb-1">Stake (ETH)</label>
+                            <label className="block text-xs text-gray-500 mb-1">{t('lottery.betSlip.stake')}</label>
                             <div className="flex items-center">
                               <button 
                                 onClick={() => setBetStake(Math.max(0.01, betStake - 0.05))}
@@ -571,17 +598,17 @@ export default function LotteryPage() {
                       <div className="p-4 border-t border-gray-800">
                         <div className="space-y-2 mb-4">
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">Total Stake</span>
+                            <span className="text-gray-400">{t('lottery.betSlip.totalStake')}</span>
                             <span className="font-medium">{betStake.toFixed(2)} ETH</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">Potential Win</span>
+                            <span className="text-gray-400">{t('lottery.betSlip.potentialWin')}</span>
                             <span className="text-[#10b981] font-medium">{(betStake * (selectedBet?.odds || 0)).toFixed(2)} ETH</span>
                           </div>
                         </div>
                         
                         <button className="w-full py-2.5 bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-semibold rounded-lg hover:opacity-90 transition-opacity">
-                          Place Bet
+                          {t('lottery.betSlip.placeBet')}
                         </button>
                       </div>
                     </div>
@@ -591,28 +618,28 @@ export default function LotteryPage() {
                 {/* Account Balance */}
                 <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                   <div className="p-5 border-b border-gray-800">
-                    <h2 className="text-lg font-semibold">My Account</h2>
+                    <h2 className="text-lg font-semibold">{t('lottery.account.title')}</h2>
                   </div>
                   
                   <div className="p-5">
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm text-gray-400">Available Balance</span>
+                      <span className="text-sm text-gray-400">{t('lottery.account.availableBalance')}</span>
                       <span className="text-xl font-bold">4.872 ETH</span>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-3 mb-5">
                       <button className="flex items-center justify-center space-x-1 py-2.5 bg-[#121212] rounded-lg border border-gray-700 text-sm font-medium hover:border-[#b8860b]/50 transition-colors">
                         <i className="fa fa-plus text-[#b8860b]"></i>
-                        <span>Deposit</span>
+                        <span>{t('lottery.account.deposit')}</span>
                       </button>
                       <button className="flex items-center justify-center space-x-1 py-2.5 bg-[#121212] rounded-lg border border-gray-700 text-sm font-medium hover:border-[#b8860b]/50 transition-colors">
                         <i className="fa fa-minus text-gray-400"></i>
-                        <span>Withdraw</span>
+                        <span>{t('lottery.account.withdraw')}</span>
                       </button>
                     </div>
                     
                     <div className="border-t border-gray-800 pt-4">
-                      <h3 className="text-sm font-medium mb-3">Recent Transactions</h3>
+                      <h3 className="text-sm font-medium mb-3">{t('lottery.account.recentTransactions')}</h3>
                       
                       <div className="space-y-3 max-h-48 overflow-y-auto scrollbar-hide">
                         {/* Transaction 1 */}
@@ -622,8 +649,8 @@ export default function LotteryPage() {
                               <i className="fa fa-arrow-down text-[#10b981]"></i>
                             </div>
                             <div>
-                              <p className="text-sm">Deposit</p>
-                              <p className="text-xs text-gray-500">Today, 14:32</p>
+                              <p className="text-sm">{t('lottery.account.transactionDeposit')}</p>
+                              <p className="text-xs text-gray-500">{t('lottery.account.today')}, 14:32</p>
                             </div>
                           </div>
                           <span className="text-sm font-medium text-[#10b981]">+2.50 ETH</span>
@@ -636,8 +663,8 @@ export default function LotteryPage() {
                               <i className="fa fa-arrow-up text-[#ef4444]"></i>
                             </div>
                             <div>
-                              <p className="text-sm">Bet Placement</p>
-                              <p className="text-xs text-gray-500">Yesterday, 20:15</p>
+                              <p className="text-sm">{t('lottery.account.transactionBet')}</p>
+                              <p className="text-xs text-gray-500">{t('lottery.account.yesterday')}, 20:15</p>
                             </div>
                           </div>
                           <span className="text-sm font-medium text-[#ef4444]">-0.25 ETH</span>
@@ -650,8 +677,8 @@ export default function LotteryPage() {
                               <i className="fa fa-trophy text-[#10b981]"></i>
                             </div>
                             <div>
-                              <p className="text-sm">Winnings</p>
-                              <p className="text-xs text-gray-500">Yesterday, 18:47</p>
+                              <p className="text-sm">{t('lottery.account.transactionWinnings')}</p>
+                              <p className="text-xs text-gray-500">{t('lottery.account.yesterday')}, 18:47</p>
                             </div>
                           </div>
                           <span className="text-sm font-medium text-[#10b981]">+0.87 ETH</span>
@@ -664,7 +691,7 @@ export default function LotteryPage() {
                               <i className="fa fa-arrow-up text-[#ef4444]"></i>
                             </div>
                             <div>
-                              <p className="text-sm">Withdrawal</p>
+                              <p className="text-sm">{t('lottery.account.transactionWithdrawal')}</p>
                               <p className="text-xs text-gray-500">Jun 10, 11:23</p>
                             </div>
                           </div>
@@ -673,7 +700,7 @@ export default function LotteryPage() {
                       </div>
                       
                       <a href="#" className="text-center block text-sm text-[#b8860b] hover:text-[#d4af37] mt-3">
-                        View All Transactions
+                        {t('lottery.account.viewAll')}
                       </a>
                     </div>
                   </div>
@@ -682,7 +709,7 @@ export default function LotteryPage() {
                 {/* Promotions */}
                 <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                   <div className="p-5 border-b border-gray-800">
-                    <h2 className="text-lg font-semibold">Current Promotions</h2>
+                    <h2 className="text-lg font-semibold">{t('lottery.promotionsCard.title')}</h2>
                   </div>
                   
                   <div className="divide-y divide-gray-800">
@@ -691,12 +718,12 @@ export default function LotteryPage() {
                         <img src="https://picsum.photos/id/1060/400/200" alt="Welcome Bonus" className="w-full h-32 object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent"></div>
                         <div className="absolute bottom-2 left-2 right-2">
-                          <h3 className="font-medium text-white">Welcome Bonus</h3>
+                          <h3 className="font-medium text-white">{t('lottery.promotionsCard.welcomeBonus')}</h3>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mb-2">100% up to 5 ETH on your first deposit</p>
+                      <p className="text-xs text-gray-400 mb-2">{t('lottery.promotionsCard.welcomeBonusDesc')}</p>
                       <button className="w-full py-1.5 bg-[#121212] rounded-lg border border-[#b8860b]/30 text-[#b8860b] text-xs font-medium hover:bg-[#b8860b]/10 transition-colors">
-                        Claim Now
+                        {t('lottery.promotionsCard.claimNow')}
                       </button>
                     </div>
                     
@@ -705,12 +732,12 @@ export default function LotteryPage() {
                         <img src="https://picsum.photos/id/1062/400/200" alt="Weekly Cashback" className="w-full h-32 object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent"></div>
                         <div className="absolute bottom-2 left-2 right-2">
-                          <h3 className="font-medium text-white">Weekly Cashback</h3>
+                          <h3 className="font-medium text-white">{t('lottery.promotionsCard.weeklyCashback')}</h3>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mb-2">Get 10% cashback on net losses every week</p>
+                      <p className="text-xs text-gray-400 mb-2">{t('lottery.promotionsCard.weeklyCashbackDesc')}</p>
                       <button className="w-full py-1.5 bg-[#121212] rounded-lg border border-gray-700 text-gray-300 text-xs font-medium hover:border-[#b8860b]/30 hover:text-[#b8860b] transition-colors">
-                        Learn More
+                        {t('lottery.promotionsCard.learnMore')}
                       </button>
                     </div>
                   </div>
@@ -725,14 +752,14 @@ export default function LotteryPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Responsible Gambling</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Gambling Addiction Help</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Self-Exclusion</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">Age Verification</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.responsibleBar.title')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.responsibleBar.helpLink')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.responsibleBar.selfExclusion')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.responsibleBar.ageVerification')}</a>
               </div>
               
               <div className="flex items-center space-x-4">
-                <span className="text-xs text-gray-500">18+ Only</span>
+                <span className="text-xs text-gray-500">{t('lottery.responsibleBar.ageLimit')}</span>
                 <div className="flex space-x-3">
                   <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" className="h-5 opacity-70" />
                   <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" className="h-5 opacity-70" />
@@ -748,9 +775,9 @@ export default function LotteryPage() {
         <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
               <div className="md:col-span-2">
-                <div className="text-[#b8860b] text-2xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>LegitChain</div>
+                <div className="text-[#b8860b] text-2xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{t('lottery.footer.brandName')}</div>
                 <p className="text-gray-400 text-sm mb-4 max-w-md">
-                  A licensed blockchain gambling platform offering provably fair games, transparent operations, and instant payouts. Gamble responsibly.
+                  {t('lottery.footer.brandDescription')}
                 </p>
                 <div className="flex space-x-4">
                   <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors"><i className="fa fa-twitter"></i></a>
@@ -761,43 +788,43 @@ export default function LotteryPage() {
             </div>
               
             <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Games</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">{t('lottery.footer.gamesTitle')}</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Slots</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Live Casino</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Sports Betting</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Esports</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Tournaments</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.slotsLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.liveCasinoLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.sportsBettingLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.esportsLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.tournamentsLink')}</a></li>
               </ul>
             </div>
               
             <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Support</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">{t('lottery.footer.supportTitle')}</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Help Center</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">FAQs</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Contact Us</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Responsible Gambling</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Terms & Conditions</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.helpCenterLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.faqLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.contactLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.responsibleGamblingLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.termsConditionsLink')}</a></li>
               </ul>
             </div>
               
             <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">Legal</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">{t('lottery.footer.legalTitle')}</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">License Information</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Terms of Service</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Cookie Policy</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">Jurisdiction Restrictions</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.licenseInfoLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.privacyPolicyLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.termsServiceLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.cookiePolicyLink')}</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.jurisdictionLink')}</a></li>
                 </ul>
             </div>
           </div>
           
             <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-500 text-xs">&copy; 2023 LegitChain. All rights reserved.</p>
+              <p className="text-gray-500 text-xs">{t('lottery.footer.copyrightText')}</p>
               <p className="text-gray-500 text-xs mt-2 md:mt-0">
-                Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004.
+                {t('lottery.footer.disclaimer')}
               </p>
           </div>
         </div>

@@ -96,27 +96,30 @@ const supabase = createClient(
 
 // 每10秒检查一次市场
 setInterval(async () => {
-  try {
-    // 获取 BTC 价格
-    const response = await axios.get(
-      'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'
-    );
-    
-    const priceChange = parseFloat(response.data.priceChangePercent);
-    
-    // 如果价格变化超过阈值，创建警报
-    if (Math.abs(priceChange) > 2) {
-      await supabase.from('alerts').insert({
-        symbol: 'BTCUSDT',
-        type: 'price_alert',
-        message: `BTC 价格变化 ${priceChange.toFixed(2)}%`,
-        severity: Math.abs(priceChange) > 5 ? 'critical' : 'high',
-        details: {
-          price_change: priceChange,
-          current_price: response.data.lastPrice
-        }
-      });
-    }
+      try {
+        // 获取 BTC 和 ETH 价格
+        const symbols = ['BTCUSDT', 'ETHUSDT'];
+        const response = await axios.get(
+          `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
+        );
+        
+        response.data.forEach(async (ticker) => {
+          const priceChange = parseFloat(ticker.priceChangePercent);
+          
+          // 如果价格变化超过阈值，创建警报
+          if (Math.abs(priceChange) > 2) {
+            await supabase.from('alerts').insert({
+              symbol: ticker.symbol,
+              type: 'price_alert',
+              message: `${ticker.symbol} 价格变化 ${priceChange.toFixed(2)}%`,
+              severity: Math.abs(priceChange) > 5 ? 'critical' : 'high',
+              details: {
+                price_change: priceChange,
+                current_price: ticker.lastPrice
+              }
+            });
+          }
+        });
   } catch (error) {
     console.error('监控错误:', error);
   }
@@ -160,7 +163,7 @@ useEffect(() => {
     try {
       // 直接调用币安API
       const response = await fetch(
-        'https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","BNBUSDT"]'
+        'https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT"]'
       );
       const data = await response.json();
       
@@ -238,7 +241,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {
   try {
-    // 获取币安数据
+    // 获取币安数据（BTC和ETH）
     const response = await fetch(
       'https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT"]'
     );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // TradingView Widget 声明
 declare global {
@@ -37,6 +38,7 @@ interface RealtimeAlert {
 }
 
 export default function BlackSwanPage() {
+  const { t } = useTranslation();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('all'); // 'all' 或具体日期
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [timeRange, setTimeRange] = useState<number>(3); // 默认3小时
@@ -44,10 +46,25 @@ export default function BlackSwanPage() {
   const [crashEvents, setCrashEvents] = useState<CrashEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalAlerts: 0, monitoredAssets: 0 });
+  const [mounted, setMounted] = useState(false); // 防止 hydration 错误
   
   // TradingView Widget 容器引用
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const widgetInstanceRef = useRef<any>(null);
+
+  // 客户端挂载标记
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 安全的时间格式化函数（防止 hydration 错误）
+  const formatTime = (timestamp: string | Date): string => {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
 
   // 获取所有唯一日期（从事件中提取）
   const getUniqueDates = (): string[] => {
@@ -122,8 +139,8 @@ export default function BlackSwanPage() {
       if (isUnmounting) return;
       
       try {
-        // 获取多个主流币种的24小时数据
-        const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
+        // 获取BTC和ETH的24小时数据
+        const symbols = ['BTCUSDT', 'ETHUSDT'];
         const response = await fetch(
           `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
         );
@@ -142,9 +159,12 @@ export default function BlackSwanPage() {
             if (Math.abs(priceChange) > 5) severity = 'critical';
             else if (Math.abs(priceChange) > 3) severity = 'high';
             
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
             newAlerts.push({
               id: `${ticker.symbol}-${Date.now()}`,
-              timestamp: new Date().toLocaleTimeString('zh-CN'),
+              timestamp: timeString,
               asset: ticker.symbol.replace('USDT', '/USDT'),
               severity: severity,
               message: `24h 价格变化 ${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)}% | 当前价格: $${parseFloat(ticker.lastPrice).toFixed(2)}`,
@@ -192,7 +212,7 @@ export default function BlackSwanPage() {
               
               return {
                 id: item.id?.toString() || Date.now().toString(),
-                timestamp: new Date(item.timestamp).toLocaleTimeString('zh-CN'),
+                timestamp: formatTime(item.timestamp),
                 asset: item.symbol.replace('USDT', '/USDT'),
                 severity: severity,
                 message: item.message,
@@ -268,7 +288,7 @@ export default function BlackSwanPage() {
               
               const newAlert: RealtimeAlert = {
                 id: Date.now().toString(),
-                timestamp: new Date(alert.timestamp).toLocaleTimeString('zh-CN'),
+                timestamp: formatTime(alert.timestamp),
                 asset: alert.symbol.replace('USDT', '/USDT'),
                 severity: severity,
                 message: alert.message,
@@ -320,7 +340,7 @@ export default function BlackSwanPage() {
             
             return {
               id: `${item.timestamp}-${item.symbol}-${index}`,
-              timestamp: new Date(item.timestamp).toLocaleTimeString('zh-CN'),
+              timestamp: formatTime(item.timestamp),
               asset: item.symbol.replace('USDT', '/USDT'),
               severity: severity,
               message: item.message,
@@ -599,23 +619,23 @@ export default function BlackSwanPage() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between font-mono">
           <Link href="/markets" className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors text-sm">
             <span>[←</span>
-            <span>BACK TO MARKETS]</span>
+            <span>{t('nav.backToMarkets').toUpperCase()}]</span>
           </Link>
           <div className="flex items-center gap-3">
             <img src="/image/black-swan.png" alt="Black Swan" className="w-6 h-6 object-contain brightness-125" />
-            <h1 className="text-green-400 text-lg font-bold">BLACK SWAN DETECTION SYSTEM</h1>
+            <h1 className="text-green-400 text-lg font-bold">{t('blackSwan.title').toUpperCase()}</h1>
             <Link 
               href="/black-swan-terminal" 
               className="ml-3 px-3 py-1 bg-green-600 hover:bg-green-500 text-black text-xs font-bold rounded transition-colors border border-green-400"
-              title="切换到完整终端"
+              title={t('blackSwan.openFullTerminal')}
             >
-              [FULL TERMINAL]
+              [{t('blackSwan.fullTerminal')}]
             </Link>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-green-400 text-xs">MONITORING</span>
+              <span className="text-green-400 text-xs">{t('blackSwan.monitoring').toUpperCase()}</span>
             </div>
           </div>
         </div>
@@ -631,13 +651,13 @@ export default function BlackSwanPage() {
                 ╔═══════════════════════════════════════════════════════╗
               </div>
               <h2 className="text-2xl font-bold text-green-400 mb-2">
-                MARKET ANOMALY DETECTION PLATFORM
+                {t('blackSwan.subtitle').toUpperCase()}
               </h2>
               <p className="text-gray-400 text-sm">
-                &gt; Real-time alert system powered by AI algorithms
+                &gt; {t('blackSwan.realtime')}
               </p>
               <p className="text-gray-400 text-sm">
-                &gt; Early identification of black swan events
+                &gt; {t('blackSwan.earlyDetection')}
               </p>
               <div className="text-green-400 text-sm mt-2">
                 ╚═══════════════════════════════════════════════════════╝
@@ -657,10 +677,10 @@ export default function BlackSwanPage() {
               {/* 终端标题栏 */}
               <div className="bg-gray-900 border-b border-green-500 px-4 py-2">
                 <h2 className="text-sm font-bold text-green-400 font-mono flex items-center gap-2">
-                  ═══ HISTORICAL EVENTS ═══
+                  ═══ {t('blackSwan.historicalEvents').toUpperCase()} ═══
                 </h2>
                 <div className="text-xs text-gray-500 font-mono mt-1">
-                  &gt; Real crypto crash history
+                  &gt; {t('blackSwan.realCryptoHistory')}
                 </div>
               </div>
               
@@ -668,7 +688,7 @@ export default function BlackSwanPage() {
                 {/* 日期筛选按钮 */}
                 <div className="mb-4">
                   <label className="block text-xs font-mono text-gray-500 mb-2">
-                    &gt; FILTER BY DATE:
+                    &gt; {t('blackSwan.filterByDate').toUpperCase()}:
                   </label>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
                     {/* 全部按钮 */}
@@ -683,7 +703,7 @@ export default function BlackSwanPage() {
                       <span className="mr-2">
                         {selectedDateFilter === 'all' ? '●' : '○'}
                       </span>
-                      ALL DATES ({crashEvents.length})
+                      {t('blackSwan.allDates').toUpperCase()} ({crashEvents.length})
                     </button>
                     
                     {/* 日期按钮列表 */}
@@ -829,7 +849,7 @@ export default function BlackSwanPage() {
                           &gt; Date: {selectedEvent.date}
                         </div>
                         <div>
-                          &gt; Time: {new Date(selectedEvent.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                          &gt; Time: {mounted ? formatTime(selectedEvent.timestamp).substring(0, 5) : '--:--'}
                         </div>
                         <div>
                           &gt; Window: {timeRange}h
