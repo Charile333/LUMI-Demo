@@ -27,18 +27,137 @@ export default function LumiSoonPage() {
   useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimer: NodeJS.Timeout;
+    let pollingTimer: NodeJS.Timeout;
+    let binanceTimer: NodeJS.Timeout;
     let isUnmounting = false;
+
+    // 检测是否在生产环境（Vercel）
+    const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+
+    // 🔥 新增：直接从币安获取实时市场数据（Vercel 兼容）
+    const fetchBinanceData = async () => {
+      if (isUnmounting) return;
+      
+      try {
+        // 获取BTC和ETH的24小时数据
+        const symbols = ['BTCUSDT', 'ETHUSDT'];
+        const response = await fetch(
+          `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
+        );
+        
+        if (!response.ok) throw new Error('币安API请求失败');
+        
+        const data = await response.json();
+        const newAlerts: RealtimeAlert[] = [];
+        
+        data.forEach((ticker: any) => {
+          const priceChange = parseFloat(ticker.priceChangePercent);
+          
+          // 只显示价格变化超过1%的币种
+          if (Math.abs(priceChange) > 1) {
+            let severity: 'critical' | 'high' | 'medium' = 'medium';
+            if (Math.abs(priceChange) > 5) severity = 'critical';
+            else if (Math.abs(priceChange) > 3) severity = 'high';
+            
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            newAlerts.push({
+              id: `${ticker.symbol}-${Date.now()}`,
+              timestamp: timeString,
+              asset: ticker.symbol.replace('USDT', '/USDT'),
+              severity: severity,
+              message: `24h 价格变化 ${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)}% | 当前价格: $${parseFloat(ticker.lastPrice).toFixed(2)}`,
+              change: priceChange
+            });
+          }
+        });
+        
+        // 按价格变化幅度排序（绝对值最大的在前）
+        newAlerts.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+        
+        if (newAlerts.length > 0) {
+          setRealtimeData(prev => {
+            // 合并新旧数据，保留最近10条
+            const merged = [...newAlerts, ...prev.filter(a => !a.id.includes('-' + Date.now()))];
+            const newData = merged.slice(0, 10);
+            
+            // 快速检查：如果长度和第一项相同，可能数据没变化
+            if (prev.length === newData.length && prev.length > 0 && prev[0].id === newData[0].id) {
+              return prev;
+            }
+            return newData;
+          });
+          setWsConnected(true); // 设置为已连接状态
+        }
+        
+        console.log('✅ 实时市场数据更新成功', newAlerts.length, '条警报');
+      } catch (error) {
+        console.error('获取币安数据失败:', error);
+      }
+    };
+
+    // Vercel 环境：使用轮询 + 币安API
+    const startPolling = () => {
+      if (isUnmounting) return;
+      
+      console.log('🔄 Vercel 环境：使用轮询模式 + 币安API实时数据');
+      
+      const fetchLatestAlerts = async () => {
+        try {
+          const response = await fetch('/api/alerts/latest');
+          const result = await response.json();
+          
+          if (result.success && result.data && result.data.length > 0) {
+            const newAlerts: RealtimeAlert[] = result.data.map((item: any) => {
+              let change = 0;
+              if (item.details && item.details.price_change) {
+                change = item.details.price_change * 100;
+              }
+              
+              let severity: 'critical' | 'high' | 'medium' = item.severity || 'medium';
+              
+              return {
+                id: item.id?.toString() || Date.now().toString(),
+                timestamp: new Date(item.timestamp).toLocaleTimeString('zh-CN'),
+                asset: item.symbol.replace('USDT', '/USDT'),
+                severity: severity,
+                message: item.message,
+                change: change
+              };
+            });
+            
+            setRealtimeData(prev => [...newAlerts, ...prev].slice(0, 10));
+          }
+        } catch (error) {
+          console.error('获取最新警报失败:', error);
+        }
+      };
+      
+      // 立即获取一次数据库警报（如果有）
+      fetchLatestAlerts();
+      
+      // 立即获取一次币安数据
+      fetchBinanceData();
+      
+      // 每15秒轮询数据库一次
+      pollingTimer = setInterval(fetchLatestAlerts, 15000);
+      
+      // 每10秒获取币安数据
+      binanceTimer = setInterval(fetchBinanceData, 10000);
+    };
 
     const connectWebSocket = () => {
       if (isUnmounting) return;
       
-      // 检测是否在生产环境（Vercel）- 跳过 WebSocket 连接
-      const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
-      
       if (isProduction) {
-        console.log('⚠️  生产环境：WebSocket 功能已禁用');
+        startPolling();
         return;
       }
+      
+      // 本地环境也启用币安数据（作为补充）
+      fetchBinanceData();
+      binanceTimer = setInterval(fetchBinanceData, 30000); // 本地环境30秒更新一次
       
       try {
         // 仅在本地开发环境连接 WebSocket
@@ -168,6 +287,12 @@ export default function LumiSoonPage() {
       }
       if (reconnectTimer) {
         clearTimeout(reconnectTimer);
+      }
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
+      }
+      if (binanceTimer) {
+        clearInterval(binanceTimer);
       }
     };
   }, []);
@@ -388,7 +513,7 @@ export default function LumiSoonPage() {
               
               {/* 右侧警报信息显示区 - 黑天鹅终端风格 */}
               <div className="flex-1">
-                <div className="bg-black rounded-lg overflow-hidden border-2 border-green-500/50 h-full flex flex-col">
+                <div className="bg-black rounded-lg overflow-hidden border-2 border-green-500/50 flex flex-col" style={{ minHeight: '600px', maxHeight: '600px' }}>
                   {/* 终端顶部栏 */}
                   <div className="bg-gray-900 border-b border-green-500 px-4 py-2 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -399,19 +524,27 @@ export default function LumiSoonPage() {
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
                       <span className={`font-mono text-xs ${wsConnected ? 'text-green-400' : 'text-red-400'}`}>
-                        {wsConnected ? t('landing.terminal.monitoring').toUpperCase() : t('landing.terminal.offline').toUpperCase()}
+                        {wsConnected ? 'BINANCE API' : t('landing.terminal.offline').toUpperCase()}
                       </span>
                     </div>
                   </div>
 
                   {/* 终端内容区 */}
                   <div className="bg-black p-4 flex-1 flex flex-col">
+                    {/* 实时数据流标题 */}
+                    <div className="mb-2 text-xs text-cyan-400 font-mono border-b border-green-900 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span>🔴 LIVE</span>
+                        <span className="text-gray-500">|</span>
+                        <span className="text-gray-400">实时市场数据 (24h 变化 &gt; 1%)</span>
+                      </div>
+                    </div>
                     {/* 实时数据流 - 终端样式 */}
-                    <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs">
+                    <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs" style={{ willChange: 'contents' }}>
                       {realtimeData.length === 0 ? (
                         <div className="text-center py-10 text-gray-600">
                           <div className="text-2xl mb-2">[ {t('landing.terminal.standby').toUpperCase()} ]</div>
-                          <p className="text-xs">{t('landing.terminal.waitingForAlerts')}</p>
+                          <p className="text-xs">连接币安API中...</p>
                           <div className="mt-2 text-green-500 animate-pulse">█</div>
                         </div>
                       ) : (
@@ -427,7 +560,7 @@ export default function LumiSoonPage() {
                               </span>
                               
                               {/* 严重程度 */}
-                              <span className={`font-bold shrink-0 w-16 text-[10px] ${
+                              <span className={`font-bold shrink-0 w-12 text-[10px] ${
                                 alert.severity === 'critical'
                                   ? 'text-red-500'
                                   : alert.severity === 'high'
@@ -551,13 +684,15 @@ export default function LumiSoonPage() {
         body {
           background: #000 !important;
           padding-top: 0 !important;
-          overflow: hidden;
+          overflow-y: auto;
+          overflow-x: hidden;
           position: relative;
         }
 
         html {
           overflow-y: auto;
           overflow-x: hidden;
+          scroll-behavior: smooth;
         }
 
         /* 确保内容在背景之上 */

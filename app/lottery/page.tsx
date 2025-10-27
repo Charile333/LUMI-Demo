@@ -136,26 +136,17 @@ export default function LotteryPage() {
           <div className="relative rounded-xl overflow-hidden mb-6">
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#121212]/70 to-transparent z-10"></div>
             <img src="https://picsum.photos/id/1048/1600/400" alt="Premium Gaming Experience" className="w-full h-48 md:h-64 object-cover" />
-            <div className="absolute inset-0 z-20 flex items-center justify-between p-6 md:p-10">
-              <div className="flex flex-col justify-center">
-                <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 max-w-lg" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{t('lottery.banner.title')}</h1>
-                <p className="text-gray-300 mb-4 max-w-md">{t('lottery.banner.description')}</p>
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/lottery-game" className="bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-semibold px-5 py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2">
-                    <i className="fa fa-ticket"></i>
-                    <span>Lottery</span>
-                  </Link>
-                  <button className="bg-transparent border border-gray-600 text-white font-medium px-5 py-2 rounded-lg hover:border-[#b8860b]/50 transition-colors">
-                    {t('lottery.banner.depositFunds')}
-                  </button>
-                </div>
-              </div>
-              
-              {/* Explore Games 按钮 - 右侧 */}
-              <div className="hidden md:block">
-                <Link href="/lottery-game" className="bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2 shadow-lg">
-                  <i className="fa fa-gamepad text-lg"></i>
-                  <span className="text-base">Explore Games</span>
+            <div className="absolute inset-0 z-20 flex flex-col justify-center p-6 md:p-10">
+              <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 max-w-lg" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{t('lottery.banner.title')}</h1>
+              <p className="text-gray-300 mb-4 max-w-md">{t('lottery.banner.description')}</p>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/lottery-game" className="bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] font-semibold px-5 py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center space-x-2">
+                  <i className="fa fa-ticket"></i>
+                  <span>Lottery</span>
+                </Link>
+                <Link href="/lottery-game" className="bg-transparent border-2 border-[#b8860b] text-white font-semibold px-5 py-2 rounded-lg hover:bg-[#b8860b]/10 transition-colors flex items-center space-x-2">
+                  <i className="fa fa-gamepad"></i>
+                  <span>Explore Games</span>
                 </Link>
               </div>
             </div>
