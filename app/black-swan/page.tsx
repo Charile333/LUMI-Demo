@@ -37,7 +37,7 @@ interface RealtimeAlert {
 }
 
 export default function BlackSwanPage() {
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('all'); // 'all' 或具体日期
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [timeRange, setTimeRange] = useState<number>(3); // 默认3小时
   const [realtimeData, setRealtimeData] = useState<RealtimeAlert[]>([]);
@@ -48,6 +48,23 @@ export default function BlackSwanPage() {
   // TradingView Widget 容器引用
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const widgetInstanceRef = useRef<any>(null);
+
+  // 获取所有唯一日期（从事件中提取）
+  const getUniqueDates = (): string[] => {
+    const dates = crashEvents.map(event => event.date);
+    return Array.from(new Set(dates)).sort((a, b) => {
+      // 按日期降序排列（最新的在前）
+      return new Date(b).getTime() - new Date(a).getTime();
+    });
+  };
+
+  // 根据选中的日期过滤事件
+  const getFilteredEvents = (): CrashEvent[] => {
+    if (selectedDateFilter === 'all') {
+      return crashEvents;
+    }
+    return crashEvents.filter(event => event.date === selectedDateFilter);
+  };
 
   // 加载历史闪崩事件和统计数据
   useEffect(() => {
@@ -94,16 +111,70 @@ export default function BlackSwanPage() {
     let ws: WebSocket | null = null;
     let reconnectTimer: NodeJS.Timeout;
     let pollingTimer: NodeJS.Timeout;
+    let binanceTimer: NodeJS.Timeout;
     let isUnmounting = false;
 
     // 检测是否在生产环境（Vercel）
     const isProduction = process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
 
-    // Vercel 环境：使用轮询
+    // 🔥 新增：直接从币安获取实时市场数据（Vercel 兼容）
+    const fetchBinanceData = async () => {
+      if (isUnmounting) return;
+      
+      try {
+        // 获取多个主流币种的24小时数据
+        const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
+        const response = await fetch(
+          `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
+        );
+        
+        if (!response.ok) throw new Error('币安API请求失败');
+        
+        const data = await response.json();
+        const newAlerts: RealtimeAlert[] = [];
+        
+        data.forEach((ticker: any) => {
+          const priceChange = parseFloat(ticker.priceChangePercent);
+          
+          // 只显示价格变化超过1%的币种
+          if (Math.abs(priceChange) > 1) {
+            let severity: 'critical' | 'high' | 'medium' = 'medium';
+            if (Math.abs(priceChange) > 5) severity = 'critical';
+            else if (Math.abs(priceChange) > 3) severity = 'high';
+            
+            newAlerts.push({
+              id: `${ticker.symbol}-${Date.now()}`,
+              timestamp: new Date().toLocaleTimeString('zh-CN'),
+              asset: ticker.symbol.replace('USDT', '/USDT'),
+              severity: severity,
+              message: `24h 价格变化 ${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)}% | 当前价格: $${parseFloat(ticker.lastPrice).toFixed(2)}`,
+              change: priceChange
+            });
+          }
+        });
+        
+        // 按价格变化幅度排序（绝对值最大的在前）
+        newAlerts.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+        
+        if (newAlerts.length > 0) {
+          setRealtimeData(prev => {
+            // 合并新旧数据，保留最近20条
+            const merged = [...newAlerts, ...prev.filter(a => !a.id.includes('-' + Date.now()))];
+            return merged.slice(0, 20);
+          });
+        }
+        
+        console.log('✅ 实时市场数据更新成功', newAlerts.length, '条警报');
+      } catch (error) {
+        console.error('获取币安数据失败:', error);
+      }
+    };
+
+    // Vercel 环境：使用轮询 + 币安API
     const startPolling = () => {
       if (isUnmounting) return;
       
-      console.log('🔄 Vercel 环境：使用轮询模式获取实时警报');
+      console.log('🔄 Vercel 环境：使用轮询模式 + 币安API实时数据');
       
       const fetchLatestAlerts = async () => {
         try {
@@ -129,18 +200,24 @@ export default function BlackSwanPage() {
               };
             });
             
-            setRealtimeData(newAlerts);
+            setRealtimeData(prev => [...newAlerts, ...prev].slice(0, 20));
           }
         } catch (error) {
           console.error('获取最新警报失败:', error);
         }
       };
       
-      // 立即获取一次
+      // 立即获取一次数据库警报（如果有）
       fetchLatestAlerts();
       
-      // 每10秒轮询一次
-      pollingTimer = setInterval(fetchLatestAlerts, 10000);
+      // 立即获取一次币安数据
+      fetchBinanceData();
+      
+      // 每15秒轮询数据库一次
+      pollingTimer = setInterval(fetchLatestAlerts, 15000);
+      
+      // 每10秒获取币安数据
+      binanceTimer = setInterval(fetchBinanceData, 10000);
     };
 
     const connectWebSocket = () => {
@@ -150,6 +227,10 @@ export default function BlackSwanPage() {
         startPolling();
         return;
       }
+      
+      // 本地环境也启用币安数据（作为补充）
+      fetchBinanceData();
+      binanceTimer = setInterval(fetchBinanceData, 30000); // 本地环境30秒更新一次
       
       try {
         // 仅在本地开发环境连接 WebSocket
@@ -269,6 +350,9 @@ export default function BlackSwanPage() {
       }
       if (pollingTimer) {
         clearInterval(pollingTimer);
+      }
+      if (binanceTimer) {
+        clearInterval(binanceTimer);
       }
     };
   }, []);
@@ -581,33 +665,65 @@ export default function BlackSwanPage() {
               </div>
               
               <div className="p-4 bg-black flex-1 overflow-y-auto">
-                {/* 日期输入 */}
+                {/* 日期筛选按钮 */}
                 <div className="mb-4">
                   <label className="block text-xs font-mono text-gray-500 mb-2">
-                    &gt; SELECT DATE:
+                    &gt; FILTER BY DATE:
                   </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-900 border border-green-900 text-green-400 font-mono text-xs focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                  />
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {/* 全部按钮 */}
+                    <button
+                      onClick={() => setSelectedDateFilter('all')}
+                      className={`w-full text-left px-3 py-2 font-mono text-xs transition-all border ${
+                        selectedDateFilter === 'all'
+                          ? 'bg-green-600 text-black border-green-400 font-bold'
+                          : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                      }`}
+                    >
+                      <span className="mr-2">
+                        {selectedDateFilter === 'all' ? '●' : '○'}
+                      </span>
+                      ALL DATES ({crashEvents.length})
+                    </button>
+                    
+                    {/* 日期按钮列表 */}
+                    {!loading && getUniqueDates().map((date) => {
+                      const eventsCount = crashEvents.filter(e => e.date === date).length;
+                      return (
+                        <button
+                          key={date}
+                          onClick={() => setSelectedDateFilter(date)}
+                          className={`w-full text-left px-3 py-2 font-mono text-xs transition-all border ${
+                            selectedDateFilter === date
+                              ? 'bg-green-600 text-black border-green-400 font-bold'
+                              : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {selectedDateFilter === date ? '●' : '○'}
+                          </span>
+                          {date} ({eventsCount})
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* 历史事件列表 */}
                 <div className="space-y-2 mb-4 flex-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 32rem)' }}>
                   <div className="text-xs font-mono text-gray-500 mb-2">
-                    &gt; CRASH EVENTS: {loading ? '...' : crashEvents.length}
+                    &gt; CRASH EVENTS: {loading ? '...' : getFilteredEvents().length}
+                    {selectedDateFilter !== 'all' && <span className="text-cyan-400"> (filtered by {selectedDateFilter})</span>}
                   </div>
                   {loading ? (
                     <div className="text-center py-4 text-gray-600 font-mono text-xs">
                       Loading events...
                     </div>
-                  ) : crashEvents.length === 0 ? (
+                  ) : getFilteredEvents().length === 0 ? (
                     <div className="text-center py-4 text-gray-600 font-mono text-xs">
                       No crash events found
                     </div>
-                  ) : crashEvents.map((event, index) => (
+                  ) : getFilteredEvents().map((event, index) => (
                     <button
                       key={`${event.id}-${index}`}
                       onClick={() => setSelectedEvent(event)}
@@ -835,19 +951,26 @@ export default function BlackSwanPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  <span className="text-green-400 font-mono text-xs">MONITORING</span>
+                  <span className="text-green-400 font-mono text-xs">BINANCE API</span>
                 </div>
               </div>
 
               {/* 终端内容区 */}
               <div className="bg-black p-4">
                 {/* 实时数据流 - 终端样式 */}
+                <div className="mb-2 text-xs text-cyan-400 font-mono border-b border-green-900 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span>🔴 LIVE</span>
+                    <span className="text-gray-500">|</span>
+                    <span className="text-gray-400">实时市场数据 (24h 变化 &gt; 1%)</span>
+                  </div>
+                </div>
                 <div className="space-y-1 max-h-[500px] overflow-y-auto font-mono text-xs">
                   {realtimeData.length === 0 ? (
                     <div className="text-center py-10 text-gray-600">
-                      <div className="text-2xl mb-2">[ STANDBY ]</div>
-                      <p className="text-xs">Waiting for alert stream...</p>
-                      <div className="mt-2 text-green-500">█</div>
+                      <div className="text-2xl mb-2">[ LOADING ]</div>
+                      <p className="text-xs">连接币安API中...</p>
+                      <div className="mt-2 text-green-500 animate-pulse">█</div>
                     </div>
                   ) : (
                     realtimeData.map((alert, index) => (
