@@ -2,8 +2,30 @@ import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import fs from 'fs'
 
+// Define types for the response
+interface CrashEvent {
+  id: string
+  date: string
+  timestamp: string
+  asset: string
+  crashPercentage: number
+  duration: string
+  description: string
+  details: {
+    previous_price: number
+    current_price: number
+    price_change: number
+    volume_change: number
+  }
+}
+
+interface QueryResult {
+  success: boolean
+  data: CrashEvent[]
+}
+
 // Database helper function to query historical crashes
-async function queryHistoricalCrashes() {
+async function queryHistoricalCrashes(): Promise<QueryResult> {
   try {
     // Dynamic import of sqlite3 to avoid build issues
     const sqlite3 = require('sqlite3').verbose()
