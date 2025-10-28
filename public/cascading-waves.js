@@ -163,7 +163,9 @@
 
   // Helper functions
   function map(value, start1, stop1, start2, stop2) {
-    return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+    var result = start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+    // 确保返回值是有限数字，防止 NaN 或 Infinity
+    return isFinite(result) ? result : start2;
   }
 
   function cos(angle) {
@@ -212,18 +214,23 @@
 
   // Animation function
   function draw(e) {
+    // 确保 e 是有效的数字
+    if (!isFinite(e)) {
+      e = performance.now();
+    }
+    
     // 先清除画布，防止白光累积
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#000000';
     ctx.fillRect(-width_half, -height_half, width, height);
     
-    let xCount = 40;
-    let yCount = 60;
+    let xCount = 30;  // 优化：从40降到30
+    let yCount = 40;  // 优化：从60降到40
     let iXCount = 1 / (xCount - 1);
     let iYCount = 1 / (yCount - 1);
-    let time = e * 0.0003;  // 减慢速度 (原来是 0.001)
-    let timeStep = 0.003;   // 减慢波动 (原来是 0.01)
+    let time = e * 0.000243;  // 再减速10% (0.00027 * 0.9)
+    let timeStep = 0.00243;   // 再减速10% (0.0027 * 0.9)
     let grad = ctx.createLinearGradient(-width, 0, width, height);
     let t = time % 1;
     let tSide = floor(time % 2) === 0;
@@ -275,7 +282,8 @@
     resize();
     
     window.addEventListener('resize', resize);
-    animate();
+    lastFrameTime = performance.now();
+    requestAnimationFrame(animate);
   }
 
   function resize() {
@@ -290,9 +298,37 @@
     ctx.translate(width_half, height_half);
   }
 
-  function animate() {
-    draw(performance.now());
+  // 帧率限制：30FPS
+  var lastFrameTime = 0;
+  var frameInterval = 1000 / 30; // 30 FPS
+  var isAnimating = true;
+
+  function animate(currentTime) {
+    if (!isAnimating) return;
+    
     requestAnimationFrame(animate);
+    
+    // 帧率限制
+    var deltaTime = currentTime - lastFrameTime;
+    if (deltaTime < frameInterval) {
+      return;
+    }
+    lastFrameTime = currentTime - (deltaTime % frameInterval);
+    
+    draw(currentTime);
+  }
+
+  // 页面可见性检测
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      // 标签页不可见，暂停动画
+      isAnimating = false;
+    } else {
+      // 标签页可见，恢复动画
+      isAnimating = true;
+      lastFrameTime = performance.now();
+      requestAnimationFrame(animate);
+    }
   }
 
   // Start when DOM is ready - but only on landing page
@@ -300,7 +336,12 @@
     // 检查是否在landing页面
     const landingElement = document.querySelector('[data-page="landing"]');
     if (landingElement) {
-      init();
+      // 延迟1秒启动动画，让首屏先加载
+      setTimeout(function() {
+        init();
+        // 添加可见性监听
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+      }, 1000);
     }
   }
 
