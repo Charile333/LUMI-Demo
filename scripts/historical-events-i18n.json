@@ -1,0 +1,95 @@
+{
+  "2025-10-10_BTCUSDT": {
+    "zh": "BTC从约$122,000跌至$104,000，跌幅约15%。全球加密市场史上最大规模清算潮",
+    "en": "BTC dropped from ~$122,000 to $104,000, down ~15%. Largest global crypto market liquidation wave in history"
+  },
+  "2025-10-10_ETHUSDT": {
+    "zh": "ETH跌幅约20%，次主流币跌幅更大，随BTC暴跌触发杠杆清算",
+    "en": "ETH down ~20%, altcoins fell further. Leveraged positions liquidated following BTC crash"
+  },
+  "2024-08-05_BTCUSDT": {
+    "zh": "日本央行加息引发全球市场恐慌，比特币暴跌",
+    "en": "Bank of Japan rate hike triggers global market panic, Bitcoin plunges"
+  },
+  "2024-07-04_ETHUSDT": {
+    "zh": "ETH现货ETF批准前夕市场获利了结",
+    "en": "Profit-taking ahead of ETH spot ETF approval"
+  },
+  "2024-03-18_BTCUSDT": {
+    "zh": "比特币触及历史新高后大幅回调",
+    "en": "Bitcoin sharp correction after reaching all-time high"
+  },
+  "2023-11-10_BTCUSDT": {
+    "zh": "CZ认罪后加密市场恐慌性抛售",
+    "en": "Crypto market panic selling after CZ plea deal"
+  },
+  "2023-08-17_BTCUSDT": {
+    "zh": "SpaceX抛售比特币引发市场恐慌",
+    "en": "SpaceX Bitcoin sale triggers market panic"
+  },
+  "2023-03-10_BTCUSDT": {
+    "zh": "Silicon Valley Bank倒闭引发加密市场震荡",
+    "en": "Silicon Valley Bank collapse causes crypto market turbulence"
+  },
+  "2022-11-09_BTCUSDT": {
+    "zh": "FTX交易所崩盘，加密市场历史性暴跌",
+    "en": "FTX exchange collapse, historic crypto market crash"
+  },
+  "2022-11-09_ETHUSDT": {
+    "zh": "FTX崩盘影响以太坊大幅下跌",
+    "en": "FTX collapse causes Ethereum sharp decline"
+  },
+  "2022-11-09_SOLUSDT": {
+    "zh": "FTX重仓SOL，Solana遭遇毁灭性打击",
+    "en": "FTX heavily invested in SOL, Solana suffers devastating blow"
+  },
+  "2022-06-18_BTCUSDT": {
+    "zh": "Celsius暂停提款，加密信贷危机爆发",
+    "en": "Celsius halts withdrawals, crypto credit crisis erupts"
+  },
+  "2022-05-12_BTCUSDT": {
+    "zh": "Terra/LUNA崩盘引发加密市场连锁反应",
+    "en": "Terra/LUNA collapse triggers crypto market chain reaction"
+  },
+  "2021-11-10_BTCUSDT": {
+    "zh": "比特币从历史最高点开始大幅回调",
+    "en": "Bitcoin major correction from all-time high"
+  },
+  "2021-09-07_BTCUSDT": {
+    "zh": "萨尔瓦多采用比特币引发市场恐慌",
+    "en": "El Salvador Bitcoin adoption triggers market panic"
+  },
+  "2021-05-19_BTCUSDT": {
+    "zh": "中国禁止加密货币挖矿和交易，市场暴跌",
+    "en": "China bans crypto mining and trading, market crashes"
+  },
+  "2021-05-19_ETHUSDT": {
+    "zh": "中国政策影响，以太坊剧烈波动",
+    "en": "China policy impact, Ethereum severe volatility"
+  },
+  "2021-04-18_BTCUSDT": {
+    "zh": "比特币首次触及64k后回调",
+    "en": "Bitcoin pullback after first touching 64k"
+  },
+  "2020-03-12_BTCUSDT": {
+    "zh": "\"黑色星期四\" - COVID-19恐慌导致比特币史诗级崩盘",
+    "en": "\"Black Thursday\" - COVID-19 panic leads to epic Bitcoin collapse"
+  },
+  "2020-03-12_ETHUSDT": {
+    "zh": "\"黑色星期四\" - 以太坊遭受重创，DeFi清算潮",
+    "en": "\"Black Thursday\" - Ethereum severely hit, DeFi liquidation wave"
+  },
+  "2019-09-24_BTCUSDT": {
+    "zh": "Bakkt期货上线后市场失望性下跌",
+    "en": "Market disappointing selloff after Bakkt futures launch"
+  },
+  "2018-11-14_BTCUSDT": {
+    "zh": "BCH硬分叉引发加密市场恐慌性抛售",
+    "en": "BCH hard fork triggers crypto market panic selling"
+  },
+  "2018-01-16_BTCUSDT": {
+    "zh": "从历史高点崩盘，熊市开始",
+    "en": "Crash from all-time high, bear market begins"
+  }
+}
+

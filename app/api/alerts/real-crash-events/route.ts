@@ -116,7 +116,33 @@ async function queryHistoricalCrashes() {
 }
 
 export async function GET(request: NextRequest) {
+  // Get language from query parameter or accept-language header
+  const { searchParams } = new URL(request.url)
+  const lang = searchParams.get('lang') || request.headers.get('accept-language')?.split(',')[0]?.split('-')[0] || 'zh'
+  
   const result = await queryHistoricalCrashes()
+  
+  // If successful, translate descriptions based on language
+  if (result.success && result.data) {
+    result.data = result.data.map((event: any) => {
+      // Try to get description from details object based on language
+      let description = event.description
+      
+      if (event.details && typeof event.details === 'object') {
+        if (lang === 'en' && event.details.description_en) {
+          description = event.details.description_en
+        } else if (lang === 'zh' && event.details.description_zh) {
+          description = event.details.description_zh
+        }
+      }
+      
+      return {
+        ...event,
+        description
+      }
+    })
+  }
+  
   return NextResponse.json(result)
 }
 

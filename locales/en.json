@@ -176,7 +176,9 @@
     "binanceApi": "BINANCE API",
     "liveMarketData": "Real-time market data (24h change > 1%)",
     "connectingApi": "Connecting to Binance API...",
-    "fullTerminal": "FULL TERMINAL"
+    "fullTerminal": "FULL TERMINAL",
+    "loadingEvents": "Loading events...",
+    "noEventsFound": "No crash events found"
   },
   "orderbook": {
     "realtimeTest": "Real-time Order Book Test",
@@ -291,7 +293,9 @@
       "sportsbook": "Sportsbook",
       "sportsbookCount": "24 Sports",
       "tournamentsTitle": "Tournaments",
-      "tournamentsCount": "7 Active"
+      "tournamentsCount": "7 Active",
+      "poker": "Texas Hold'em",
+      "pokerCount": "6 Tables"
     },
     "featured": {
       "title": "Featured Games",
@@ -309,7 +313,11 @@
       "blackjackMinBet": "Min Bet: 0.001 ETH",
       "esportsArena": "Esports Arena",
       "esportsArenaDesc": "Sportsbook • 12 Leagues • Live Bets",
-      "esportsEvents": "148 Events Today"
+      "esportsEvents": "148 Events Today",
+      "texasHoldem": "Texas Hold'em Poker",
+      "texasHoldemDesc": "Poker • Multi-Player • Tournament Ready",
+      "texasHoldemPlayers": "326 Players Online",
+      "new": "NEW"
     },
     "liveSports": {
       "title": "Live Sports Events",
@@ -542,6 +550,8 @@
       "offline": "OFFLINE",
       "standby": "STANDBY",
       "waitingForAlerts": "Waiting for alert stream...",
+      "liveMarketData": "Live Market Data (24h change > 1%)",
+      "connectingBinance": "Connecting to Binance API...",
       "stats": "STATS",
       "recent": "Recent",
       "critical": "Critical",

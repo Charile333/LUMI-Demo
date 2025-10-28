@@ -5,9 +5,21 @@
 
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
 // LUMI独立数据库路径
 const dbPath = path.join(__dirname, '..', 'database', 'alerts.db');
+
+// Load i18n translations
+const i18nPath = path.join(__dirname, 'historical-events-i18n.json');
+let i18nTranslations = {};
+try {
+  if (fs.existsSync(i18nPath)) {
+    i18nTranslations = JSON.parse(fs.readFileSync(i18nPath, 'utf8'));
+  }
+} catch (error) {
+  console.warn('⚠️  Warning: Could not load i18n translations, using fallback');
+}
 
 // 真实历史闪崩事件数据
 const historicalCrashes = [
@@ -18,7 +30,8 @@ const historicalCrashes = [
     crashPercentage: -14.75,
     peakPrice: 122000,
     bottomPrice: 104000,
-    description: 'BTC从约$122,000跌至$104,000，跌幅约15%。全球加密市场史上最大规模清算潮',
+    description_zh: 'BTC从约$122,000跌至$104,000，跌幅约15%。全球加密市场史上最大规模清算潮',
+    description_en: 'BTC dropped from ~$122,000 to $104,000, down ~15%. Largest global crypto market liquidation wave in history',
     duration: 12,
     volume_spike: 8.5,
     liquidation_usd: 19000000000,  // 190亿美元杠杆清算
@@ -266,6 +279,13 @@ function createHistoricalAlert(db, crash, callback) {
   const priceChange = crash.crashPercentage / 100;
   const timestamp = new Date(crash.date + 'T12:00:00Z').toISOString();
   
+  // Get translations from i18n file or use provided descriptions
+  const eventKey = `${crash.date}_${crash.symbol}`;
+  const translation = i18nTranslations[eventKey] || {};
+  
+  const description_zh = crash.description_zh || crash.description || translation.zh || '';
+  const description_en = crash.description_en || translation.en || description_zh;
+  
   const details = JSON.stringify({
     price_change: priceChange,
     current_price: crash.bottomPrice,
@@ -273,7 +293,9 @@ function createHistoricalAlert(db, crash, callback) {
     alert_type: 'Historical Crash Event',
     volume_change: crash.volume_spike,
     duration_hours: crash.duration,
-    is_historical: true
+    is_historical: true,
+    description_zh: description_zh,
+    description_en: description_en
   });
   
   const insertQuery = `
@@ -281,13 +303,14 @@ function createHistoricalAlert(db, crash, callback) {
     VALUES (?, ?, ?, 'critical', ?, 'historical_crash')
   `;
   
-  const message = `${crash.description}`;
+  // 默认使用中文描述作为message
+  const message = description_zh;
   
   db.run(insertQuery, [timestamp, crash.symbol, message, details], (err) => {
     if (err) {
       console.error(`❌ Error importing ${crash.date} ${crash.symbol}:`, err.message);
     } else {
-      console.log(`✅ ${crash.date} | ${crash.symbol.padEnd(10)} | ${crash.crashPercentage.toFixed(1)}% | ${crash.description.substring(0, 50)}...`);
+      console.log(`✅ ${crash.date} | ${crash.symbol.padEnd(10)} | ${crash.crashPercentage.toFixed(1)}% | ${description_zh.substring(0, 50)}...`);
     }
     callback();
   });

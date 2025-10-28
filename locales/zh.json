@@ -176,7 +176,9 @@
     "binanceApi": "币安API",
     "liveMarketData": "实时市场数据（24小时变化 > 1%）",
     "connectingApi": "连接币安API中...",
-    "fullTerminal": "完整终端"
+    "fullTerminal": "完整终端",
+    "loadingEvents": "加载事件中...",
+    "noEventsFound": "未找到闪崩事件"
   },
   "orderbook": {
     "realtimeTest": "实时订单簿测试",
@@ -291,7 +293,9 @@
       "sportsbook": "体育博彩",
       "sportsbookCount": "24 项运动",
       "tournamentsTitle": "锦标赛",
-      "tournamentsCount": "7 个活跃"
+      "tournamentsCount": "7 个活跃",
+      "poker": "德州扑克",
+      "pokerCount": "6 个牌桌"
     },
     "featured": {
       "title": "精选游戏",
@@ -309,7 +313,11 @@
       "blackjackMinBet": "最小投注：0.001 ETH",
       "esportsArena": "电竞竞技场",
       "esportsArenaDesc": "体育博彩 • 12 个联赛 • 实时投注",
-      "esportsEvents": "今日 148 场赛事"
+      "esportsEvents": "今日 148 场赛事",
+      "texasHoldem": "德州扑克",
+      "texasHoldemDesc": "扑克 • 多人对战 • 支持锦标赛",
+      "texasHoldemPlayers": "326 名玩家在线",
+      "new": "新"
     },
     "liveSports": {
       "title": "实时体育赛事",
@@ -542,6 +550,8 @@
       "offline": "离线",
       "standby": "待命",
       "waitingForAlerts": "等待警报流...",
+      "liveMarketData": "实时市场数据 (24h 变化 > 1%)",
+      "connectingBinance": "连接币安API中...",
       "stats": "统计",
       "recent": "最近",
       "critical": "严重",

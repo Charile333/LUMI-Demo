@@ -162,7 +162,7 @@ export default function LotteryPage() {
                   <h2 className="text-lg font-semibold">{t('lottery.gameCategories.title')}</h2>
                 </div>
                 
-                <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-4 grid grid-cols-2 md:grid-cols-5 gap-3">
                   <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-[#b8860b]/30 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center mb-3">
                       <i className="fa fa-dice text-[#121212]"></i>
@@ -193,6 +193,15 @@ export default function LotteryPage() {
                     </div>
                     <span className="text-sm font-medium">{t('lottery.gameCategories.tournamentsTitle')}</span>
                     <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.tournamentsCount')}</span>
+                  </button>
+                  
+                  <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-[#b8860b]/50 transition-all duration-300 hover:border-[#b8860b] hover:shadow-lg hover:shadow-[#b8860b]/20 hover:-translate-y-1 relative overflow-hidden">
+                    <div className="absolute top-1 right-1 bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] text-xs font-bold px-2 py-0.5 rounded">{t('lottery.featured.new')}</div>
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center mb-3">
+                      <i className="fa fa-spade text-[#121212]"></i>
+                    </div>
+                    <span className="text-sm font-medium">{t('lottery.gameCategories.poker')}</span>
+                    <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.pokerCount')}</span>
                   </button>
                 </div>
               </div>
@@ -253,24 +262,43 @@ export default function LotteryPage() {
                     </div>
                   </div>
                   
-                  {/* Featured Game 3 */}
-                  <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                  {/* Featured Game 3 - Texas Hold'em Poker */}
+                  <div className="bg-[#1a1a1a] rounded-xl border border-[#b8860b]/40 overflow-hidden transition-all duration-300 hover:border-[#b8860b] hover:shadow-xl hover:shadow-[#b8860b]/20 hover:-translate-y-2 relative">
                     <div className="relative">
-                      <img src="https://picsum.photos/id/1054/600/300" alt="Esports Betting" className="w-full h-40 object-cover" />
+                      <img src="https://picsum.photos/id/1054/600/300" alt="Texas Hold'em Poker" className="w-full h-40 object-cover brightness-90" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] text-xs font-bold px-2 py-1 rounded shadow-lg">{t('lottery.featured.new')}</div>
+                      <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center">
+                          <i className="fa fa-spade text-[#121212]"></i>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center">
+                          <i className="fa fa-heart text-[#121212]"></i>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center">
+                          <i className="fa fa-diamond text-[#121212]"></i>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#b8860b] to-[#d4af37] flex items-center justify-center">
+                          <i className="fa fa-club text-[#121212]"></i>
+                        </div>
+                      </div>
                     </div>
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{t('lottery.featured.esportsArena')}</h3>
+                        <h3 className="font-medium text-[#d4af37]">{t('lottery.featured.texasHoldem')}</h3>
                         <div className="flex items-center">
                           <i className="fa fa-star text-[#b8860b] text-xs"></i>
-                          <span className="text-xs ml-1">4.7/5</span>
+                          <span className="text-xs ml-1">4.9/5</span>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.esportsArenaDesc')}</p>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.texasHoldemDesc')}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{t('lottery.featured.esportsEvents')}</span>
-                        <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          {t('lottery.featured.betNow')}
+                        <span className="text-xs text-emerald-400 flex items-center gap-1">
+                          <i className="fa fa-circle text-[6px]"></i>
+                          {t('lottery.featured.texasHoldemPlayers')}
+                        </span>
+                        <button className="px-4 py-1.5 rounded-md text-sm font-bold bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] hover:opacity-90 transition-all duration-200 shadow-lg shadow-[#b8860b]/30">
+                          {t('lottery.featured.playNow')}
                         </button>
                       </div>
                     </div>

@@ -38,7 +38,7 @@ interface RealtimeAlert {
 }
 
 export default function BlackSwanPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('all'); // 'all' 或具体日期
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [timeRange, setTimeRange] = useState<number>(3); // 默认3小时
@@ -87,8 +87,10 @@ export default function BlackSwanPage() {
   useEffect(() => {
     const loadCrashEvents = async () => {
       try {
-        // 使用相对路径的 API（兼容 Vercel 部署）
-        const response = await fetch('/api/alerts/real-crash-events');
+        // Use i18n.language to get current language
+        const currentLang = i18n.language || 'zh';
+        // 使用相对路径的 API（兼容 Vercel 部署），传递语言参数
+        const response = await fetch(`/api/alerts/real-crash-events?lang=${currentLang}`);
         const result = await response.json();
         if (result.success && result.data) {
           setCrashEvents(result.data);
@@ -121,7 +123,7 @@ export default function BlackSwanPage() {
 
     loadCrashEvents();
     loadStats();
-  }, []);
+  }, [i18n.language]); // 当语言切换时重新加载数据
 
   // 连接真实的预警系统 WebSocket 或轮询
   useEffect(() => {
@@ -613,20 +615,20 @@ export default function BlackSwanPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-neutral-900 to-stone-950">
       {/* 终端风格顶部导航 */}
-      <div className="bg-gray-900 border-b border-green-500 sticky top-0 z-50">
+      <div className="bg-gradient-to-r from-zinc-900/98 via-neutral-900/98 to-zinc-900/98 border-b border-amber-600/30 backdrop-blur-md sticky top-0 z-50 shadow-2xl shadow-black/40">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between font-mono">
-          <Link href="/markets" className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors text-sm">
-            <span>[←</span>
+          <Link href="/markets" className="flex items-center gap-2 text-amber-400/90 hover:text-amber-300 transition-colors text-sm group">
+            <span className="group-hover:translate-x-[-4px] transition-transform">[←</span>
             <span>{t('nav.backToMarkets').toUpperCase()}]</span>
           </Link>
           <div className="flex items-center gap-3">
-            <img src="/image/black-swan.png" alt="Black Swan" className="w-6 h-6 object-contain brightness-125" />
-            <h1 className="text-green-400 text-lg font-bold">{t('blackSwan.title').toUpperCase()}</h1>
+            <img src="/image/black-swan.png" alt="Black Swan" className="w-6 h-6 object-contain brightness-110 drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]" />
+            <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-lg font-bold tracking-wide">{t('blackSwan.title').toUpperCase()}</h1>
             <Link 
               href="/black-swan-terminal" 
-              className="ml-3 px-3 py-1 bg-green-600 hover:bg-green-500 text-black text-xs font-bold rounded transition-colors border border-green-400"
+              className="ml-3 px-3 py-1 bg-gradient-to-r from-amber-600/90 to-yellow-600/90 hover:from-amber-500 hover:to-yellow-500 text-black text-xs font-bold rounded transition-all duration-300 border border-amber-500/60 shadow-xl shadow-amber-900/40"
               title={t('blackSwan.openFullTerminal')}
             >
               [{t('blackSwan.fullTerminal')}]
@@ -634,8 +636,8 @@ export default function BlackSwanPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-green-400 text-xs">{t('blackSwan.monitoring').toUpperCase()}</span>
+              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-500/60"></span>
+              <span className="text-amber-400/90 text-xs">{t('blackSwan.monitoring').toUpperCase()}</span>
             </div>
           </div>
         </div>
@@ -644,27 +646,29 @@ export default function BlackSwanPage() {
       
       <div className="container mx-auto px-4 py-6">
         {/* 终端风格欢迎横幅 */}
-        <div className="mb-6 bg-gray-900 border-2 border-green-500/50 p-6 font-mono">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 bg-gradient-to-br from-zinc-900/95 via-neutral-900/90 to-zinc-900/95 border-2 border-amber-600/25 p-6 font-mono backdrop-blur-sm shadow-2xl shadow-black/60 relative overflow-hidden">
+          {/* 背景光效 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/3 via-yellow-500/3 to-amber-500/3 animate-pulse"></div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
-              <div className="text-green-400 text-sm mb-2">
+              <div className="text-amber-500/80 text-sm mb-2">
                 ╔═══════════════════════════════════════════════════════╗
               </div>
-              <h2 className="text-2xl font-bold text-green-400 mb-2">
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 mb-2 tracking-wide">
                 {t('blackSwan.subtitle').toUpperCase()}
               </h2>
-              <p className="text-gray-400 text-sm">
-                &gt; {t('blackSwan.realtime')}
+              <p className="text-stone-300 text-sm flex items-center gap-2">
+                <span className="text-amber-500">&gt;</span> {t('blackSwan.realtime')}
               </p>
-              <p className="text-gray-400 text-sm">
-                &gt; {t('blackSwan.earlyDetection')}
+              <p className="text-stone-300 text-sm flex items-center gap-2">
+                <span className="text-amber-500">&gt;</span> {t('blackSwan.earlyDetection')}
               </p>
-              <div className="text-green-400 text-sm mt-2">
+              <div className="text-amber-500/80 text-sm mt-2">
                 ╚═══════════════════════════════════════════════════════╝
               </div>
             </div>
-            <div className="opacity-30">
-              <img src="/image/black-swan.png" alt="Black Swan" className="w-24 h-24 object-contain brightness-125" />
+            <div className="opacity-50">
+              <img src="/image/black-swan.png" alt="Black Swan" className="w-24 h-24 object-contain brightness-110 drop-shadow-[0_0_25px_rgba(251,191,36,0.4)]" />
             </div>
           </div>
         </div>
@@ -673,22 +677,22 @@ export default function BlackSwanPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* 左侧：历史事件选择器（终端风格）*/}
           <div className="lg:col-span-3">
-            <div className="bg-gray-900 border-2 border-green-900 overflow-hidden sticky top-[6rem] flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
+            <div className="bg-gradient-to-br from-zinc-900/95 to-neutral-900/90 border-2 border-amber-700/20 overflow-hidden sticky top-[6rem] flex flex-col backdrop-blur-sm shadow-2xl shadow-black/50" style={{ height: 'calc(100vh - 8rem)' }}>
               {/* 终端标题栏 */}
-              <div className="bg-gray-900 border-b border-green-500 px-4 py-2">
-                <h2 className="text-sm font-bold text-green-400 font-mono flex items-center gap-2">
+              <div className="bg-gradient-to-r from-zinc-900/98 to-neutral-900/98 border-b border-amber-600/30 px-4 py-2 shadow-lg shadow-black/40">
+                <h2 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono flex items-center gap-2 tracking-wide">
                   ═══ {t('blackSwan.historicalEvents').toUpperCase()} ═══
                 </h2>
-                <div className="text-xs text-gray-500 font-mono mt-1">
-                  &gt; {t('blackSwan.realCryptoHistory')}
+                <div className="text-xs text-stone-400 font-mono mt-1">
+                  <span className="text-amber-500">&gt;</span> {t('blackSwan.realCryptoHistory')}
                 </div>
               </div>
               
-              <div className="p-4 bg-black flex-1 overflow-y-auto">
+              <div className="p-4 bg-gradient-to-b from-zinc-950 to-neutral-950/90 flex-1 overflow-y-auto">
                 {/* 日期筛选按钮 */}
                 <div className="mb-4">
-                  <label className="block text-xs font-mono text-gray-500 mb-2">
-                    &gt; {t('blackSwan.filterByDate').toUpperCase()}:
+                  <label className="block text-xs font-mono text-stone-400 mb-2">
+                    <span className="text-amber-500">&gt;</span> {t('blackSwan.filterByDate').toUpperCase()}:
                   </label>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
                     {/* 全部按钮 */}
@@ -696,8 +700,8 @@ export default function BlackSwanPage() {
                       onClick={() => setSelectedDateFilter('all')}
                       className={`w-full text-left px-3 py-2 font-mono text-xs transition-all border ${
                         selectedDateFilter === 'all'
-                          ? 'bg-green-600 text-black border-green-400 font-bold'
-                          : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                          ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 font-bold shadow-lg shadow-amber-900/40'
+                          : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
                       }`}
                     >
                       <span className="mr-2">
@@ -715,8 +719,8 @@ export default function BlackSwanPage() {
                           onClick={() => setSelectedDateFilter(date)}
                           className={`w-full text-left px-3 py-2 font-mono text-xs transition-all border ${
                             selectedDateFilter === date
-                              ? 'bg-green-600 text-black border-green-400 font-bold'
-                              : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                              ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 font-bold shadow-lg shadow-amber-900/40'
+                              : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
                           }`}
                         >
                           <span className="mr-2">
@@ -731,17 +735,17 @@ export default function BlackSwanPage() {
 
                 {/* 历史事件列表 */}
                 <div className="space-y-2 mb-4 flex-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 32rem)' }}>
-                  <div className="text-xs font-mono text-gray-500 mb-2">
-                    &gt; CRASH EVENTS: {loading ? '...' : getFilteredEvents().length}
-                    {selectedDateFilter !== 'all' && <span className="text-cyan-400"> (filtered by {selectedDateFilter})</span>}
+                  <div className="text-xs font-mono text-stone-400 mb-2">
+                    <span className="text-amber-500">&gt;</span> CRASH EVENTS: {loading ? '...' : getFilteredEvents().length}
+                    {selectedDateFilter !== 'all' && <span className="text-yellow-500"> (filtered by {selectedDateFilter})</span>}
                   </div>
                   {loading ? (
-                    <div className="text-center py-4 text-gray-600 font-mono text-xs">
-                      Loading events...
+                    <div className="text-center py-4 text-stone-500 font-mono text-xs">
+                      {t('blackSwan.loadingEvents')}
                     </div>
                   ) : getFilteredEvents().length === 0 ? (
-                    <div className="text-center py-4 text-gray-600 font-mono text-xs">
-                      No crash events found
+                    <div className="text-center py-4 text-stone-500 font-mono text-xs">
+                      {t('blackSwan.noEventsFound')}
                     </div>
                   ) : getFilteredEvents().map((event, index) => (
                     <button
@@ -749,32 +753,32 @@ export default function BlackSwanPage() {
                       onClick={() => setSelectedEvent(event)}
                       className={`w-full text-left p-3 border transition-all font-mono text-xs ${
                         selectedEvent?.id === event.id
-                          ? 'border-green-500 bg-green-900/20'
-                          : 'border-green-900 bg-gray-900 hover:border-green-500/50'
+                          ? 'border-amber-600/50 bg-gradient-to-r from-amber-900/25 to-yellow-900/20 shadow-lg shadow-amber-900/30'
+                          : 'border-amber-900/20 bg-zinc-900/40 hover:border-amber-700/40 hover:bg-zinc-800/50'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <span className="text-cyan-400">{event.asset}</span>
+                        <span className="text-amber-400">{event.asset}</span>
                         <span className={`font-bold ${
-                          event.crashPercentage < 0 ? 'text-red-400' : 'text-green-400'
+                          event.crashPercentage < 0 ? 'text-rose-400' : 'text-emerald-400'
                         }`}>
                           {event.crashPercentage}%
                         </span>
                       </div>
-                      <div className="text-gray-500 mb-1">
+                      <div className="text-stone-300 mb-1">
                         {event.date}
                       </div>
-                      <div className="text-gray-600">
-                        Duration: {event.duration}
+                      <div className="text-stone-500">
+                        {t('blackSwan.duration')}: {event.duration}
                       </div>
                     </button>
                   ))}
                 </div>
 
                 {/* 时间范围选择 */}
-                <div className="pt-4 border-t border-green-900">
-                  <label className="block text-xs font-mono text-gray-500 mb-2">
-                    &gt; TIME RANGE:
+                <div className="pt-4 border-t border-amber-900/20">
+                  <label className="block text-xs font-mono text-stone-400 mb-2">
+                    <span className="text-amber-500">&gt;</span> TIME RANGE:
                   </label>
                   <div className="grid grid-cols-3 gap-1 mb-1">
                     {[1, 3, 6].map((hours) => (
@@ -783,8 +787,8 @@ export default function BlackSwanPage() {
                         onClick={() => setTimeRange(hours)}
                         className={`px-2 py-1.5 text-xs font-mono transition-all border ${
                           timeRange === hours
-                            ? 'bg-green-600 text-black border-green-400'
-                            : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                            ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 shadow-lg shadow-amber-900/40'
+                            : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
                         }`}
                       >
                         {hours}h
@@ -798,8 +802,8 @@ export default function BlackSwanPage() {
                         onClick={() => setTimeRange(hours)}
                         className={`px-2 py-1.5 text-xs font-mono transition-all border ${
                           timeRange === hours
-                            ? 'bg-green-600 text-black border-green-400'
-                            : 'bg-gray-900 text-gray-400 border-green-900 hover:border-green-500'
+                            ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 shadow-lg shadow-amber-900/40'
+                            : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
                         }`}
                       >
                         {hours}h
@@ -813,69 +817,70 @@ export default function BlackSwanPage() {
 
           {/* 中间：数据分析区域（终端风格）*/}
           <div className="lg:col-span-6">
-            <div className="bg-gray-900 border-2 border-green-900 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
+            <div className="bg-gradient-to-br from-zinc-900/95 to-neutral-900/90 border-2 border-amber-700/20 overflow-hidden flex flex-col backdrop-blur-sm shadow-2xl shadow-black/50" style={{ height: 'calc(100vh - 8rem)' }}>
               {/* 终端标题栏 */}
-              <div className="bg-gray-900 border-b border-green-500 px-4 py-2">
-                <h2 className="text-sm font-bold text-green-400 font-mono">
+              <div className="bg-gradient-to-r from-zinc-900/98 to-neutral-900/98 border-b border-amber-600/30 px-4 py-2 shadow-lg shadow-black/40">
+                <h2 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono tracking-wide">
                   ═══ CRASH DATA ANALYSIS ═══
                 </h2>
               </div>
 
-              <div className="bg-black p-4 flex-1 overflow-y-auto">
+              <div className="bg-gradient-to-b from-zinc-950 to-neutral-950/90 p-4 flex-1 overflow-y-auto">
                 {selectedEvent ? (
                   <div className="space-y-4">
                     {/* 事件概览 - 终端样式 */}
-                    <div className="border-2 border-green-500/50 p-4 bg-gray-900/50">
-                      <div className="flex items-start justify-between mb-3">
+                    <div className="border-2 border-amber-700/30 p-4 bg-gradient-to-br from-zinc-900/90 to-neutral-900/80 shadow-2xl shadow-black/40 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-amber-500/3 via-yellow-500/3 to-amber-500/3"></div>
+                      <div className="flex items-start justify-between mb-3 relative z-10">
                         <div className="flex-1">
-                          <div className="text-cyan-400 font-mono text-lg font-bold mb-2">
+                          <div className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono text-lg font-bold mb-2 tracking-wide">
                             {selectedEvent.asset}
                           </div>
-                          <div className="text-gray-400 font-mono text-xs">
-                            &gt; {selectedEvent.description}
+                          <div className="text-stone-300 font-mono text-xs">
+                            <span className="text-amber-500">&gt;</span> {selectedEvent.description}
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-3xl font-bold text-red-400 font-mono">
+                          <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-red-500 font-mono">
                             {selectedEvent.crashPercentage}%
                           </div>
-                          <div className="text-xs text-gray-500 mt-1 font-mono">
+                          <div className="text-xs text-stone-400 mt-1 font-mono">
                             {selectedEvent.duration}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-500 font-mono border-t border-green-900 pt-2">
+                      <div className="flex items-center gap-4 text-xs text-stone-400 font-mono border-t border-amber-900/30 pt-2 relative z-10">
                         <div>
-                          &gt; Date: {selectedEvent.date}
+                          <span className="text-amber-500">&gt;</span> Date: {selectedEvent.date}
                         </div>
                         <div>
-                          &gt; Time: {mounted ? formatTime(selectedEvent.timestamp).substring(0, 5) : '--:--'}
+                          <span className="text-amber-500">&gt;</span> Time: {mounted ? formatTime(selectedEvent.timestamp).substring(0, 5) : '--:--'}
                         </div>
                         <div>
-                          &gt; Window: {timeRange}h
+                          <span className="text-amber-500">&gt;</span> Window: {timeRange}h
                         </div>
                       </div>
                     </div>
 
                     {/* 图表区域 - TradingView Widget */}
                     <div className="flex-shrink-0">
-                      <div className="text-green-400 font-mono text-xs mb-2 flex items-center justify-between">
-                        <span>&gt; PRICE CHART:</span>
-                        <span className="text-gray-600">
-                          Powered by TradingView
+                      <div className="text-amber-400 font-mono text-xs mb-2 flex items-center justify-between">
+                        <span><span className="text-amber-500">&gt;</span> {t('blackSwan.priceChart')}:</span>
+                        <span className="text-stone-500">
+                          {t('blackSwan.chartPoweredBy')}
                         </span>
                       </div>
-                      <div className="bg-black border-2 border-green-900 overflow-hidden">
+                      <div className="bg-zinc-950 border-2 border-amber-900/30 overflow-hidden shadow-2xl shadow-black/40">
                         <div 
                           id="tradingview-widget-container" 
                           ref={chartContainerRef}
-                          className="w-full bg-black"
+                          className="w-full bg-zinc-950"
                           style={{ height: '350px' }}
                         />
                       </div>
                       <div className="mt-2 space-y-1">
-                        <div className="text-gray-600 font-mono text-xs">
-                          &gt; Chart: {(() => {
+                        <div className="text-stone-500 font-mono text-xs">
+                          <span className="text-amber-500">&gt;</span> Chart: {(() => {
                             const eventYear = new Date(selectedEvent.timestamp).getFullYear();
                             const asset = selectedEvent.asset.replace('/', '');
                             let displayExchange = 'BINANCE';
@@ -892,65 +897,65 @@ export default function BlackSwanPage() {
                           })()} | Event: {selectedEvent.date} | Window: {timeRange}h
                         </div>
                         <div className="flex items-center gap-2 text-xs font-mono">
-                          <span className="text-gray-500">Timeline:</span>
-                          <span className="text-cyan-400">←{Math.floor(timeRange/2)}h before</span>
-                          <span className="text-red-400 font-bold">⚠ CRASH EVENT</span>
-                          <span className="text-cyan-400">{timeRange - Math.floor(timeRange/2)}h after→</span>
+                          <span className="text-stone-400">{t('blackSwan.timeline')}:</span>
+                          <span className="text-amber-400">←{Math.floor(timeRange/2)}h {t('blackSwan.before')}</span>
+                          <span className="text-rose-400 font-bold">⚠ {t('blackSwan.crashEvent')}</span>
+                          <span className="text-amber-400">{timeRange - Math.floor(timeRange/2)}h {t('blackSwan.after')}→</span>
                         </div>
-                        <div className="text-yellow-400 font-mono text-xs">
-                          ⚡ Chart auto-focused on crash time
+                        <div className="text-yellow-500 font-mono text-xs">
+                          ⚡ {t('blackSwan.chartAutoFocused')}
                         </div>
                       </div>
                     </div>
 
                     {/* 数据详情 - 终端网格 */}
                     <div>
-                      <div className="text-green-400 font-mono text-xs mb-2">
-                        &gt; DATA METRICS:
+                      <div className="text-amber-400 font-mono text-xs mb-2">
+                        <span className="text-amber-500">&gt;</span> {t('blackSwan.dataMetrics')}:
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-gray-900 border border-green-900 p-3">
-                          <div className="text-gray-500 font-mono text-xs mb-1">Peak Price</div>
-                          <div className="text-xl font-bold text-white font-mono">
+                        <div className="bg-gradient-to-br from-zinc-900/90 to-emerald-950/30 border border-emerald-600/30 p-3 shadow-xl shadow-black/30">
+                          <div className="text-stone-400 font-mono text-xs mb-1">{t('blackSwan.peakPrice')}</div>
+                          <div className="text-xl font-bold text-emerald-400 font-mono">
                             {selectedEvent.details?.previous_price 
                               ? `$${selectedEvent.details.previous_price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` 
                               : 'N/A'}
                           </div>
-                          <div className="text-gray-600 font-mono text-xs mt-1">Pre-crash</div>
+                          <div className="text-stone-500 font-mono text-xs mt-1">{t('blackSwan.preCrash')}</div>
                         </div>
-                        <div className="bg-gray-900 border border-red-500 p-3">
-                          <div className="text-gray-500 font-mono text-xs mb-1">Bottom Price</div>
-                          <div className="text-xl font-bold text-red-400 font-mono">
+                        <div className="bg-gradient-to-br from-zinc-900/90 to-rose-950/30 border border-rose-600/30 p-3 shadow-xl shadow-black/30">
+                          <div className="text-stone-400 font-mono text-xs mb-1">{t('blackSwan.bottomPrice')}</div>
+                          <div className="text-xl font-bold text-rose-400 font-mono">
                             {selectedEvent.details?.current_price 
                               ? `$${selectedEvent.details.current_price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` 
                               : 'N/A'}
                           </div>
-                          <div className="text-gray-600 font-mono text-xs mt-1">At crash</div>
+                          <div className="text-stone-500 font-mono text-xs mt-1">{t('blackSwan.atCrash')}</div>
                         </div>
-                        <div className="bg-gray-900 border border-orange-500 p-3">
-                          <div className="text-gray-500 font-mono text-xs mb-1">Price Change</div>
+                        <div className="bg-gradient-to-br from-zinc-900/90 to-orange-950/30 border border-orange-600/30 p-3 shadow-xl shadow-black/30">
+                          <div className="text-stone-400 font-mono text-xs mb-1">{t('blackSwan.priceChange')}</div>
                           <div className="text-xl font-bold text-orange-400 font-mono">
                             {selectedEvent.crashPercentage}%
                           </div>
-                          <div className="text-gray-600 font-mono text-xs mt-1">Total drop</div>
+                          <div className="text-stone-500 font-mono text-xs mt-1">{t('blackSwan.totalDrop')}</div>
                         </div>
-                        <div className="bg-gray-900 border border-purple-500 p-3">
-                          <div className="text-gray-500 font-mono text-xs mb-1">Duration</div>
-                          <div className="text-xl font-bold text-purple-400 font-mono">
+                        <div className="bg-gradient-to-br from-zinc-900/90 to-amber-950/30 border border-amber-600/30 p-3 shadow-xl shadow-black/30">
+                          <div className="text-stone-400 font-mono text-xs mb-1">{t('blackSwan.duration')}</div>
+                          <div className="text-xl font-bold text-amber-400 font-mono">
                             {selectedEvent.duration}
                           </div>
-                          <div className="text-gray-600 font-mono text-xs mt-1">Event length</div>
+                          <div className="text-stone-500 font-mono text-xs mt-1">{t('blackSwan.eventLength')}</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-20">
-                    <div className="text-5xl mb-4 text-gray-700">[ ? ]</div>
-                    <p className="text-gray-600 font-mono text-sm">
-                      &gt; Please select an event from the left panel
+                    <div className="text-5xl mb-4 text-stone-700">[ ? ]</div>
+                    <p className="text-stone-400 font-mono text-sm">
+                      <span className="text-amber-500">&gt;</span> Please select an event from the left panel
                     </p>
-                    <div className="mt-3 text-green-500 font-mono text-xs animate-pulse">
+                    <div className="mt-3 text-amber-500 font-mono text-xs animate-pulse">
                       █
                     </div>
                   </div>
@@ -961,55 +966,55 @@ export default function BlackSwanPage() {
 
           {/* 右侧：实时数据终端（终端风格）*/}
           <div className="lg:col-span-3">
-            <div className="bg-black rounded-xl shadow-2xl overflow-hidden sticky top-[6rem] border-2 border-green-500/50">
+            <div className="bg-gradient-to-br from-zinc-900/95 to-neutral-900/90 rounded-xl shadow-2xl overflow-hidden sticky top-[6rem] border-2 border-amber-700/20 backdrop-blur-sm shadow-black/50 flex flex-col" style={{ height: 'calc(100vh - 8rem)' }}>
               {/* 终端顶部栏 */}
-              <div className="bg-gray-900 border-b border-green-500 px-4 py-2 flex items-center justify-between">
+              <div className="bg-gradient-to-r from-zinc-900/98 to-neutral-900/98 border-b border-amber-600/30 px-4 py-2 flex items-center justify-between shadow-lg shadow-black/40">
                 <div className="flex items-center gap-3">
-                  <span className="text-green-400 font-mono text-sm font-bold">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono text-sm font-bold tracking-wide">
                     ═══ LIVE ALERT STREAM ═══
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  <span className="text-green-400 font-mono text-xs">BINANCE API</span>
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-500/60"></span>
+                  <span className="text-amber-400 font-mono text-xs">BINANCE API</span>
                 </div>
               </div>
 
               {/* 终端内容区 */}
-              <div className="bg-black p-4">
+              <div className="bg-gradient-to-b from-zinc-950 to-neutral-950/90 p-4 flex-1 flex flex-col overflow-hidden">
                 {/* 实时数据流 - 终端样式 */}
-                <div className="mb-2 text-xs text-cyan-400 font-mono border-b border-green-900 pb-2">
+                <div className="mb-2 text-xs text-amber-400 font-mono border-b border-amber-900/30 pb-2 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <span>🔴 LIVE</span>
-                    <span className="text-gray-500">|</span>
-                    <span className="text-gray-400">实时市场数据 (24h 变化 &gt; 1%)</span>
+                    <span className="text-stone-500">|</span>
+                    <span className="text-stone-400">{t('blackSwan.liveMarketData')}</span>
                   </div>
                 </div>
-                <div className="space-y-1 max-h-[500px] overflow-y-auto font-mono text-xs">
+                <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs">
                   {realtimeData.length === 0 ? (
-                    <div className="text-center py-10 text-gray-600">
-                      <div className="text-2xl mb-2">[ LOADING ]</div>
-                      <p className="text-xs">连接币安API中...</p>
-                      <div className="mt-2 text-green-500 animate-pulse">█</div>
+                    <div className="text-center py-10 text-stone-500">
+                      <div className="text-2xl mb-2 text-stone-700">[ LOADING ]</div>
+                      <p className="text-xs">{t('blackSwan.connectingApi')}</p>
+                      <div className="mt-2 text-amber-500 animate-pulse">█</div>
                     </div>
                   ) : (
                     realtimeData.map((alert, index) => (
                       <div
                         key={`alert-${alert.id}-${index}`}
-                        className="hover:bg-gray-900/50 px-2 py-1.5 rounded transition-colors border-l-2 border-transparent hover:border-green-500"
+                        className="hover:bg-zinc-800/50 px-2 py-1.5 rounded transition-colors border-l-2 border-transparent hover:border-amber-500"
                       >
                         <div className="flex items-start gap-2">
                           {/* 时间戳 */}
-                          <span className="text-gray-600 shrink-0">
+                          <span className="text-stone-500 shrink-0">
                             [{alert.timestamp}]
                           </span>
                           
                           {/* 严重程度 */}
                           <span className={`font-bold shrink-0 w-20 ${
                             alert.severity === 'critical'
-                              ? 'text-red-500'
+                              ? 'text-rose-400'
                               : alert.severity === 'high'
-                              ? 'text-orange-500'
+                              ? 'text-orange-400'
                               : 'text-yellow-500'
                           }`}>
                             {alert.severity === 'critical' ? 'CRITICAL' : 
@@ -1017,19 +1022,19 @@ export default function BlackSwanPage() {
                           </span>
                           
                           {/* 资产 */}
-                          <span className="text-cyan-400 shrink-0 w-24">
+                          <span className="text-amber-400 shrink-0 w-24">
                             {alert.asset}
                           </span>
                           
                           {/* 变化 */}
                           <span className={`shrink-0 w-16 ${
-                            alert.change < 0 ? 'text-red-400' : 'text-green-400'
+                            alert.change < 0 ? 'text-rose-400' : 'text-emerald-400'
                           }`}>
                             {alert.change > 0 ? '+' : ''}{alert.change.toFixed(2)}%
                           </span>
                           
                           {/* 消息 */}
-                          <span className="text-gray-400 flex-1 truncate">
+                          <span className="text-stone-400 flex-1 truncate">
                             {alert.message}
                           </span>
                         </div>
@@ -1039,48 +1044,48 @@ export default function BlackSwanPage() {
                 </div>
 
                 {/* 终端底部状态 */}
-                <div className="mt-4 pt-3 border-t border-green-900">
+                <div className="mt-4 pt-3 border-t border-amber-900/30 flex-shrink-0">
                   <div className="grid grid-cols-2 gap-2">
                     {/* 左侧：统计 */}
-                    <div className="border border-green-900 p-2 rounded">
-                      <div className="text-green-400 font-mono text-xs mb-1.5 font-bold">
+                    <div className="border border-amber-900/30 p-2 rounded bg-zinc-900/50">
+                      <div className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono text-xs mb-1.5 font-bold tracking-wide">
                         ╔═ STATISTICS ═╗
                       </div>
                       <div className="space-y-1 text-xs font-mono">
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Recent:</span>
+                          <span className="text-stone-400">Recent:</span>
                           <span className="text-white">{realtimeData.length}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Critical:</span>
-                          <span className="text-red-500">
+                          <span className="text-stone-400">Critical:</span>
+                          <span className="text-rose-400">
                             {realtimeData.filter(a => a.severity === 'critical').length}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Total:</span>
-                          <span className="text-cyan-400">{stats.totalAlerts}</span>
+                          <span className="text-stone-400">Total:</span>
+                          <span className="text-amber-400">{stats.totalAlerts}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* 右侧：系统状态 */}
-                    <div className="border border-green-900 p-2 rounded">
-                      <div className="text-green-400 font-mono text-xs mb-1.5 font-bold">
+                    <div className="border border-amber-900/30 p-2 rounded bg-zinc-900/50">
+                      <div className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500 font-mono text-xs mb-1.5 font-bold tracking-wide">
                         ╔═ SYSTEM ═╗
                       </div>
                       <div className="space-y-1 text-xs font-mono">
                         <div className="flex justify-between">
-                          <span className="text-gray-500">WS:</span>
-                          <span className="text-green-400">✓ ONLINE</span>
+                          <span className="text-stone-400">WS:</span>
+                          <span className="text-emerald-400">✓ ONLINE</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Monitor:</span>
-                          <span className="text-green-400">✓ ACTIVE</span>
+                          <span className="text-stone-400">Monitor:</span>
+                          <span className="text-emerald-400">✓ ACTIVE</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Assets:</span>
-                          <span className="text-cyan-400">{stats.monitoredAssets}</span>
+                          <span className="text-stone-400">Assets:</span>
+                          <span className="text-amber-400">{stats.monitoredAssets}</span>
                         </div>
                       </div>
                     </div>
@@ -1090,10 +1095,10 @@ export default function BlackSwanPage() {
                   <div className="mt-3 text-center">
                     <Link 
                       href="/black-swan-terminal"
-                      className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-mono text-xs transition-colors"
+                      className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 font-mono text-xs transition-colors"
                     >
                       <span>→</span>
-                      <span>Open Full Terminal View</span>
+                      <span>{t('blackSwan.openFullTerminal')}</span>
                       <span>←</span>
                     </Link>
                   </div>
@@ -1121,36 +1126,38 @@ export default function BlackSwanPage() {
           animation: slideIn 0.3s ease-out;
         }
 
-        /* 终端风格滚动条 */
+        /* 奢华金融风格滚动条 */
         ::-webkit-scrollbar {
           width: 10px;
           height: 10px;
         }
 
         ::-webkit-scrollbar-track {
-          background: #000000;
-          border: 1px solid #1a4d2e;
+          background: #18181b;
+          border: 1px solid #292524;
         }
 
         ::-webkit-scrollbar-thumb {
-          background: #0f5132;
-          border: 1px solid #00ff00;
-          border-radius: 0;
+          background: linear-gradient(180deg, #78716c 0%, #a8a29e 100%);
+          border: 1px solid #78716c;
+          border-radius: 2px;
+          box-shadow: 0 0 4px rgba(161, 98, 7, 0.2);
         }
 
         ::-webkit-scrollbar-thumb:hover {
-          background: #16a34a;
-          border-color: #22c55e;
+          background: linear-gradient(180deg, #d97706 0%, #f59e0b 100%);
+          border-color: #f59e0b;
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
         }
 
         ::-webkit-scrollbar-corner {
-          background: #000000;
+          background: #18181b;
         }
 
         /* Firefox 滚动条 */
         * {
           scrollbar-width: thin;
-          scrollbar-color: #0f5132 #000000;
+          scrollbar-color: #78716c #18181b;
         }
       `}</style>
     </div>

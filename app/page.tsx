@@ -536,7 +536,7 @@ export default function LumiSoonPage() {
                       <div className="flex items-center gap-2">
                         <span>🔴 LIVE</span>
                         <span className="text-gray-500">|</span>
-                        <span className="text-gray-400">实时市场数据 (24h 变化 &gt; 1%)</span>
+                        <span className="text-gray-400">{t('landing.terminal.liveMarketData')}</span>
                       </div>
                     </div>
                     {/* 实时数据流 - 终端样式 */}
@@ -544,7 +544,7 @@ export default function LumiSoonPage() {
                       {realtimeData.length === 0 ? (
                         <div className="text-center py-10 text-gray-600">
                           <div className="text-2xl mb-2">[ {t('landing.terminal.standby').toUpperCase()} ]</div>
-                          <p className="text-xs">连接币安API中...</p>
+                          <p className="text-xs">{t('landing.terminal.connectingBinance')}</p>
                           <div className="mt-2 text-green-500 animate-pulse">█</div>
                         </div>
                       ) : (
