@@ -363,11 +363,14 @@ export default function LumiSoonPage() {
 
       <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="text-center w-full">
-          {/* Logo */}
+          {/* BETA SOON 卡片 */}
           <div className="mb-10 flex justify-center">
-            <h1 className="text-5xl md:text-6xl font-black text-white text-glow tracking-tight" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>
-              LUMI
-            </h1>
+            <div className="inline-flex items-center gap-3 bg-black/60 backdrop-blur-sm border border-white/20 rounded-full px-6 py-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></div>
+              <span className="text-gray-300 text-sm font-semibold tracking-wider uppercase" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>
+                {t('landing.betaTag')}
+              </span>
+            </div>
           </div>
 
           {/* 核心 "SOON" 区域 */}
@@ -381,35 +384,35 @@ export default function LumiSoonPage() {
               
         {/* 专业黑白主题时间轴 */}
         <div className="mt-16 w-full">
-          <div className="relative max-w-5xl mx-auto">
+          <div className="relative max-w-7xl mx-auto px-9">
             <div className="absolute left-[-9999px] right-[-12000px] top-6 h-[0.5px] bg-white z-0 transform -translate-y-1/2"></div>
             <div className="flex justify-between relative z-10">
               <Link href="/black-swan" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q4_2025_title')}</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[200px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q4_2025_title')}</div>
+                <div className="text-gray-400 text-lg font-semibold text-center group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   {t('landing.timeline.q4_2025_desc1')}<br/>{t('landing.timeline.q4_2025_desc2')}
                 </div>
               </Link>
               <Link href="/lottery" className="flex flex-col items-center relative group cursor-pointer transition-all hover:scale-105">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-600 absolute top-6 -translate-y-1/2 group-hover:bg-green-400 group-hover:border-green-400 transition-colors"></div>
-                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q1_2026_title')}</div>
-                <div className="text-gray-400 text-lg font-semibold text-center max-w-[180px] group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+                <div className="text-white font-bold text-lg mt-8 mb-1 group-hover:text-green-400 transition-colors whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q1_2026_title')}</div>
+                <div className="text-gray-400 text-lg font-semibold text-center group-hover:text-white transition-colors" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   {t('landing.timeline.q1_2026_desc1')}<br/>{t('landing.timeline.q1_2026_desc2')}
                 </div>
               </Link>
               <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title={`${t('landing.timeline.comingSoon')} in Q2 2026`}>
                 <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q2_2026_title')}</div>
-                <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1 whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q2_2026_title')}</div>
+                <div className="text-gray-500 text-lg font-semibold text-center whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   {t('landing.timeline.q2_2026_desc')}
                   <div className="text-xs text-gray-600 mt-1">{t('landing.timeline.comingSoon')}</div>
                 </div>
               </div>
               <div className="flex flex-col items-center relative group cursor-not-allowed opacity-60" title={`${t('landing.timeline.comingSoon')} in Q3 2026`}>
                 <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-gray-600 absolute top-6 -translate-y-1/2"></div>
-                <div className="text-gray-300 font-bold text-lg mt-8 mb-1" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q3_2026_title')}</div>
-                <div className="text-gray-500 text-lg font-semibold text-center max-w-[180px]" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
+                <div className="text-gray-300 font-bold text-lg mt-8 mb-1 whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>{t('landing.timeline.q3_2026_title')}</div>
+                <div className="text-gray-500 text-lg font-semibold text-center whitespace-nowrap" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '0.02em'}}>
                   {t('landing.timeline.q3_2026_desc')}
                   <div className="text-xs text-gray-600 mt-1">{t('landing.timeline.comingSoon')}</div>
                 </div>
@@ -418,8 +421,32 @@ export default function LumiSoonPage() {
           </div>
         </div>
         
-        {/* 动态下滑指引 - 双V形箭头 */}
-        <div className="relative z-20 flex justify-center py-8">
+        {/* 进入市场按钮 - 黑白极简设计 */}
+        <div className="relative z-20 flex justify-center py-8 mt-8">
+          <Link 
+            href="/markets"
+            className="group relative"
+          >
+            {/* 背景毛玻璃 */}
+            <div className="absolute inset-0 backdrop-blur-md bg-white/5 border border-white/20 rounded-lg transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/40"></div>
+            
+            {/* 紫色光晕（悬停显示） */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 rounded-lg blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {/* 按钮内容 */}
+            <div className="relative flex items-center gap-3 px-10 py-4">
+              <span className="text-white text-lg font-semibold tracking-wide transition-all duration-300 group-hover:text-purple-200" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif'}}>
+                {t('landing.enterMarket')}
+              </span>
+              <svg className="w-5 h-5 text-white transition-all duration-300 group-hover:translate-x-1 group-hover:text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </Link>
+        </div>
+        
+        {/* 动态下滑指引 - 双V形箭头 (右下角) */}
+        <div className="fixed right-8 bottom-8 z-20">
           <div className="scroll-indicator" onClick={handleScrollDown}>
             <div className="scroll-text">
               <span className="text-white/60 text-sm font-medium tracking-wider">
@@ -880,6 +907,19 @@ export default function LumiSoonPage() {
 
         .scroll-indicator:hover .chevron {
           filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+        }
+
+        /* 高级按钮光效动画 */
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%) skewX(-15deg);
+          }
+          100% {
+            transform: translateX(200%) skewX(-15deg);
+          }
+        }
+        .animate-shimmer {
+          animation: shimmer 3s infinite;
         }
       `}</style>
       </div>
