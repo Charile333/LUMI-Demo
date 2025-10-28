@@ -23,6 +23,14 @@ export default function LumiSoonPage() {
   const [stats, setStats] = useState({ totalAlerts: 0, monitoredAssets: 0 });
   const [wsConnected, setWsConnected] = useState(false);
 
+  // 下滑指引点击处理函数
+  const handleScrollDown = () => {
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth'
+    });
+  };
+
   // 连接 WebSocket
   useEffect(() => {
     let ws: WebSocket | null = null;
@@ -409,6 +417,25 @@ export default function LumiSoonPage() {
             </div>
           </div>
         </div>
+        
+        {/* 动态下滑指引 - 双V形箭头 */}
+        <div className="relative z-20 flex justify-center py-8">
+          <div className="scroll-indicator" onClick={handleScrollDown}>
+            <div className="scroll-text">
+              <span className="text-white/60 text-sm font-medium tracking-wider">
+                {t('landing.scrollDown')}
+              </span>
+            </div>
+            <div className="chevron-container">
+              <svg className="chevron chevron-1" width="60" height="60" viewBox="0 0 60 60">
+                <polyline points="10,20 30,40 50,20" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <svg className="chevron chevron-2" width="60" height="60" viewBox="0 0 60 60">
+                <polyline points="10,20 30,40 50,20" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Our Apps 毛玻璃方框 */}
@@ -771,6 +798,88 @@ export default function LumiSoonPage() {
         * {
           scrollbar-width: thin;
           scrollbar-color: #0f5132 #000000;
+        }
+
+        /* 动态下滑指引样式 - 双V形箭头 */
+        .scroll-indicator {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+          transform: translateY(-4px);
+        }
+
+        .scroll-text {
+          animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        .chevron-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          height: 100px;
+        }
+
+        .chevron {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          opacity: 0;
+          filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+        }
+
+        .chevron-1 {
+          animation: chevronFloat 2s ease-in-out infinite;
+        }
+
+        .chevron-2 {
+          animation: chevronFloat 2s ease-in-out 0.5s infinite;
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% {
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        @keyframes chevronFloat {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-15px);
+          }
+          25% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+            transform: translateX(-50%) translateY(15px);
+          }
+          75% {
+            opacity: 0.3;
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(45px);
+          }
+        }
+
+        /* 点击下滑指引时的滚动效果 */
+        .scroll-indicator:active {
+          transform: translateY(2px);
+        }
+
+        .scroll-indicator:hover .chevron {
+          filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
         }
       `}</style>
       </div>
