@@ -49,7 +49,6 @@ export default function ProfilePage() {
             </div>
             <div className="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
             <nav className="hidden md:flex space-x-6 text-sm">
-              <a href="#" className="text-white hover:text-[#b8860b] transition-colors border-b-2 border-[#b8860b] pb-1">{t('profile.menu.profile')}</a>
               <Link href="/lottery" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.games')}</Link>
               <Link href="/sports-betting" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.sports')}</Link>
               <Link href="/live-casino" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.liveCasino')}</Link>

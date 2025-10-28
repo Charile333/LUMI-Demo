@@ -548,7 +548,7 @@ export default function LotteryGamePage() {
         </main>
         
         {/* Footer */}
-        <footer className="bg-[#1a1a1a] border-t border-gray-800 mt-12">
+        <footer className="bg-[#1a1a1a] border-t border-gray-800 mt-12" suppressHydrationWarning>
           <div className="container mx-auto px-4 py-10">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>

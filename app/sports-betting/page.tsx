@@ -6,6 +6,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import GiftCenter from '@/components/GiftCenter';
 
 // Types
 interface Bet {
@@ -99,13 +100,13 @@ export default function SportsBettingPage() {
         {/* Responsible Gambling Notice */}
         <div className="bg-[#1a1a1a] border-b border-[#b8860b]/30 py-2">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-xs text-gray-300 flex items-center justify-center md:justify-start">
+            <p className="text-xs text-gray-300 flex items-center justify-center md:justify-start" suppressHydrationWarning>
               <i className="fa fa-info-circle text-[#b8860b] mr-2"></i>
               {t('sportsBetting.responsibleGambling')}
             </p>
             <div className="flex space-x-4 mt-2 md:mt-0">
-              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.responsibleGamblingLink')}</a>
-              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.helpCenter')}</a>
+              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingLink')}</a>
+              <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.helpCenter')}</a>
             </div>
           </div>
         </div>
@@ -140,12 +141,7 @@ export default function SportsBettingPage() {
                   <span>{t('sportsBetting.nav.backToMarkets')}</span>
                 </Link>
                 
-                <div className="relative">
-                  <button className="text-gray-300 hover:text-white transition-colors relative">
-                    <i className="fa fa-bell-o"></i>
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#b8860b] text-[#121212] text-xs rounded-full flex items-center justify-center">2</span>
-                  </button>
-                </div>
+                <GiftCenter />
                 
                 <div className="h-6 w-px bg-gray-700"></div>
                 
@@ -1199,26 +1195,21 @@ export default function SportsBettingPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.responsibleGamblingBar.title')}</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.responsibleGamblingBar.helpLink')}</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.responsibleGamblingBar.selfExclusion')}</a>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors">{t('sportsBetting.responsibleGamblingBar.ageVerification')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingBar.title')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingBar.helpLink')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingBar.selfExclusion')}</a>
+                <a href="#" className="text-xs text-gray-400 hover:text-[#b8860b] transition-colors" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingBar.ageVerification')}</a>
               </div>
               
               <div className="flex items-center space-x-4">
-                <span className="text-xs text-gray-500">{t('sportsBetting.responsibleGamblingBar.ageLimit')}</span>
-                <div className="flex space-x-3">
-                  <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" className="h-5 opacity-70" />
-                  <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" className="h-5 opacity-70" />
-                  <img src="https://picsum.photos/id/105/40/20" alt="Fair Gaming" className="h-5 opacity-70" />
-                </div>
+                <span className="text-xs text-gray-500" suppressHydrationWarning>{t('sportsBetting.responsibleGamblingBar.ageLimit')}</span>
               </div>
             </div>
           </div>
         </div>
         
         {/* Footer */}
-        <footer className="bg-[#1a1a1a] border-t border-gray-800 py-10">
+        <footer className="bg-[#1a1a1a] border-t border-gray-800 py-10" suppressHydrationWarning>
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
               <div className="md:col-span-2">

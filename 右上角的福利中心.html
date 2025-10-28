@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegitChain | 福利中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        },
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        primary: '#3b82f6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gift-hover {
+                @apply transition-all duration-300 hover:border-gold/70 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-1;
+            }
+            .badge-dot {
+                @apply absolute -top-1 -right-1 w-4 h-4 bg-gold text-dark text-xs rounded-full flex items-center justify-center animate-pulse;
+            }
+            .scrollbar-thin {
+                scrollbar-width: thin;
+            }
+            .scrollbar-thin::-webkit-scrollbar {
+                width: 4px;
+            }
+            .scrollbar-thin::-webkit-scrollbar-thumb {
+                @apply bg-gray-700 rounded-full;
+            }
+            .scrollbar-thin::-webkit-scrollbar-track {
+                @apply bg-dark;
+            }
+            .animate-bounce-slow {
+                animation: bounce 2s infinite;
+            }
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-3px); }
+            }
+            .toast-enter {
+                animation: toastIn 0.3s forwards;
+            }
+            @keyframes toastIn {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        }
+    </style>
+    
+    <!-- 谷歌字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased min-h-screen">
+    <!-- 页面遮罩（点击外部关闭弹窗） -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden" style="backdrop-filter: blur(1px);"></div>
+
+    <!-- 顶部导航栏（含礼物图标入口） -->
+    <header class="sticky top-0 z-50 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">LegitChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Games</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Live Casino</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Tournaments</a>
+                    <a href="#" class="text-white hover:text-gold transition-colors border-b-2 border-gold pb-1">Promotions</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- 礼物图标入口（核心元素） -->
+                <div class="relative" id="giftIconContainer">
+                    <button id="giftToggleBtn" class="text-gray-300 hover:text-gold transition-colors relative p-1.5 rounded-full hover:bg-dark-light focus:outline-none">
+                        <i class="fa fa-gift text-gold text-lg animate-bounce-slow"></i>
+                        <span class="badge-dot" id="unreadCount">5</span> <!-- 未读福利数量 -->
+                    </button>
+                    
+                    <!-- 福利中心悬浮弹窗（默认隐藏） -->
+                    <div id="giftCenterPopup" class="absolute right-0 mt-2 w-80 md:w-96 bg-dark-light rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-50 hidden transform origin-top-right transition-all duration-300 ease-in-out scale-95 opacity-0">
+                        <!-- 弹窗头部 -->
+                        <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                            <h3 class="text-lg font-display font-semibold flex items-center">
+                                <i class="fa fa-gift text-gold mr-2"></i>
+                                福利中心
+                            </h3>
+                            <span class="bg-gold/20 text-gold text-xs px-2 py-0.5 rounded-full flex items-center relative">
+                                <span class="badge-dot absolute -top-5 -right-5 w-3 h-3"></span>
+                                5个未领取
+                            </span>
+                        </div>
+                        
+                        <!-- 弹窗内容区 -->
+                        <div class="max-h-[60vh] overflow-y-auto scrollbar-thin">
+                            <!-- 1. 新手福利 -->
+                            <div class="p-4 border-b border-gray-800">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-medium text-white flex items-center">
+                                        <i class="fa fa-rocket text-warning mr-2"></i>
+                                        新手专享
+                                    </h4>
+                                    <a href="#" class="text-xs text-gold hover:text-gold-light transition-colors">查看全部</a>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <!-- 新手礼包 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">注册即领礼包</h5>
+                                                <p class="text-xs text-gray-400 mt-1">0.01 ETH + 20免费 spins</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <span class="bg-dark-light px-1.5 py-0.5 rounded mr-2">无需存款</span>
+                                                    <span class="text-gray-500">剩余: 3天2小时</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-gold text-dark text-xs font-medium px-3 py-1 rounded hover:opacity-90 transition-opacity claim-btn" data-gift="new-user">
+                                                立即领取
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 2. 存款福利 -->
+                            <div class="p-4 border-b border-gray-800">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-medium text-white flex items-center">
+                                        <i class="fa fa-money text-primary mr-2"></i>
+                                        存款奖励
+                                    </h4>
+                                    <a href="#" class="text-xs text-gold hover:text-gold-light transition-colors">查看全部</a>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <!-- 首存翻倍 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">首次存款翻倍</h5>
+                                                <p class="text-xs text-gray-400 mt-1">100% 奖金上限 2 ETH</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <span class="bg-dark-light px-1.5 py-0.5 rounded mr-2">首存专享</span>
+                                                    <span class="text-gray-500">剩余: 7天5小时</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-dark border border-gold/30 text-gold text-xs font-medium px-3 py-1 rounded hover:bg-gold/10 transition-colors">
+                                                去存款
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Crypto 存款额外奖励 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">Crypto存款额外25%</h5>
+                                                <p class="text-xs text-gray-400 mt-1">所有加密货币存款适用</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <span class="bg-dark-light px-1.5 py-0.5 rounded mr-2">不限次数</span>
+                                                    <span class="text-gray-500">长期有效</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-dark border border-gold/30 text-gold text-xs font-medium px-3 py-1 rounded hover:bg-gold/10 transition-colors">
+                                                去存款
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 3. 任务奖励 -->
+                            <div class="p-4 border-b border-gray-800">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-medium text-white flex items-center">
+                                        <i class="fa fa-tasks text-success mr-2"></i>
+                                        任务奖励
+                                    </h4>
+                                    <a href="#" class="text-xs text-gold hover:text-gold-light transition-colors">查看全部</a>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <!-- 每日签到 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">每日签到奖励</h5>
+                                                <p class="text-xs text-gray-400 mt-1">连续签到7天领大奖</p>
+                                                <div class="flex items-center mt-2">
+                                                    <div class="flex space-x-1">
+                                                        <div class="w-4 h-4 rounded-full bg-gold flex items-center justify-center text-[10px]">1</div>
+                                                        <div class="w-4 h-4 rounded-full bg-gold flex items-center justify-center text-[10px]">2</div>
+                                                        <div class="w-4 h-4 rounded-full bg-gold flex items-center justify-center text-[10px]">3</div>
+                                                        <div class="w-4 h-4 rounded-full bg-dark-light border border-gray-600 flex items-center justify-center text-[10px] text-gray-500">4</div>
+                                                        <div class="w-4 h-4 rounded-full bg-dark-light border border-gray-600 flex items-center justify-center text-[10px] text-gray-500">5</div>
+                                                        <div class="w-4 h-4 rounded-full bg-dark-light border border-gray-600 flex items-center justify-center text-[10px] text-gray-500">6</div>
+                                                        <div class="w-4 h-4 rounded-full bg-dark-light border border-gray-600 flex items-center justify-center text-[10px] text-gray-500">7</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button class="bg-success text-white text-xs font-medium px-3 py-1 rounded hover:opacity-90 transition-opacity">
+                                                已签到
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 完成首注 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">完成首次投注</h5>
+                                                <p class="text-xs text-gray-400 mt-1">奖励 0.02 ETH + 30 spins</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <div class="w-full bg-dark-light rounded-full h-1.5 mr-2">
+                                                        <div class="bg-gray-600 h-1.5 rounded-full" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-gray-500">0/1</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-dark border border-gray-600 text-gray-400 text-xs font-medium px-3 py-1 rounded cursor-not-allowed">
+                                                未完成
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 4. 专属福利 -->
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-medium text-white flex items-center">
+                                        <i class="fa fa-diamond text-gold mr-2"></i>
+                                        专属福利
+                                    </h4>
+                                    <a href="#" class="text-xs text-gold hover:text-gold-light transition-colors">查看全部</a>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <!-- VIP 专享 -->
+                                    <div class="bg-dark rounded-lg border border-gold/30 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium flex items-center">
+                                                    <i class="fa fa-star text-gold mr-1"></i>
+                                                    VIP 专属礼包
+                                                </h5>
+                                                <p class="text-xs text-gray-400 mt-1">1 ETH + 100 免费 spins</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <span class="bg-gold/20 text-gold px-1.5 py-0.5 rounded mr-2">VIP 专享</span>
+                                                    <span class="text-gray-500">剩余: 15天</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-gold text-dark text-xs font-medium px-3 py-1 rounded hover:opacity-90 transition-opacity claim-btn" data-gift="vip">
+                                                立即领取
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 邀请奖励 -->
+                                    <div class="bg-dark rounded-lg border border-gray-700 p-3 gift-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="text-sm font-medium">邀请好友奖励</h5>
+                                                <p class="text-xs text-gray-400 mt-1">好友首存 20% 佣金</p>
+                                                <div class="flex items-center mt-2 text-xs">
+                                                    <span class="bg-dark-light px-1.5 py-0.5 rounded mr-2">不限人数</span>
+                                                    <span class="text-gray-500">已邀请: 0人</span>
+                                                </div>
+                                            </div>
+                                            <button class="bg-dark border border-gold/30 text-gold text-xs font-medium px-3 py-1 rounded hover:bg-gold/10 transition-colors" id="inviteBtn">
+                                                邀请好友
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 弹窗底部 -->
+                        <div class="p-4 border-t border-gray-800 bg-dark/50">
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-400">
+                                    <i class="fa fa-info-circle text-gold mr-1"></i>
+                                    福利领取后需满足相应 wagering 要求
+                                </p>
+                                <button id="closeGiftBtn" class="text-xs text-gray-400 hover:text-white transition-colors">
+                                    关闭 <i class="fa fa-times ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户信息区 -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="h-6 w-px bg-gray-700"></div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Balance</p>
+                                <p class="text-sm font-medium">15.328 ETH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="text-center mb-10">
+            <h1 class="text-[clamp(1.8rem,4vw,3rem)] font-display font-bold mb-4">探索您的专属福利</h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">点击右上角的礼物图标，打开福利中心领取您的专属奖励、完成任务获取额外奖励，享受更多会员专属福利</p>
+        </div>
+        
+        <!-- 福利展示区 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-dark-light rounded-xl border border-gray-800 p-6 text-center gift-hover">
+                <div class="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-gift text-gold text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium mb-2">新手福利</h3>
+                <p class="text-gray-400 text-sm">注册即享多重好礼，助力您开启游戏之旅</p>
+            </div>
+            
+            <div class="bg-dark-light rounded-xl border border-gray-800 p-6 text-center gift-hover">
+                <div class="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-trophy text-gold text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium mb-2">任务奖励</h3>
+                <p class="text-gray-400 text-sm">完成日常任务获取丰厚奖励，越努力越幸运</p>
+            </div>
+            
+            <div class="bg-dark-light rounded-xl border border-gray-800 p-6 text-center gift-hover">
+                <div class="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-diamond text-gold text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium mb-2">VIP专属</h3>
+                <p class="text-gray-400 text-sm">升级会员等级，解锁更多专属特权与福利</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 通知提示框 -->
+    <div id="toastNotification" class="fixed top-4 right-4 bg-dark-light border border-gold/30 rounded-lg p-4 shadow-lg z-50 hidden toast-enter max-w-xs">
+        <div class="flex items-start">
+            <div class="flex-shrink-0 text-gold mr-3">
+                <i class="fa fa-check-circle text-xl"></i>
+            </div>
+            <div>
+                <h4 class="font-medium text-white" id="toastTitle">领取成功</h4>
+                <p class="text-sm text-gray-300 mt-1" id="toastMessage">您已成功领取新手礼包</p>
+            </div>
+            <button class="ml-auto text-gray-400 hover:text-white" id="closeToast">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 邀请好友弹窗 -->
+    <div id="inviteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="bg-dark-light border border-gray-800 rounded-xl w-full max-w-md mx-4 relative z-10 transform transition-all duration-300 scale-95 opacity-0" id="inviteModalContent">
+            <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                <h3 class="text-lg font-medium">邀请好友</h3>
+                <button id="closeInviteModal" class="text-gray-400 hover:text-white">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-5">
+                <p class="text-sm text-gray-300 mb-4">邀请好友注册并存款，您将获得好友首存金额的20%作为奖励，无上限！</p>
+                
+                <div class="mb-4">
+                    <label class="block text-xs text-gray-400 mb-2">您的邀请链接</label>
+                    <div class="flex">
+                        <input type="text" value="https://legitchain.com/i/abc123" readonly class="flex-1 bg-dark border border-gray-700 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                        <button id="copyLinkBtn" class="bg-gold text-dark font-medium px-3 py-2 rounded-r-md hover:opacity-90 transition-opacity">
+                            复制
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3 mb-5">
+                    <button class="flex-1 bg-dark border border-gray-700 rounded-md p-2 flex items-center justify-center hover:border-gold/50 transition-colors">
+                        <i class="fa fa-telegram text-blue-400 mr-2"></i>
+                        <span class="text-sm">Telegram</span>
+                    </button>
+                    <button class="flex-1 bg-dark border border-gray-700 rounded-md p-2 flex items-center justify-center hover:border-gold/50 transition-colors">
+                        <i class="fa fa-whatsapp text-green-400 mr-2"></i>
+                        <span class="text-sm">WhatsApp</span>
+                    </button>
+                    <button class="flex-1 bg-dark border border-gray-700 rounded-md p-2 flex items-center justify-center hover:border-gold/50 transition-colors">
+                        <i class="fa fa-envelope text-gray-400 mr-2"></i>
+                        <span class="text-sm">邮件</span>
+                    </button>
+                </div>
+                
+                <div class="bg-dark rounded-lg p-3 border border-gray-800">
+                    <h4 class="text-xs font-medium mb-2">邀请奖励说明</h4>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                            <span>好友完成首次存款后，奖励即时到账</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                            <span>奖励无上限，邀请越多，奖励越多</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                            <span>奖励无需 wagering，可直接提现</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark-light border-t border-gray-800 py-8 mt-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gold text-xl font-display font-bold mb-4 md:mb-0">LegitChain</div>
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">关于我们</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">帮助中心</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">条款与条件</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">隐私政策</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors">负责任游戏</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-6 pt-6 text-center text-xs text-gray-500">
+                © 2023 LegitChain. 保留所有权利. 18+ 请负责任地游戏.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 交互逻辑 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 元素获取
+            const giftToggleBtn = document.getElementById('giftToggleBtn');
+            const giftCenterPopup = document.getElementById('giftCenterPopup');
+            const closeGiftBtn = document.getElementById('closeGiftBtn');
+            const overlay = document.getElementById('overlay');
+            const claimButtons = document.querySelectorAll('.claim-btn');
+            const toastNotification = document.getElementById('toastNotification');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const closeToast = document.getElementById('closeToast');
+            const inviteBtn = document.getElementById('inviteBtn');
+            const inviteModal = document.getElementById('inviteModal');
+            const inviteModalContent = document.getElementById('inviteModalContent');
+            const closeInviteModal = document.getElementById('closeInviteModal');
+            const copyLinkBtn = document.getElementById('copyLinkBtn');
+            const unreadCount = document.getElementById('unreadCount');
+            
+            // 福利中心弹窗控制
+            function openGiftCenter() {
+                giftCenterPopup.classList.remove('hidden', 'scale-95', 'opacity-0');
+                giftCenterPopup.classList.add('scale-100', 'opacity-100');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeGiftCenter() {
+                giftCenterPopup.classList.remove('scale-100', 'opacity-100');
+                giftCenterPopup.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    giftCenterPopup.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+            
+            // 打开邀请好友弹窗
+            function openInviteModal() {
+                closeGiftCenter();
+                setTimeout(() => {
+                    inviteModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        inviteModalContent.classList.remove('scale-95', 'opacity-0');
+                        inviteModalContent.classList.add('scale-100', 'opacity-100');
+                    }, 50);
+                }, 300);
+            }
+            
+            // 关闭邀请好友弹窗
+            function closeInviteModalFunc() {
+                inviteModalContent.classList.remove('scale-100', 'opacity-100');
+                inviteModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    inviteModal.classList.add('hidden');
+                }, 300);
+            }
+            
+            // 显示通知提示
+            function showToast(title, message) {
+                toastTitle.textContent = title;
+                toastMessage.textContent = message;
+                toastNotification.classList.remove('hidden');
+                
+                // 3秒后自动关闭
+                setTimeout(() => {
+                    hideToast();
+                }, 3000);
+            }
+            
+            // 隐藏通知提示
+            function hideToast() {
+                toastNotification.classList.add('hidden');
+            }
+            
+            // 福利领取功能
+            function claimGift(button, giftType) {
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> 领取中...';
+                
+                // 模拟领取过程
+                setTimeout(() => {
+                    // 根据不同礼包类型显示不同信息
+                    let title, message;
+                    if (giftType === 'new-user') {
+                        title = '新手礼包领取成功';
+                        message = '0.01 ETH 和 20 免费 spins 已存入您的账户';
+                    } else if (giftType === 'vip') {
+                        title = 'VIP专属礼包领取成功';
+                        message = '1 ETH 和 100 免费 spins 已存入您的账户';
+                    }
+                    
+                    // 更新按钮状态
+                    button.innerHTML = '<i class="fa fa-check mr-1"></i> 已领取';
+                    button.classList.remove('bg-gold', 'text-dark');
+                    button.classList.add('bg-success', 'text-white');
+                    
+                    // 显示成功提示
+                    showToast(title, message);
+                    
+                    // 更新未读数量
+                    let count = parseInt(unreadCount.textContent);
+                    if (count > 0) {
+                        unreadCount.textContent = count - 1;
+                    }
+                }, 1500);
+            }
+            
+            // 复制邀请链接
+            function copyLink() {
+                const input = document.querySelector('input[value^="https://legitchain.com/i/"]');
+                input.select();
+                document.execCommand('copy');
+                
+                const originalText = copyLinkBtn.textContent;
+                copyLinkBtn.textContent = '已复制';
+                setTimeout(() => {
+                    copyLinkBtn.textContent = originalText;
+                }, 2000);
+            }
+            
+            // 事件监听
+            giftToggleBtn.addEventListener('click', openGiftCenter);
+            closeGiftBtn.addEventListener('click', closeGiftCenter);
+            overlay.addEventListener('click', closeGiftCenter);
+            
+            claimButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const giftType = this.getAttribute('data-gift');
+                    claimGift(this, giftType);
+                });
+            });
+            
+            closeToast.addEventListener('click', hideToast);
+            
+            inviteBtn.addEventListener('click', openInviteModal);
+            closeInviteModal.addEventListener('click', closeInviteModalFunc);
+            inviteModal.querySelector('.absolute').addEventListener('click', closeInviteModalFunc);
+            
+            copyLinkBtn.addEventListener('click', copyLink);
+            
+            // 点击ESC键关闭弹窗
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeGiftCenter();
+                    closeInviteModalFunc();
+                    hideToast();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -509,6 +509,13 @@
       "copyrightText": "© 2025 LUMI. All rights reserved.",
       "copyright": "© 2025 LUMI. All rights reserved.",
       "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
+    },
+    "responsibleBar": {
+      "title": "Responsible Gambling",
+      "helpLink": "Gambling Addiction Help",
+      "selfExclusion": "Self-Exclusion",
+      "ageVerification": "Age Verification",
+      "ageLimit": "18+ Only"
     }
   },
   "landing": {
@@ -564,13 +571,6 @@
       "active": "ACTIVE",
       "assets": "Assets",
       "openFullTerminal": "Open Full Terminal"
-    },
-    "responsibleBar": {
-      "title": "Responsible Gambling",
-      "helpLink": "Gambling Addiction Help",
-      "selfExclusion": "Self-Exclusion",
-      "ageVerification": "Age Verification",
-      "ageLimit": "18+ Only"
     },
     "matches": {
       "live": "Live",
@@ -640,6 +640,23 @@
     "title": "Sports Betting",
     "subtitle": "Bet on your favorite sports with transparent odds and instant payouts on the blockchain",
     "searchEvents": "Search events...",
+    "banner": {
+      "soon": "COMING SOON",
+      "date": "2026 Q1",
+      "title": "Sports Betting Platform Coming Soon"
+    },
+    "responsibleGambling": "18+ Gamble responsibly. This platform operates under license number GL-2023-004. Terms apply.",
+    "responsibleGamblingLink": "Responsible Gambling",
+    "helpCenter": "Help Center",
+    "nav": {
+      "games": "Games",
+      "sports": "Sports",
+      "liveCasino": "Live Casino",
+      "tournaments": "Tournaments",
+      "promotions": "Promotions",
+      "backToMarkets": "Back to Markets"
+    },
+    "balance": "Balance",
     "liveNow": "Live Now",
     "upcoming": "Upcoming",
     "upcomingEvents": "Upcoming Events",
@@ -697,12 +714,123 @@
       "possession": "Possession",
       "corners": "Corners",
       "viewFull": "View Full Stats"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "A licensed blockchain sports betting platform offering transparent odds, live betting, and instant payouts. Gamble responsibly.",
+      "sportsSection": "Sports",
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "esports": "Esports",
+      "allSports": "All Sports",
+      "supportSection": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contactUs": "Contact Us",
+      "responsibleGambling": "Responsible Gambling",
+      "termsConditions": "Terms & Conditions",
+      "legalSection": "Legal",
+      "licenseInfo": "License Information",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "jurisdictionRestrictions": "Jurisdiction Restrictions",
+      "copyright": "© 2025 LUMI. All rights reserved.",
+      "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
+    },
+    "responsibleGamblingBar": {
+      "title": "Responsible Gambling",
+      "helpLink": "Gambling Addiction Help",
+      "selfExclusion": "Self-Exclusion",
+      "ageVerification": "Age Verification",
+      "ageLimit": "18+ Only"
+    },
+    "matches": {
+      "live": "Live",
+      "matchday": "Matchday",
+      "vs": "vs",
+      "win": "Win",
+      "draw": "Draw",
+      "home": "Home",
+      "away": "Away",
+      "markets": "Markets",
+      "moreMarkets": "More Markets",
+      "playoffs": "Playoffs",
+      "tomorrow": "Tomorrow",
+      "tonight": "Tonight",
+      "esports": "Esports"
+    },
+    "leagues": {
+      "premierLeague": "English Premier League",
+      "laLiga": "La Liga",
+      "championsLeague": "Champions League",
+      "nba": "NBA",
+      "nbaPlayoffs": "NBA Playoffs",
+      "lolWorlds": "LoL World Championship",
+      "semifinal": "Semifinal",
+      "liveSuffix": " Live"
+    },
+    "teams": {
+      "realMadrid": "Real Madrid",
+      "manchesterCity": "Manchester City",
+      "arsenal": "Arsenal",
+      "tottenham": "Tottenham",
+      "chelsea": "Chelsea",
+      "liverpool": "Liverpool",
+      "barcelona": "Barcelona",
+      "sevilla": "Sevilla",
+      "celtics": "Celtics",
+      "heat": "Heat",
+      "mavericks": "Mavericks",
+      "warriors": "Warriors",
+      "lakers": "Lakers",
+      "bulls": "Bulls",
+      "t1": "T1",
+      "geng": "GenG",
+      "manUnited": "Man United",
+      "newcastle": "Newcastle"
+    },
+    "betOptions": {
+      "home": "Home",
+      "draw": "Draw",
+      "away": "Away",
+      "over": "Over",
+      "under": "Under"
+    },
+    "sports": {
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "iceHockey": "Ice Hockey",
+      "baseball": "Baseball",
+      "rugby": "Rugby",
+      "mma": "MMA",
+      "horseRacing": "Horse Racing",
+      "esports": "Esports"
     }
   },
   "liveCasino": {
     "title": "Live Casino",
     "subtitle": "Experience real-time gaming with professional dealers, all on the blockchain",
     "searchTables": "Search tables...",
+    "banner": {
+      "soon": "COMING SOON",
+      "date": "2026 Q1",
+      "title": "Live Casino Platform Coming Soon"
+    },
+    "responsibleGambling": "18+ Gamble responsibly. This platform operates under license number GL-2023-004. Terms apply.",
+    "responsibleGamblingLink": "Responsible Gambling",
+    "helpCenter": "Help Center",
+    "nav": {
+      "games": "Games",
+      "sports": "Sports",
+      "liveCasino": "Live Casino",
+      "tournaments": "Tournaments",
+      "promotions": "Promotions",
+      "backToMarkets": "Back to Markets"
+    },
+    "balance": "Balance",
     "categories": {
       "title": "Game Categories",
       "allLive": "All Live Games",
@@ -722,6 +850,28 @@
       "vip": "VIP (1+ ETH)",
       "apply": "Apply Filters"
     },
+    "games": {
+      "blackjack": "Blackjack",
+      "roulette": "Roulette",
+      "viewAll": "View All"
+    },
+    "featured": {
+      "live": "LIVE",
+      "premiumBlackjack": "Premium Blackjack",
+      "table": "Table",
+      "vipBlackjackLounge": "VIP Blackjack Lounge",
+      "description": "Play at a private blackjack table with our exclusive VIP dealers, enhanced limits, and special rewards",
+      "players": "Players",
+      "minBet": "Min Bet",
+      "maxBet": "Max Bet",
+      "joinTable": "Join Table"
+    },
+    "myBalance": {
+      "title": "My Balance",
+      "available": "Available Balance",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw"
+    },
     "table": {
       "live": "LIVE",
       "table": "Table",
@@ -740,12 +890,51 @@
       "gameStatus": "Game Status",
       "dealingCards": "Dealing Cards",
       "returnToTable": "Return to Table"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "Experience live casino gaming with professional dealers, all on the blockchain for complete transparency and fairness.",
+      "liveCasinoSection": "Live Casino",
+      "blackjack": "Blackjack",
+      "roulette": "Roulette",
+      "baccarat": "Baccarat",
+      "gameShows": "Game Shows",
+      "poker": "Poker",
+      "supportSection": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contactUs": "Contact Us",
+      "responsibleGambling": "Responsible Gambling",
+      "termsConditions": "Terms & Conditions",
+      "legalSection": "Legal",
+      "licenseInfo": "License Information",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "jurisdictionRestrictions": "Jurisdiction Restrictions",
+      "copyright": "© 2025 LUMI. All rights reserved.",
+      "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
     }
   },
   "promotions": {
     "title": "Promotions",
     "subtitle": "Exclusive bonuses, special offers, and rewards for LUMI players",
     "searchPromotions": "Search promotions...",
+    "banner": {
+      "soon": "COMING SOON",
+      "date": "2026 Q1",
+      "title": "Exclusive Promotions Coming Soon"
+    },
+    "responsibleGambling": "18+ Gamble responsibly. This platform operates under license number GL-2023-004. Terms apply.",
+    "nav": {
+      "games": "Games",
+      "sports": "Sports",
+      "liveCasino": "Live Casino",
+      "tournaments": "Tournaments",
+      "promotions": "Promotions",
+      "backToMarkets": "Back to Markets"
+    },
+    "balance": "Balance",
     "tabs": {
       "all": "All Promotions",
       "newPlayer": "New Player Offers",
@@ -829,12 +1018,51 @@
       "goldLevel": "Gold Level",
       "pointsToNext": "Points to Next Level",
       "currentPoints": "Current Points"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "Enjoy exclusive promotions and bonuses on our blockchain gaming platform. All offers come with transparent terms and fair conditions.",
+      "promotionsSection": "Promotions",
+      "newPlayerOffers": "New Player Offers",
+      "depositBonuses": "Deposit Bonuses",
+      "freeSpins": "Free Spins",
+      "loyaltyProgram": "Loyalty Program",
+      "bonusCodes": "Bonus Codes",
+      "supportSection": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contactUs": "Contact Us",
+      "responsibleGambling": "Responsible Gambling",
+      "termsConditions": "Terms & Conditions",
+      "legalSection": "Legal",
+      "licenseInfo": "License Information",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "jurisdictionRestrictions": "Jurisdiction Restrictions",
+      "copyright": "© 2025 LUMI. All rights reserved.",
+      "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
     }
   },
   "tournaments": {
     "title": "Tournaments",
     "subtitle": "Compete in competitive gaming events with massive blockchain prize pools",
     "searchTournaments": "Search tournaments...",
+    "banner": {
+      "soon": "COMING SOON",
+      "date": "2026 Q1",
+      "title": "Tournament Platform Coming Soon"
+    },
+    "responsibleGambling": "18+ Gamble responsibly. This platform operates under license number GL-2023-004. Terms apply.",
+    "nav": {
+      "games": "Games",
+      "sports": "Sports",
+      "liveCasino": "Live Casino",
+      "tournaments": "Tournaments",
+      "promotions": "Promotions",
+      "backToMarkets": "Back to Markets"
+    },
+    "balance": "Balance",
     "tabs": {
       "live": "Live Now",
       "upcoming": "Upcoming",
@@ -869,6 +1097,31 @@
       "recent": "Recent Results",
       "viewAll": "View All"
     },
+    "tournamentDetails": {
+      "live": "LIVE",
+      "upcoming": "UPCOMING",
+      "startsSoon": "STARTS SOON",
+      "free": "Free",
+      "entry": "Entry",
+      "endsIn": "Ends in",
+      "startsIn": "Starts in",
+      "players": "Players",
+      "registered": "Registered",
+      "topPayout": "Top Payout",
+      "progress": "Tournament Progress",
+      "regProgress": "Registration Progress",
+      "yourRank": "Your Current Rank",
+      "joinNow": "Join Now",
+      "registerNow": "Register Now",
+      "viewDetails": "View Details"
+    },
+    "myStats": {
+      "title": "My Tournament Stats",
+      "active": "Active Tournaments",
+      "won": "Tournaments Won",
+      "totalWinnings": "Total Winnings",
+      "globalRank": "Global Rank"
+    },
     "details": {
       "entry": "Entry",
       "players": "Players",
@@ -898,6 +1151,30 @@
       "tournamentsWon": "Tournaments Won",
       "thisWeekChange": "this week",
       "viewComplete": "View Complete Rankings"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "Participate in exciting tournaments and win blockchain-based prize pools. Our platform ensures fair play and transparent rewards for all participants.",
+      "tournamentsSection": "Tournaments",
+      "liveNow": "Live Now",
+      "upcoming": "Upcoming",
+      "pastResults": "Past Results",
+      "rulesInfo": "Rules & Info",
+      "prizesRewards": "Prizes & Rewards",
+      "supportSection": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contactUs": "Contact Us",
+      "responsibleGambling": "Responsible Gambling",
+      "termsConditions": "Terms & Conditions",
+      "legalSection": "Legal",
+      "licenseInfo": "License Information",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "jurisdictionRestrictions": "Jurisdiction Restrictions",
+      "copyright": "© 2025 LUMI. All rights reserved.",
+      "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
     }
   },
   "profile": {
@@ -1035,6 +1312,37 @@
       "copyright": "© 2025 LUMI. All rights reserved.",
       "disclaimer": "18+ Play responsibly. Gambling may lead to addiction, please treat it rationally. This platform is licensed by regulatory authorities."
     }
+  },
+  "giftCenter": {
+    "title": "Gift Center",
+    "unclaimed": " Unclaimed",
+    "newUserTitle": "New Player",
+    "depositRewards": "Deposit Rewards",
+    "taskRewards": "Task Rewards",
+    "exclusiveGifts": "Exclusive Gifts",
+    "viewAll": "View All",
+    "registerGift": "Registration Gift Pack",
+    "freeSpins": "free spins",
+    "noDeposit": "No Deposit Required",
+    "remaining": "Remaining",
+    "days": "d",
+    "hours": "h",
+    "claim": "Claim Now",
+    "firstDepositDouble": "First Deposit Double",
+    "bonusCap": "Bonus Cap",
+    "firstDepositOnly": "First Deposit Only",
+    "goDeposit": "Go Deposit",
+    "dailyCheckin": "Daily Check-in Reward",
+    "checkinDesc": "Check in for 7 days to win big prize",
+    "checkedIn": "Checked In",
+    "vipGift": "VIP Exclusive Pack",
+    "exclusive": "Exclusive",
+    "wageringNote": "Wagering requirements apply after claiming gifts",
+    "close": "Close",
+    "newUserSuccess": "New Player Pack Claimed",
+    "newUserMessage": "0.01 ETH and 20 free spins have been credited to your account",
+    "vipSuccess": "VIP Exclusive Pack Claimed",
+    "vipMessage": "1 ETH and 100 free spins have been credited to your account"
   }
 }
 

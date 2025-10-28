@@ -509,6 +509,13 @@
       "copyrightText": "© 2025 LUMI。保留所有权利。",
       "copyright": "© 2025 LUMI。保留所有权利。",
       "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
+    },
+    "responsibleBar": {
+      "title": "理性博彩",
+      "helpLink": "博彩成瘾帮助",
+      "selfExclusion": "自我排除",
+      "ageVerification": "年龄验证",
+      "ageLimit": "仅限 18 岁以上"
     }
   },
   "landing": {
@@ -564,13 +571,6 @@
       "active": "活跃",
       "assets": "资产",
       "openFullTerminal": "打开完整终端"
-    },
-    "responsibleBar": {
-      "title": "理性博彩",
-      "helpLink": "博彩成瘾帮助",
-      "selfExclusion": "自我排除",
-      "ageVerification": "年龄验证",
-      "ageLimit": "仅限 18 岁以上"
     }
   },
   "sportsBetting": {
@@ -1271,6 +1271,37 @@
       "copyright": "© 2025 LUMI。保留所有权利。",
       "disclaimer": "18+ 请理性游戏。博彩可能会导致成瘾，请理性对待。本平台已获得监管机构许可。"
     }
+  },
+  "giftCenter": {
+    "title": "福利中心",
+    "unclaimed": "个未领取",
+    "newUserTitle": "新手专享",
+    "depositRewards": "存款奖励",
+    "taskRewards": "任务奖励",
+    "exclusiveGifts": "专属福利",
+    "viewAll": "查看全部",
+    "registerGift": "注册即领礼包",
+    "freeSpins": "免费 spins",
+    "noDeposit": "无需存款",
+    "remaining": "剩余",
+    "days": "天",
+    "hours": "小时",
+    "claim": "立即领取",
+    "firstDepositDouble": "首次存款翻倍",
+    "bonusCap": "奖金上限",
+    "firstDepositOnly": "首存专享",
+    "goDeposit": "去存款",
+    "dailyCheckin": "每日签到奖励",
+    "checkinDesc": "连续签到7天领大奖",
+    "checkedIn": "已签到",
+    "vipGift": "VIP 专属礼包",
+    "exclusive": "专享",
+    "wageringNote": "福利领取后需满足相应 wagering 要求",
+    "close": "关闭",
+    "newUserSuccess": "新手礼包领取成功",
+    "newUserMessage": "0.01 ETH 和 20 免费 spins 已存入您的账户",
+    "vipSuccess": "VIP专属礼包领取成功",
+    "vipMessage": "1 ETH 和 100 免费 spins 已存入您的账户"
   }
 }
 
