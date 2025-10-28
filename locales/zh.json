@@ -24,6 +24,7 @@
   },
   "topic": {
     "create": "创建话题投票",
+    "createAndVote": "创建 & 投票",
     "createButton": "创造话题",
     "title": "话题标题",
     "titlePlaceholder": "输入话题标题...",

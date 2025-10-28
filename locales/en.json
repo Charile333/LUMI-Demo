@@ -24,6 +24,7 @@
   },
   "topic": {
     "create": "Create Topic Vote",
+    "createAndVote": "Create & Vote",
     "createButton": "Create Topic",
     "title": "Topic Title",
     "titlePlaceholder": "Enter topic title...",

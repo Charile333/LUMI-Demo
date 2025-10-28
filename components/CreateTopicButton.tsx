@@ -109,7 +109,7 @@ export function CreateTopicButton() {
         {/* 气泡提示 - create & vote */}
         <div className="absolute bottom-full right-0 mb-3 animate-bounce-slow">
           <div className="relative bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg shadow-lg whitespace-nowrap">
-            <span className="text-sm font-semibold tracking-wide">Create & Vote</span>
+            <span className="text-sm font-semibold tracking-wide">{t('topic.createAndVote')}</span>
             {/* 气泡三角形箭头 */}
             <div className="absolute top-full right-6 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-purple-600"></div>
           </div>
