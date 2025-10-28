@@ -524,7 +524,7 @@ export default function LumiSoonPage() {
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
                       <span className={`font-mono text-xs ${wsConnected ? 'text-green-400' : 'text-red-400'}`}>
-                        {wsConnected ? 'BINANCE API' : t('landing.terminal.offline').toUpperCase()}
+                        {wsConnected ? 'LIVE' : t('landing.terminal.offline').toUpperCase()}
                       </span>
                     </div>
                   </div>

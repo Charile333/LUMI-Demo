@@ -81,10 +81,10 @@ export default function LotteryPage() {
             <div className="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
             <nav className="hidden md:flex space-x-6 text-sm">
                 <a href="#" className="text-white hover:text-[#b8860b] transition-colors border-b-2 border-[#b8860b] pb-1">{t('lottery.games')}</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.sports')}</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.liveCasino')}</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.tournaments')}</a>
-                <a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.promotions')}</a>
+                <Link href="/sports-betting" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.sports')}</Link>
+                <Link href="/live-casino" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.liveCasino')}</Link>
+                <Link href="/tournaments" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.tournaments')}</Link>
+                <Link href="/promotions" className="text-gray-400 hover:text-[#b8860b] transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">{t('lottery.promotions')}</Link>
             </nav>
           </div>
           
@@ -109,7 +109,7 @@ export default function LotteryPage() {
               
               <div className="h-6 w-px bg-gray-700"></div>
               
-                <div className="flex items-center space-x-3">
+                <Link href="/profile" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
                   <div>
                   <div className="text-right">
                       <p className="text-xs text-gray-400">{t('lottery.balance')}</p>
@@ -120,7 +120,7 @@ export default function LotteryPage() {
                   <div className="w-8 h-8 rounded-full overflow-hidden border border-[#b8860b]/30">
                     <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" className="w-full h-full object-cover" />
                   </div>
-                </div>
+                </Link>
             </div>
             
             <button className="md:hidden text-gray-300 hover:text-white">
@@ -171,29 +171,29 @@ export default function LotteryPage() {
                     <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.slotsCount')}</span>
                   </button>
                   
-                  <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                  <Link href="/live-casino" className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-play-circle-o text-[#b8860b]"></i>
                     </div>
                     <span className="text-sm font-medium">{t('lottery.gameCategories.liveCasinoTitle')}</span>
                     <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.liveCasinoCount')}</span>
-                  </button>
+                  </Link>
                   
-                  <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                  <Link href="/sports-betting" className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-trophy text-[#b8860b]"></i>
                     </div>
                     <span className="text-sm font-medium">{t('lottery.gameCategories.sportsbook')}</span>
                     <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.sportsbookCount')}</span>
-                  </button>
+                  </Link>
                   
-                  <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                  <Link href="/tournaments" className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-gray-700 transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
                     <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center mb-3">
                       <i className="fa fa-users text-[#b8860b]"></i>
                     </div>
                     <span className="text-sm font-medium">{t('lottery.gameCategories.tournamentsTitle')}</span>
                     <span className="text-xs text-gray-500 mt-1">{t('lottery.gameCategories.tournamentsCount')}</span>
-                  </button>
+                  </Link>
                   
                   <button className="flex flex-col items-center justify-center p-4 bg-[#121212] rounded-lg border border-[#b8860b]/50 transition-all duration-300 hover:border-[#b8860b] hover:shadow-lg hover:shadow-[#b8860b]/20 hover:-translate-y-1 relative overflow-hidden">
                     <div className="absolute top-1 right-1 bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] text-xs font-bold px-2 py-0.5 rounded">{t('lottery.featured.new')}</div>
@@ -310,7 +310,7 @@ export default function LotteryPage() {
               <div>
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>{t('lottery.liveSports.title')}</h2>
-                  <a href="#" className="text-sm text-[#b8860b] hover:text-[#d4af37]">{t('lottery.liveSports.viewAll')}</a>
+                  <Link href="/sports-betting" className="text-sm text-[#b8860b] hover:text-[#d4af37]">{t('lottery.liveSports.viewAll')}</Link>
                 </div>
                 
                 <div className="space-y-4">
@@ -820,10 +820,10 @@ export default function LotteryPage() {
                 <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">{t('lottery.footer.gamesTitle')}</h3>
                 <ul className="space-y-2 text-sm">
                   <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.slotsLink')}</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.liveCasinoLink')}</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.sportsBettingLink')}</a></li>
+                  <li><Link href="/live-casino" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.liveCasinoLink')}</Link></li>
+                  <li><Link href="/sports-betting" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.sportsBettingLink')}</Link></li>
                   <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.esportsLink')}</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.tournamentsLink')}</a></li>
+                  <li><Link href="/tournaments" className="text-gray-400 hover:text-[#b8860b] transition-colors">{t('lottery.footer.tournamentsLink')}</Link></li>
               </ul>
             </div>
               

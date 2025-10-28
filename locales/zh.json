@@ -173,9 +173,9 @@
     "chartAutoFocused": "图表自动聚焦闪崩时刻",
     "preCrash": "闪崩前",
     "atCrash": "闪崩时",
-    "binanceApi": "币安API",
+    "binanceApi": "实时数据",
     "liveMarketData": "实时市场数据（24小时变化 > 1%）",
-    "connectingApi": "连接币安API中...",
+    "connectingApi": "分析中...",
     "fullTerminal": "完整终端",
     "loadingEvents": "加载事件中...",
     "noEventsFound": "未找到闪崩事件"
@@ -350,9 +350,10 @@
       "clearAll": "清除全部",
       "empty": "您的投注单是空的",
       "emptyDesc": "添加选择以开始",
-      "stake": "投注额 (ETH)",
+      "stake": "投注额",
       "totalStake": "总投注额",
       "potentialWin": "潜在赢奖",
+      "potentialWinLabel": "潜在赢奖",
       "placeBet": "下注"
     },
     "account": {
@@ -455,7 +456,7 @@
       "termsOfService": "服务条款",
       "privacyPolicy": "隐私政策",
       "contact": "联系我们",
-      "copyright": "© 2023 LUMI. 保留所有权利。",
+      "copyright": "© 2025 LUMI。保留所有权利。",
       "disclaimer": "博彩可能会上瘾。请负责任地游戏。并非所有司法管辖区都可用。"
     },
     "footer": {
@@ -505,8 +506,8 @@
         "ageVerification": "年龄验证"
       },
       "ageRestriction": "仅限 18 岁以上",
-      "copyrightText": "© 2023 LUMI。保留所有权利。",
-      "copyright": "© 2023 LUMI。保留所有权利。",
+      "copyrightText": "© 2025 LUMI。保留所有权利。",
+      "copyright": "© 2025 LUMI。保留所有权利。",
       "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
     }
   },
@@ -551,7 +552,7 @@
       "standby": "待命",
       "waitingForAlerts": "等待警报流...",
       "liveMarketData": "实时市场数据 (24h 变化 > 1%)",
-      "connectingBinance": "连接币安API中...",
+      "connectingBinance": "分析中...",
       "stats": "统计",
       "recent": "最近",
       "critical": "严重",
@@ -563,6 +564,712 @@
       "active": "活跃",
       "assets": "资产",
       "openFullTerminal": "打开完整终端"
+    },
+    "responsibleBar": {
+      "title": "理性博彩",
+      "helpLink": "博彩成瘾帮助",
+      "selfExclusion": "自我排除",
+      "ageVerification": "年龄验证",
+      "ageLimit": "仅限 18 岁以上"
+    }
+  },
+  "sportsBetting": {
+    "title": "体育博彩",
+    "subtitle": "在区块链上以透明赔率和即时支付投注您喜爱的体育项目",
+    "searchEvents": "搜索赛事...",
+    "banner": {
+      "soon": "即将推出",
+      "date": "2026 Q1",
+      "title": "体育博彩平台即将推出"
+    },
+    "responsibleGambling": "18+ 请理性博彩。本平台在许可证号 GL-2023-004 下运营。条款适用。",
+    "nav": {
+      "games": "游戏",
+      "sports": "体育",
+      "liveCasino": "真人娱乐场",
+      "tournaments": "锦标赛",
+      "promotions": "促销活动",
+      "backToMarkets": "返回市场"
+    },
+    "liveNow": "正在直播",
+    "upcoming": "即将开始",
+    "upcomingEvents": "即将开始的赛事",
+    "viewAllEvents": "查看全部赛事",
+    "outrights": "冠军预测",
+    "categories": {
+      "title": "体育分类",
+      "football": "足球",
+      "basketball": "篮球",
+      "tennis": "网球",
+      "iceHockey": "冰球",
+      "baseball": "棒球",
+      "rugby": "橄榄球",
+      "mma": "综合格斗",
+      "horseRacing": "赛马",
+      "esports": "电子竞技",
+      "viewAll": "查看所有体育项目"
+    },
+    "popularLeagues": {
+      "title": "热门联赛",
+      "epl": "英格兰超级联赛",
+      "ucl": "欧洲冠军联赛",
+      "nba": "NBA",
+      "laLiga": "西甲联赛",
+      "serieA": "意甲联赛"
+    },
+    "betSlip": {
+      "title": "投注单",
+      "empty": "您的投注单是空的",
+      "emptyDesc": "点击赔率添加选择",
+      "clearAll": "清除全部",
+      "selections": "个选择",
+      "selection": "个选择",
+      "stake": "投注额 (ETH)",
+      "betType": "投注类型",
+      "single": "单注",
+      "accumulator": "串关",
+      "system": "系统投注",
+      "totalStake": "总投注额",
+      "potentialWin": "潜在赢奖",
+      "placeBet": "下注"
+    },
+    "balance": {
+      "title": "我的余额",
+      "available": "可用余额",
+      "deposit": "存款",
+      "withdraw": "提款",
+      "depositMethods": "存款方式",
+      "options": "选项"
+    },
+    "liveStats": {
+      "title": "实时统计",
+      "shots": "射门",
+      "shotsOnTarget": "射正",
+      "possession": "控球率",
+      "corners": "角球",
+      "viewFull": "查看完整统计"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "持牌区块链体育博彩平台，提供透明赔率、实时投注和即时支付。请理性博彩。",
+      "sportsSection": "体育",
+      "football": "足球",
+      "basketball": "篮球",
+      "tennis": "网球",
+      "esports": "电竞",
+      "allSports": "所有体育项目",
+      "supportSection": "支持",
+      "helpCenter": "帮助中心",
+      "faqs": "常见问题",
+      "contactUs": "联系我们",
+      "responsibleGambling": "理性博彩",
+      "termsConditions": "条款和条件",
+      "legalSection": "法律",
+      "licenseInfo": "许可证信息",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "cookiePolicy": "Cookie 政策",
+      "jurisdictionRestrictions": "司法管辖区限制",
+      "copyright": "© 2025 LUMI。保留所有权利。",
+      "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
+    },
+    "responsibleGamblingBar": {
+      "title": "理性博彩",
+      "helpLink": "博彩成瘾帮助",
+      "selfExclusion": "自我排除",
+      "ageVerification": "年龄验证",
+      "ageLimit": "仅限 18 岁以上"
+    },
+    "matches": {
+      "live": "直播",
+      "matchday": "比赛日",
+      "vs": "对阵",
+      "win": "胜",
+      "draw": "平局",
+      "home": "主场",
+      "away": "客场",
+      "markets": "个盘口",
+      "moreMarkets": "个盘口",
+      "playoffs": "季后赛",
+      "tomorrow": "明天",
+      "tonight": "今晚",
+      "esports": "电竞"
+    },
+    "leagues": {
+      "premierLeague": "英格兰超级联赛",
+      "laLiga": "西班牙甲级联赛",
+      "championsLeague": "欧洲冠军联赛",
+      "nba": "NBA",
+      "nbaPlayoffs": "NBA 季后赛",
+      "lolWorlds": "英雄联盟世界赛",
+      "semifinal": "半决赛",
+      "liveSuffix": "场直播"
+    },
+    "teams": {
+      "realMadrid": "皇家马德里",
+      "manchesterCity": "曼城",
+      "arsenal": "阿森纳",
+      "tottenham": "托特纳姆热刺",
+      "chelsea": "切尔西",
+      "liverpool": "利物浦",
+      "barcelona": "巴塞罗那",
+      "sevilla": "塞维利亚",
+      "celtics": "凯尔特人",
+      "heat": "热火",
+      "mavericks": "独行侠",
+      "warriors": "勇士",
+      "lakers": "湖人",
+      "bulls": "公牛",
+      "t1": "T1",
+      "geng": "GenG",
+      "manUnited": "曼联",
+      "newcastle": "纽卡斯尔"
+    },
+    "betOptions": {
+      "home": "主胜",
+      "draw": "平局",
+      "away": "客胜",
+      "over": "大球",
+      "under": "小球"
+    },
+    "sports": {
+      "football": "足球",
+      "basketball": "篮球",
+      "tennis": "网球",
+      "iceHockey": "冰球",
+      "baseball": "棒球",
+      "rugby": "橄榄球",
+      "mma": "综合格斗",
+      "horseRacing": "赛马",
+      "esports": "电竞"
+    }
+  },
+  "liveCasino": {
+    "title": "真人娱乐场",
+    "subtitle": "在区块链上体验专业荷官的实时游戏",
+    "searchTables": "搜索桌台...",
+    "banner": {
+      "soon": "即将推出",
+      "date": "2026 Q1",
+      "title": "真人娱乐场平台即将推出"
+    },
+    "responsibleGambling": "18+ 请理性博彩。本平台在许可证号 GL-2023-004 下运营。条款适用。",
+    "responsibleGamblingLink": "理性博彩",
+    "helpCenter": "帮助中心",
+    "nav": {
+      "games": "游戏",
+      "sports": "体育",
+      "liveCasino": "真人娱乐场",
+      "tournaments": "锦标赛",
+      "promotions": "促销活动",
+      "backToMarkets": "返回市场"
+    },
+    "balance": "余额",
+    "featured": {
+      "live": "直播",
+      "premiumBlackjack": "高级二十一点",
+      "table": "桌台",
+      "vipBlackjackLounge": "VIP 二十一点贵宾厅",
+      "description": "在私人二十一点桌台与我们专属的 VIP 荷官一起游戏，享受增强的限额和特殊奖励",
+      "players": "玩家",
+      "minBet": "最小投注",
+      "maxBet": "最大投注",
+      "joinTable": "加入桌台"
+    },
+    "categories": {
+      "title": "游戏分类",
+      "allLive": "所有真人游戏",
+      "blackjack": "二十一点",
+      "roulette": "轮盘",
+      "baccarat": "百家乐",
+      "gameShows": "游戏秀",
+      "poker": "扑克",
+      "other": "其他游戏"
+    },
+    "filters": {
+      "title": "筛选",
+      "betLimits": "投注限额",
+      "low": "低额 (0.001 - 0.01 ETH)",
+      "medium": "中额 (0.01 - 0.1 ETH)",
+      "high": "高额 (0.1 - 1 ETH)",
+      "vip": "VIP (1+ ETH)",
+      "apply": "应用筛选"
+    },
+    "games": {
+      "blackjack": "二十一点",
+      "roulette": "轮盘",
+      "viewAll": "查看全部"
+    },
+    "table": {
+      "live": "直播",
+      "table": "桌台",
+      "players": "玩家",
+      "dealer": "荷官",
+      "minBet": "最小投注",
+      "maxBet": "最大投注",
+      "joinTable": "加入桌台",
+      "moreMarkets": "更多市场"
+    },
+    "currentlyPlaying": {
+      "title": "正在游戏",
+      "leave": "离开",
+      "yourBet": "您的当前投注",
+      "tableBalance": "桌台余额",
+      "gameStatus": "游戏状态",
+      "dealingCards": "发牌中",
+      "returnToTable": "返回桌台"
+    },
+    "myBalance": {
+      "title": "我的余额",
+      "available": "可用余额",
+      "deposit": "存款",
+      "withdraw": "提款"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "体验专业荷官的真人娱乐场游戏，所有游戏都在区块链上，确保完全透明和公平。",
+      "liveCasinoSection": "真人娱乐场",
+      "blackjack": "二十一点",
+      "roulette": "轮盘",
+      "baccarat": "百家乐",
+      "gameShows": "游戏秀",
+      "poker": "扑克",
+      "supportSection": "支持",
+      "helpCenter": "帮助中心",
+      "faqs": "常见问题",
+      "contactUs": "联系我们",
+      "responsibleGambling": "理性博彩",
+      "termsConditions": "条款和条件",
+      "legalSection": "法律",
+      "licenseInfo": "许可证信息",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "cookiePolicy": "Cookie 政策",
+      "jurisdictionRestrictions": "司法管辖区限制",
+      "copyright": "© 2025 LUMI。保留所有权利。",
+      "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
+    }
+  },
+  "promotions": {
+    "title": "促销活动",
+    "subtitle": "LUMI 玩家专享红利、特别优惠和奖励",
+    "searchPromotions": "搜索促销...",
+    "banner": {
+      "soon": "即将推出",
+      "date": "2026 Q1",
+      "title": "独家促销活动即将推出"
+    },
+    "responsibleGambling": "18+ 请理性博彩。本平台在许可证号 GL-2023-004 下运营。条款适用。",
+    "nav": {
+      "games": "游戏",
+      "sports": "体育",
+      "liveCasino": "真人娱乐场",
+      "tournaments": "锦标赛",
+      "promotions": "促销活动",
+      "backToMarkets": "返回市场"
+    },
+    "balance": "余额",
+    "tabs": {
+      "all": "所有促销",
+      "newPlayer": "新玩家优惠",
+      "deposit": "存款红利",
+      "loyalty": "忠诚奖励"
+    },
+    "featured": {
+      "popular": "热门",
+      "newPlayers": "新玩家",
+      "title": "欢迎红利套餐",
+      "description": "首次存款可获得 100% 匹配奖金，外加 50 次免费旋转和专属锦标赛入场资格",
+      "claimOffer": "领取优惠",
+      "days": "天",
+      "hours": "小时",
+      "mins": "分钟",
+      "secs": "秒"
+    },
+    "categories": {
+      "title": "促销类型",
+      "all": "所有促销",
+      "newPlayer": "新玩家优惠",
+      "deposit": "存款红利",
+      "loyalty": "忠诚奖励",
+      "seasonal": "季节性促销",
+      "free": "免费旋转和投注"
+    },
+    "sections": {
+      "newPlayer": "新玩家优惠",
+      "deposit": "存款红利",
+      "depositBonuses": "存款红利",
+      "freeSpins": "免费旋转和投注",
+      "loyalty": "忠诚奖励",
+      "viewAll": "查看全部"
+    },
+    "bonuses": {
+      "firstDeposit": {
+        "title": "首次存款红利",
+        "desc": "首次存款可获得 100% 匹配奖金，最高 2 ETH，外加精选老虎机游戏 50 次免费旋转。"
+      },
+      "welcomePackage": {
+        "title": "三部曲欢迎礼包",
+        "desc": "前三次存款均享红利：首存 100% 最高 2 ETH，第二次 50% 最高 2 ETH，第三次 50% 最高 1 ETH。"
+      },
+      "weeklyReload": {
+        "title": "每周充值红利",
+        "desc": "每个周末可获得 50% 充值红利，最高 1 ETH。非常适合延长您的游戏时间。"
+      },
+      "hot": "热门",
+      "weekly": "每周",
+      "match100": "100% 匹配",
+      "upTo5ETH": "最高 5 ETH",
+      "match50": "50% 匹配",
+      "newPlayers": "新玩家",
+      "allPlayers": "所有玩家",
+      "validFor30Days": "有效期 30 天",
+      "validFriSun": "有效期 周五-周日",
+      "wagering35x": "35x 流水要求",
+      "wagering40x": "40x 流水要求",
+      "minDeposit": "最低存款"
+    },
+    "details": {
+      "newPlayers": "新玩家",
+      "allPlayers": "所有玩家",
+      "validFor": "有效期 30 天",
+      "wagering": "流水要求",
+      "minDeposit": "最低存款",
+      "claimBonus": "领取红利",
+      "optIn": "选择加入",
+      "getSpins": "获取旋转"
+    },
+    "myBonuses": {
+      "title": "我的激活红利",
+      "expiresIn": "有效期剩余",
+      "bonusRemaining": "剩余红利",
+      "wageringProgress": "流水进度",
+      "viewDetails": "查看详情",
+      "viewAll": "查看所有红利"
+    },
+    "loyaltyProgram": {
+      "title": "忠诚计划",
+      "goldLevel": "黄金等级",
+      "pointsToNext": "距下一等级积分",
+      "currentPoints": "当前积分"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "在我们的区块链游戏平台上享受独家促销和红利。所有优惠均具有透明条款和公平条件。",
+      "promotionsSection": "促销活动",
+      "newPlayerOffers": "新玩家优惠",
+      "depositBonuses": "存款红利",
+      "freeSpins": "免费旋转",
+      "loyaltyProgram": "忠诚计划",
+      "bonusCodes": "红利代码",
+      "supportSection": "支持",
+      "helpCenter": "帮助中心",
+      "faqs": "常见问题",
+      "contactUs": "联系我们",
+      "responsibleGambling": "理性博彩",
+      "termsConditions": "条款和条件",
+      "legalSection": "法律",
+      "licenseInfo": "许可证信息",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "cookiePolicy": "Cookie 政策",
+      "jurisdictionRestrictions": "司法管辖区限制",
+      "copyright": "© 2025 LUMI。保留所有权利。",
+      "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
+    }
+  },
+  "tournaments": {
+    "title": "锦标赛",
+    "subtitle": "参加竞技游戏赛事，赢取海量区块链奖池",
+    "searchTournaments": "搜索锦标赛...",
+    "banner": {
+      "soon": "即将推出",
+      "date": "2026 Q1",
+      "title": "锦标赛平台即将推出"
+    },
+    "responsibleGambling": "18+ 请理性博彩。本平台在许可证号 GL-2023-004 下运营。条款适用。",
+    "nav": {
+      "games": "游戏",
+      "sports": "体育",
+      "liveCasino": "真人娱乐场",
+      "tournaments": "锦标赛",
+      "promotions": "促销活动",
+      "backToMarkets": "返回市场"
+    },
+    "balance": "余额",
+    "tabs": {
+      "live": "正在进行",
+      "upcoming": "即将开始",
+      "results": "最近结果",
+      "my": "我的锦标赛"
+    },
+    "featured": {
+      "liveNow": "正在直播",
+      "prizePool": "奖金池",
+      "players": "玩家",
+      "yourRank": "您的排名",
+      "joinTournament": "加入锦标赛",
+      "title": "LUMI 大型锦标赛",
+      "description": "终极锦标赛，多种赌场游戏，海量奖金池和顶级玩家专属 NFT 奖励",
+      "days": "天",
+      "hours": "小时",
+      "mins": "分钟",
+      "secs": "秒"
+    },
+    "categories": {
+      "title": "锦标赛分类",
+      "all": "所有锦标赛",
+      "blackjack": "二十一点锦标赛",
+      "roulette": "轮盘竞赛",
+      "slots": "老虎机锦标赛",
+      "multiGame": "多游戏赛事",
+      "vip": "VIP 锦标赛"
+    },
+    "sections": {
+      "live": "正在进行的锦标赛",
+      "upcoming": "即将开始的锦标赛",
+      "recent": "最近结果",
+      "viewAll": "查看全部"
+    },
+    "details": {
+      "entry": "参赛费",
+      "players": "玩家",
+      "registered": "已注册",
+      "endsIn": "结束时间",
+      "startsIn": "开始时间",
+      "topPayout": "顶级奖励",
+      "progress": "锦标赛进度",
+      "regProgress": "注册进度",
+      "yourRank": "您当前排名",
+      "joinNow": "立即加入",
+      "registerNow": "立即注册",
+      "viewDetails": "查看详情"
+    },
+    "myStats": {
+      "title": "我的锦标赛统计",
+      "active": "活跃锦标赛",
+      "won": "获胜锦标赛",
+      "totalWinnings": "总奖金",
+      "globalRank": "全球排名"
+    },
+    "leaderboard": {
+      "title": "全球排行榜",
+      "thisMonth": "本月",
+      "thisWeek": "本周",
+      "allTime": "历史总榜",
+      "tournamentsWon": "获胜锦标赛",
+      "thisWeekChange": "本周",
+      "viewComplete": "查看完整排名"
+    },
+    "tournamentDetails": {
+      "free": "免费",
+      "entry": "参赛费",
+      "endsIn": "结束时间",
+      "startsIn": "开始时间",
+      "players": "玩家",
+      "registered": "已注册",
+      "topPayout": "顶级奖励",
+      "progress": "锦标赛进度",
+      "regProgress": "注册进度",
+      "yourRank": "您当前排名",
+      "joinNow": "立即加入",
+      "registerNow": "立即注册",
+      "startsSoon": "即将开始",
+      "upcoming": "即将举行",
+      "live": "直播",
+      "table": "桌台"
+    },
+    "tournaments": {
+      "blackjackMasters": {
+        "title": "二十一点大师赛",
+        "entry": "0.1 ETH",
+        "prize": "15 ETH",
+        "endsIn": "6小时24分钟"
+      },
+      "rouletteRoyale": {
+        "title": "轮盘皇家赛",
+        "entry": "0.05 ETH",
+        "prize": "10 ETH",
+        "endsIn": "12小时15分钟"
+      },
+      "slotMasters": {
+        "title": "老虎机大师锦标赛",
+        "entry": "免费",
+        "prize": "25 ETH",
+        "endsIn": "3小时40分钟"
+      },
+      "baccaratHighRollers": {
+        "title": "百家乐豪客赛",
+        "entry": "1 ETH",
+        "prize": "50 ETH",
+        "startsIn": "8小时30分钟"
+      },
+      "weekendWarrior": {
+        "title": "周末勇士挑战",
+        "entry": "0.2 ETH",
+        "prize": "30 ETH",
+        "startsIn": "2天5小时"
+      }
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "参加激动人心的锦标赛，赢取基于区块链的奖金池。我们的平台确保公平竞争和透明的所有参与者奖励。",
+      "tournamentsSection": "锦标赛",
+      "liveNow": "正在进行",
+      "upcoming": "即将开始",
+      "pastResults": "历史结果",
+      "rulesInfo": "规则和信息",
+      "prizesRewards": "奖品和奖励",
+      "supportSection": "支持",
+      "helpCenter": "帮助中心",
+      "faqs": "常见问题",
+      "contactUs": "联系我们",
+      "responsibleGambling": "理性博彩",
+      "termsConditions": "条款和条件",
+      "legalSection": "法律",
+      "licenseInfo": "许可证信息",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "cookiePolicy": "Cookie 政策",
+      "jurisdictionRestrictions": "司法管辖区限制",
+      "copyright": "© 2025 LUMI。保留所有权利。",
+      "disclaimer": "博彩可能会上瘾。请理性游戏。由游戏管理局许可和监管，许可证号 GL-2023-004。"
+    }
+  },
+  "profile": {
+    "title": "个人主页",
+    "subtitle": "管理您的账户并查看游戏统计数据",
+    "hero": {
+      "title": "体验区块链",
+      "subtitle": "高端游戏平台",
+      "description": "安全、透明、公平的游戏体验，畅享海量游戏与专属福利，立即加入 LUMI",
+      "startPlaying": "开始游戏",
+      "learnMore": "了解更多"
+    },
+    "personal": {
+      "title": "个人资料",
+      "vipMember": "VIP 黄金会员",
+      "registrationDate": "注册日期",
+      "email": "邮箱",
+      "phone": "电话",
+      "lastLogin": "上次登录",
+      "today": "今天",
+      "editProfile": "编辑资料"
+    },
+    "accountOverview": {
+      "title": "账户概览",
+      "availableBalance": "可用余额",
+      "deposit": "存款",
+      "withdraw": "提款",
+      "totalDeposits": "总存款",
+      "totalWithdrawals": "总提款",
+      "totalWinnings": "赢取金额",
+      "totalBets": "投注次数",
+      "recentActivity": "近期活动"
+    },
+    "membership": {
+      "title": "会员特权",
+      "levelProgress": "会员等级进度",
+      "points": "积分",
+      "currentLevel": "黄金",
+      "nextLevel": "白金",
+      "exclusiveBenefits": "会员专享福利",
+      "benefit1": "10% 每周返现，无上限",
+      "benefit2": "专属客户经理 24/7 服务",
+      "benefit3": "提款优先处理，1小时内到账",
+      "benefit4": "每月免费领取 1 ETH 礼包"
+    },
+    "recommended": {
+      "title": "为您推荐",
+      "viewAll": "查看全部",
+      "startPlaying": "开始游戏",
+      "rtp": "RTP",
+      "lowRisk": "低风险",
+      "tables": "张桌",
+      "hot": "热门",
+      "games": {
+        "goldenFortune": "黄金财富",
+        "premiumBlackjack": "高级二十一点",
+        "liveRoulette": "真人轮盘",
+        "texasHoldem": "德州扑克"
+      },
+      "categories": {
+        "slots": "老虎机",
+        "table": "桌游",
+        "live": "真人",
+        "poker": "扑克"
+      }
+    },
+    "exclusivePromotions": {
+      "title": "专属福利活动",
+      "limitedTime": "限时活动",
+      "vipExclusive": "VIP专属",
+      "joinNow": "立即参与",
+      "viewDetails": "查看详情",
+      "weekendDouble": {
+        "title": "周末双倍存款",
+        "desc": "周末存款可获得 150% 红利，最高 5 ETH"
+      },
+      "goldLeague": {
+        "title": "黄金联赛锦标赛",
+        "desc": "总奖金池 50 ETH，仅限 VIP 会员，冠军独享 20 ETH"
+      }
+    },
+    "giftCenter": {
+      "title": "福利中心",
+      "unclaimed": "个未领取",
+      "newPlayerExclusive": "新手专享",
+      "depositRewards": "存款奖励",
+      "viewAll": "查看全部",
+      "claim": "立即领取",
+      "deposit": "去存款",
+      "noDeposit": "无需存款",
+      "remaining": "剩余",
+      "firstDeposit": "首存专享",
+      "wageringNote": "福利领取后需满足相应 wagering 要求",
+      "close": "关闭",
+      "registrationGift": {
+        "title": "注册礼包",
+        "desc": "0.01 ETH + 20 次免费旋转"
+      },
+      "firstDepositDouble": {
+        "title": "首存双倍红利",
+        "desc": "首次存款 100% 红利，最高 2 ETH"
+      }
+    },
+    "menu": {
+      "profile": "个人资料",
+      "balance": "我的余额",
+      "history": "交易记录",
+      "rewards": "我的奖励",
+      "settings": "账户设置",
+      "logout": "退出登录",
+      "account": "账户",
+      "vipGold": "VIP Gold"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "基于区块链的高级游戏平台，提供安全、透明和公平的游戏体验。",
+      "gamesSection": "游戏",
+      "slots": "老虎机",
+      "tableGames": "桌游",
+      "liveCasino": "真人娱乐场",
+      "poker": "扑克",
+      "sportsBetting": "体育博彩",
+      "supportSection": "支持",
+      "helpCenter": "帮助中心",
+      "faqs": "常见问题",
+      "contactUs": "联系我们",
+      "depositMethods": "存款方式",
+      "withdrawalInstructions": "提款说明",
+      "legalSection": "法律",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "responsibleGaming": "理性游戏",
+      "ageVerification": "年龄验证",
+      "licenseInfo": "许可证信息",
+      "copyright": "© 2025 LUMI。保留所有权利。",
+      "disclaimer": "18+ 请理性游戏。博彩可能会导致成瘾，请理性对待。本平台已获得监管机构许可。"
     }
   }
 }

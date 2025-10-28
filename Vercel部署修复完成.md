@@ -212,3 +212,5 @@ SUPABASE_SERVICE_ROLE_KEY → API写入（绕过RLS）
 部署完成后告诉我测试结果！
 
 
+
+

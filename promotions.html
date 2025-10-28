@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegitChain | Promotions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        },
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        live: '#f97316',
+                        primary: '#3b82f6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            }
+            .gold-gradient {
+                background: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
+            }
+            .promo-hover {
+                @apply transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-1;
+            }
+            .countdown-item {
+                @apply bg-dark-light rounded-lg w-12 h-12 flex flex-col items-center justify-center border border-gray-700;
+            }
+        }
+    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased">
+    <!-- Responsible Gambling Notice -->
+    <div class="bg-dark-light border-b border-gold/30 py-2">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+            <p class="text-xs text-gray-300 flex items-center justify-center md:justify-start">
+                <i class="fa fa-info-circle text-gold mr-2"></i>
+                18+ Gamble Responsibly. This platform operates under license number GL-2023-004. Terms apply.
+            </p>
+            <div class="flex space-x-4 mt-2 md:mt-0">
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Help Center</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">LegitChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Games</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Live Casino</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Tournaments</a>
+                    <a href="#" class="text-white hover:text-gold transition-colors border-b-2 border-gold pb-1">Promotions</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-300 hover:text-white transition-colors relative">
+                            <i class="fa fa-gift text-gold"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-gold text-dark text-xs rounded-full flex items-center justify-center">5</span>
+                        </button>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-gray-700"></div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Balance</p>
+                                <p class="text-sm font-medium">15.328 ETH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Promotions Header -->
+        <div class="mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-display font-bold text-white">Promotions</h1>
+                    <p class="text-gray-400 mt-1">Exclusive bonuses, special offers, and rewards for LegitChain players</p>
+                </div>
+                
+                <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                    <div class="relative">
+                        <input type="text" placeholder="Search promotions..." class="bg-dark-light border border-gray-700 rounded-md px-3 py-1.5 pl-9 text-sm focus:outline-none focus:border-gold w-full md:w-64">
+                        <i class="fa fa-search absolute left-3 top-2 text-gray-500"></i>
+                    </div>
+                    
+                    <button class="bg-dark-light border border-gray-700 rounded-md p-1.5 hover:border-gold/50 transition-colors">
+                        <i class="fa fa-filter text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Promotion Tabs -->
+            <div class="flex border border-gray-800 rounded-lg overflow-hidden mb-6">
+                <button class="flex-1 py-2.5 text-center bg-gold text-dark font-medium">All Promotions</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">New Player Offers</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">Deposit Bonuses</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">Loyalty Rewards</button>
+            </div>
+            
+            <!-- Featured Promotion -->
+            <div class="relative rounded-xl overflow-hidden mb-8 group">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-darker via-dark/70 to-transparent z-10"></div>
+                <img src="https://picsum.photos/id/1069/1600/400" alt="Welcome Bonus" class="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 z-20 flex flex-col justify-end p-6 md:p-8">
+                    <div class="flex items-center mb-3">
+                        <span class="flex items-center bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full mr-2">
+                            <i class="fa fa-star mr-1"></i>
+                            POPULAR
+                        </span>
+                        <span class="text-gray-300 text-sm">Up to 5 ETH • New Players</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-white text-shadow mb-2">Welcome Bonus Package</h2>
+                    <p class="text-gray-300 mb-4 max-w-2xl">Get a 100% match on your first deposit, plus 50 free spins and exclusive tournament entry for new players</p>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex space-x-2">
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="days">07</span>
+                                <span class="text-xs text-gray-400">Days</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="hours">12</span>
+                                <span class="text-xs text-gray-400">Hours</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="minutes">30</span>
+                                <span class="text-xs text-gray-400">Mins</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="seconds">45</span>
+                                <span class="text-xs text-gray-400">Secs</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ml-auto">
+                            <button class="gold-gradient text-dark font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                                Claim Offer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Column - Promotion Categories & Filters -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Promotion Types</h2>
+                    </div>
+                    
+                    <div class="p-2">
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md bg-dark border-l-4 border-gold pl-3 -ml-4">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-gift text-gold mr-3"></i>
+                                        <span>All Promotions</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">24</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user-plus text-gray-400 mr-3"></i>
+                                        <span>New Player Offers</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">5</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-arrow-down text-gray-400 mr-3"></i>
+                                        <span>Deposit Bonuses</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">8</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-trophy text-gray-400 mr-3"></i>
+                                        <span>Loyalty Rewards</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">6</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-calendar text-gray-400 mr-3"></i>
+                                        <span>Seasonal Promotions</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">3</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-random text-gray-400 mr-3"></i>
+                                        <span>Free Spins & Bets</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">7</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="p-5 border-t border-gray-800">
+                        <h3 class="text-sm font-medium mb-3">Filters</h3>
+                        
+                        <!-- Bonus Value -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Bonus Value</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Up to 1 ETH</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">1 - 5 ETH</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">5 - 10 ETH</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">10+ ETH</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Restrictions -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Game Restrictions</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">All Games</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Slots Only</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Table Games</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Live Casino</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Expiry -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Expires Within</h4>
+                            <select class="w-full bg-dark border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                                <option>Any Time</option>
+                                <option>24 Hours</option>
+                                <option>7 Days</option>
+                                <option>30 Days</option>
+                            </select>
+                        </div>
+                        
+                        <button class="w-full mt-5 py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Column - Promotions List -->
+            <div class="lg:col-span-2 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-hide pr-2">
+                <!-- New Player Offers -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">New Player Offers</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Promotion 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1070/600/400" alt="First Deposit Bonus" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-fire mr-1"></i>
+                                        HOT
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        100% MATCH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">First Deposit Bonus</h3>
+                                        <span class="text-xs text-gray-400">New Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get a 100% match on your first deposit up to 2 ETH, plus 50 free spins on selected slot games.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid for 30 days</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>35x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-minus-circle text-gold mr-1"></i>
+                                            <span>Min. Deposit: 0.05 ETH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Claim Bonus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Promotion 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1071/600/400" alt="Welcome Package" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        UP TO 5 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">3-Part Welcome Package</h3>
+                                        <span class="text-xs text-gray-400">New Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get bonuses on your first three deposits: 100% up to 2 ETH, 50% up to 2 ETH, and 50% up to 1 ETH.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid for 30 days</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>35x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-minus-circle text-gold mr-1"></i>
+                                            <span>Min. Deposit: 0.05 ETH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Claim Bonus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deposit Bonuses -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Deposit Bonuses</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Promotion 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1072/600/400" alt="Weekly Reload" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-primary/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-refresh mr-1"></i>
+                                        WEEKLY
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        50% MATCH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Weekly Reload Bonus</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get a 50% reload bonus up to 1 ETH every weekend. Perfect for extending your gaming sessions.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid Fri-Sun</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>40x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-minus-circle text-gold mr-1"></i>
+                                            <span>Min. Deposit: 0.1 ETH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Claim Bonus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Promotion 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1073/600/400" alt="Crypto Boost" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        25% EXTRA
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Crypto Deposit Boost</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get an extra 25% bonus when depositing with Bitcoin, Ethereum, or Litecoin. Valid on all deposits.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Ongoing Promotion</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>30x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-minus-circle text-gold mr-1"></i>
+                                            <span>Min. Deposit: 0.05 ETH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Claim Bonus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Promotion 3 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1074/600/400" alt="Monday Bonus" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-primary/80 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-calendar mr-1"></i>
+                                        MONDAYS
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        30% MATCH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Monday Motivation Bonus</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Kickstart your week with a 30% bonus up to 0.5 ETH on your first deposit every Monday.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid Every Monday</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>40x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-minus-circle text-gold mr-1"></i>
+                                            <span>Min. Deposit: 0.05 ETH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Claim Bonus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Free Spins & Bets -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Free Spins & Bets</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Promotion 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1075/600/400" alt="Free Spins" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-gift mr-1"></i>
+                                        FREE
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-dark/70 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        100 SPINS
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Weekly Free Spins</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get 100 free spins on selected slot games when you deposit at least 0.1 ETH this week.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid until Sunday</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>30x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-gamepad text-gold mr-1"></i>
+                                            <span>On selected slots</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Get Spins
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Promotion 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1076/600/400" alt="Risk Free Bet" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 right-2 bg-dark/70 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        0.2 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Risk-Free Live Bet</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Place your first live casino bet of the week and get a refund up to 0.2 ETH if it loses.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Valid until Sunday</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>1x Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-video-camera text-gold mr-1"></i>
+                                            <span>Live Casino Only</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Opt In
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loyalty Rewards -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Loyalty Rewards</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Promotion 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden promo-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1077/600/400" alt="Cashback" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        UP TO 15%
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Weekly Cashback</h3>
+                                        <span class="text-xs text-gray-400">All Players</span>
+                                    </div>
+                                    
+                                    <p class="text-sm text-gray-300 mb-3">Get cashback on your weekly net losses. The higher your loyalty level, the higher your cashback percentage.</p>
+                                    
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-3 text-xs">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gold mr-1"></i>
+                                            <span>Paid every Monday</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-exclamation-circle text-gold mr-1"></i>
+                                            <span>No Wagering</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gold mr-1"></i>
+                                            <span>Based on Loyalty Level</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                            Learn More
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - My Bonuses & Loyalty -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 space-y-6">
+                    <!-- My Active Bonuses -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">My Active Bonuses</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <!-- Bonus 1 -->
+                            <div class="bg-dark rounded-lg p-3 mb-3 border border-gold/20">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-sm font-medium text-gold">First Deposit Bonus</h3>
+                                    <span class="text-xs text-gray-400">Expires in 24d</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs text-gray-400">Bonus Remaining</span>
+                                    <span class="text-xs font-medium">1.25 ETH</span>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400">Wagering Progress</span>
+                                        <span class="text-gray-400">28/175 ETH (16%)</span>
+                                    </div>
+                                    <div class="w-full bg-dark-light rounded-full h-1.5">
+                                        <div class="bg-gold h-1.5 rounded-full" style="width: 16%"></div>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-1 bg-transparent border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">
+                                    View Details
+                                </button>
+                            </div>
+                            
+                            <!-- Bonus 2 -->
+                            <div class="bg-dark rounded-lg p-3 border border-gray-700">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-sm font-medium">Free Spins</h3>
+                                    <span class="text-xs text-gray-400">Expires in 3d</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs text-gray-400">Spins Remaining</span>
+                                    <span class="text-xs font-medium">35/50</span>
+                                </div>
+                                
+                                <button class="w-full py-1 bg-transparent border border-gray-700 rounded text-xs hover:border-gold/50 transition-colors">
+                                    Use Spins
+                                </button>
+                            </div>
+                            
+                            <a href="#" class="text-center block text-sm text-gold hover:text-gold-light mt-4">
+                                View All Bonuses
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Loyalty Program -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Loyalty Program</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <div class="flex flex-col items-center mb-5">
+                                <div class="w-16 h-16 rounded-full gold-gradient flex items-center justify-center mb-3">
+                                    <i class="fa fa-diamond text-dark text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-medium">Gold Level</h3>
+                                <p class="text-xs text-gray-400 mt-1">2,450 / 5,000 Points to Next Level</p>
+                                
+                                <div class="w-full mt-3">
+                                    <div class="w-full bg-dark rounded-full h-2">
+                                        <div class="bg-gold h-2 rounded-full" style="width: 49%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-5">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Current Points</span>
+                                    <span class="text-sm font-medium">2,550</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Points from Deposits</span>
+                                    <span class="text-sm font-medium">1,800</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Points from Wagers</span>
+                                    <span class="text-sm font-medium">750</span>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-gray-800 pt-4">
+                                <h4 class="text-sm font-medium mb-3">Your Gold Level Benefits</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check text-gold mt-1 mr-2"></i>
+                                        <span>10% Weekly Cashback</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check text-gold mt-1 mr-2"></i>
+                                        <span>Priority Withdrawals</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check text-gold mt-1 mr-2"></i>
+                                        <span>Exclusive Tournaments Access</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check text-gold mt-1 mr-2"></i>
+                                        <span>Personal Account Manager</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bonus Code Redemption -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Redeem Bonus Code</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <p class="text-sm text-gray-300 mb-4">Have a bonus code? Enter it below to claim your reward.</p>
+                            
+                            <div class="flex mb-4">
+                                <input type="text" placeholder="Enter bonus code" class="flex-1 bg-dark border border-gray-700 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                                <button class="bg-gold text-dark font-medium px-3 py-2 rounded-r-md hover:opacity-90 transition-opacity">
+                                    Redeem
+                                </button>
+                            </div>
+                            
+                            <div class="bg-dark/50 rounded-lg p-3 border border-gray-700">
+                                <h4 class="text-xs font-medium text-gold mb-2">Featured Bonus Codes</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <span class="text-xs font-mono bg-dark px-2 py-1 rounded">CRYPTO10</span>
+                                        </div>
+                                        <button class="text-xs text-gold hover:text-gold-light">Use Now</button>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <span class="text-xs font-mono bg-dark px-2 py-1 rounded">SPINS50</span>
+                                        </div>
+                                        <button class="text-xs text-gold hover:text-gold-light">Use Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bonus Terms -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Bonus Terms</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <ul class="space-y-2 text-xs text-gray-300">
+                                <li class="flex items-start">
+                                    <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                                    <span>Bonuses are subject to wagering requirements as specified in each promotion</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                                    <span>Minimum deposit may be required to claim certain bonuses</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                                    <span>Bonuses expire after a specified period, typically 30 days</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                                    <span>Not all games contribute equally to wagering requirements</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-circle text-gold text-[6px] mt-1.5 mr-2"></i>
+                                    <span>Maximum bet limits apply when playing with bonus funds</span>
+                                </li>
+                            </ul>
+                            
+                            <a href="#" class="text-center block text-sm text-gold hover:text-gold-light mt-4">
+                                Full Terms & Conditions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Responsible Gambling Footer Bar -->
+    <div class="bg-dark-light border-t border-gray-800 py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Gambling Addiction Help</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Self-Exclusion</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Age Verification</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-gray-500">18+ Only</span>
+                    <div class="flex space-x-3">
+                        <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/105/40/20" alt="Fair Gaming" class="h-5 opacity-70">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div class="md:col-span-2">
+                    <div class="text-gold text-2xl font-display font-bold mb-4">LegitChain</div>
+                    <p class="text-gray-400 text-sm mb-4 max-w-md">
+                        Enjoy exclusive promotions and bonuses on our blockchain-based gaming platform. All offers come with transparent terms and fair conditions.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Promotions</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">New Player Offers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Deposit Bonuses</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Free Spins</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Loyalty Program</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Bonus Codes</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">License Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Jurisdiction Restrictions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-xs">© 2023 LegitChain. All rights reserved.</p>
+                <p class="text-gray-500 text-xs mt-2 md:mt-0">
+                    Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Countdown timer for featured promotion
+            function updateCountdown() {
+                // Set end date for demonstration (7 days from now)
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + 7);
+                endDate.setHours(12, 30, 45);
+                
+                const now = new Date();
+                const diff = endDate - now;
+                
+                // Calculate days, hours, minutes, seconds
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Update DOM elements
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+            
+            // Update countdown immediately and then every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Bonus claim functionality
+            const claimButtons = document.querySelectorAll('button:contains("Claim Bonus"), button:contains("Get Spins"), button:contains("Opt In")');
+            
+            claimButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalText = this.textContent;
+                    this.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> Processing...';
+                    this.disabled = true;
+                    
+                    // Simulate claim process
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fa fa-check mr-1"></i> Claimed';
+                        this.classList.remove('border-gold/30', 'text-gold', 'hover:bg-gold/10');
+                        this.classList.add('border-success', 'text-success', 'bg-success/10');
+                    }, 1500);
+                });
+            });
+            
+            // Bonus code redemption
+            const redeemButton = document.querySelector('button:contains("Redeem")');
+            const bonusCodeInput = document.querySelector('input[placeholder="Enter bonus code"]');
+            
+            redeemButton.addEventListener('click', function() {
+                if (bonusCodeInput.value.trim() === '') {
+                    bonusCodeInput.classList.add('border-danger');
+                    setTimeout(() => {
+                        bonusCodeInput.classList.remove('border-danger');
+                    }, 2000);
+                    return;
+                }
+                
+                const originalText = this.textContent;
+                this.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                this.disabled = true;
+                
+                // Simulate redemption process
+                setTimeout(() => {
+                    this.textContent = 'Redeemed!';
+                    this.classList.add('bg-success');
+                    
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'bg-success/20 border border-success/30 text-success text-xs rounded p-2 mt-3 text-center';
+                    successMessage.textContent = `Bonus code "${bonusCodeInput.value}" redeemed successfully!`;
+                    this.parentElement.parentNode.appendChild(successMessage);
+                    
+                    // Clear input
+                    bonusCodeInput.value = '';
+                }, 1500);
+            });
+            
+            // Featured bonus code buttons
+            const useCodeButtons = document.querySelectorAll('button:contains("Use Now")');
+            useCodeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const code = this.parentElement.querySelector('span').textContent;
+                    bonusCodeInput.value = code;
+                    
+                    // Highlight input
+                    bonusCodeInput.classList.add('border-gold');
+                    setTimeout(() => {
+                        bonusCodeInput.classList.remove('border-gold');
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

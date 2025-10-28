@@ -173,9 +173,9 @@
     "chartAutoFocused": "Chart auto-focused on crash time",
     "preCrash": "Pre-crash",
     "atCrash": "At crash",
-    "binanceApi": "BINANCE API",
+    "binanceApi": "LIVE DATA",
     "liveMarketData": "Real-time market data (24h change > 1%)",
-    "connectingApi": "Connecting to Binance API...",
+    "connectingApi": "Analyzing...",
     "fullTerminal": "FULL TERMINAL",
     "loadingEvents": "Loading events...",
     "noEventsFound": "No crash events found"
@@ -350,9 +350,10 @@
       "clearAll": "Clear All",
       "empty": "Your bet slip is empty",
       "emptyDesc": "Add selections to get started",
-      "stake": "Stake (ETH)",
+      "stake": "Stake",
       "totalStake": "Total Stake",
       "potentialWin": "Potential Win",
+      "potentialWinLabel": "Potential Win",
       "placeBet": "Place Bet"
     },
     "account": {
@@ -455,7 +456,7 @@
       "termsOfService": "Terms of Service",
       "privacyPolicy": "Privacy Policy",
       "contact": "Contact",
-      "copyright": "© 2023 LUMI. All rights reserved.",
+      "copyright": "© 2025 LUMI. All rights reserved.",
       "disclaimer": "Gambling can be addictive. Play responsibly. Not available in all jurisdictions."
     },
     "footer": {
@@ -505,8 +506,8 @@
         "ageVerification": "Age Verification"
       },
       "ageRestriction": "18+ Only",
-      "copyrightText": "© 2023 LUMI. All rights reserved.",
-      "copyright": "© 2023 LUMI. All rights reserved.",
+      "copyrightText": "© 2025 LUMI. All rights reserved.",
+      "copyright": "© 2025 LUMI. All rights reserved.",
       "disclaimer": "Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004."
     }
   },
@@ -551,7 +552,7 @@
       "standby": "STANDBY",
       "waitingForAlerts": "Waiting for alert stream...",
       "liveMarketData": "Live Market Data (24h change > 1%)",
-      "connectingBinance": "Connecting to Binance API...",
+      "connectingBinance": "Analyzing...",
       "stats": "STATS",
       "recent": "Recent",
       "critical": "Critical",
@@ -563,6 +564,476 @@
       "active": "ACTIVE",
       "assets": "Assets",
       "openFullTerminal": "Open Full Terminal"
+    },
+    "responsibleBar": {
+      "title": "Responsible Gambling",
+      "helpLink": "Gambling Addiction Help",
+      "selfExclusion": "Self-Exclusion",
+      "ageVerification": "Age Verification",
+      "ageLimit": "18+ Only"
+    },
+    "matches": {
+      "live": "Live",
+      "matchday": "Matchday",
+      "vs": "vs",
+      "win": "Win",
+      "draw": "Draw",
+      "home": "Home",
+      "away": "Away",
+      "markets": "Markets",
+      "moreMarkets": "More Markets",
+      "playoffs": "Playoffs",
+      "tomorrow": "Tomorrow",
+      "tonight": "Tonight",
+      "esports": "Esports"
+    },
+    "leagues": {
+      "premierLeague": "English Premier League",
+      "laLiga": "La Liga",
+      "championsLeague": "UEFA Champions League",
+      "nba": "NBA",
+      "nbaPlayoffs": "NBA Playoffs",
+      "lolWorlds": "LoL World Championship",
+      "semifinal": "Semifinal",
+      "liveSuffix": "Live"
+    },
+    "teams": {
+      "realMadrid": "Real Madrid",
+      "manchesterCity": "Manchester City",
+      "arsenal": "Arsenal",
+      "tottenham": "Tottenham",
+      "chelsea": "Chelsea",
+      "liverpool": "Liverpool",
+      "barcelona": "Barcelona",
+      "sevilla": "Sevilla",
+      "celtics": "Celtics",
+      "heat": "Heat",
+      "mavericks": "Mavericks",
+      "warriors": "Warriors",
+      "lakers": "Lakers",
+      "bulls": "Bulls",
+      "t1": "T1",
+      "geng": "GenG",
+      "manUnited": "Man United",
+      "newcastle": "Newcastle"
+    },
+    "betOptions": {
+      "home": "Home",
+      "draw": "Draw",
+      "away": "Away",
+      "over": "Over",
+      "under": "Under"
+    },
+    "sports": {
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "iceHockey": "Ice Hockey",
+      "baseball": "Baseball",
+      "rugby": "Rugby",
+      "mma": "MMA",
+      "horseRacing": "Horse Racing",
+      "esports": "Esports"
+    }
+  },
+  "sportsBetting": {
+    "title": "Sports Betting",
+    "subtitle": "Bet on your favorite sports with transparent odds and instant payouts on the blockchain",
+    "searchEvents": "Search events...",
+    "liveNow": "Live Now",
+    "upcoming": "Upcoming",
+    "upcomingEvents": "Upcoming Events",
+    "viewAllEvents": "View All Events",
+    "outrights": "Outrights",
+    "categories": {
+      "title": "Sports Categories",
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "iceHockey": "Ice Hockey",
+      "baseball": "Baseball",
+      "rugby": "Rugby",
+      "mma": "MMA",
+      "horseRacing": "Horse Racing",
+      "esports": "Esports",
+      "viewAll": "View All Sports"
+    },
+    "popularLeagues": {
+      "title": "Popular Leagues",
+      "epl": "English Premier League",
+      "ucl": "UEFA Champions League",
+      "nba": "NBA",
+      "laLiga": "La Liga",
+      "serieA": "Serie A"
+    },
+    "betSlip": {
+      "title": "Bet Slip",
+      "empty": "Your bet slip is empty",
+      "emptyDesc": "Click on odds to add selections",
+      "clearAll": "Clear All",
+      "selections": "selections",
+      "selection": "selection",
+      "stake": "Stake (ETH)",
+      "betType": "Bet Type",
+      "single": "Single",
+      "accumulator": "Accumulator",
+      "system": "System",
+      "totalStake": "Total Stake",
+      "potentialWin": "Potential Win",
+      "placeBet": "Place Bet"
+    },
+    "balance": {
+      "title": "My Balance",
+      "available": "Available Balance",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "depositMethods": "Deposit Methods",
+      "options": "Options"
+    },
+    "liveStats": {
+      "title": "Live Stats",
+      "shots": "Shots",
+      "shotsOnTarget": "Shots on Target",
+      "possession": "Possession",
+      "corners": "Corners",
+      "viewFull": "View Full Stats"
+    }
+  },
+  "liveCasino": {
+    "title": "Live Casino",
+    "subtitle": "Experience real-time gaming with professional dealers, all on the blockchain",
+    "searchTables": "Search tables...",
+    "categories": {
+      "title": "Game Categories",
+      "allLive": "All Live Games",
+      "blackjack": "Blackjack",
+      "roulette": "Roulette",
+      "baccarat": "Baccarat",
+      "gameShows": "Game Shows",
+      "poker": "Poker",
+      "other": "Other Games"
+    },
+    "filters": {
+      "title": "Filters",
+      "betLimits": "Bet Limits",
+      "low": "Low (0.001 - 0.01 ETH)",
+      "medium": "Medium (0.01 - 0.1 ETH)",
+      "high": "High (0.1 - 1 ETH)",
+      "vip": "VIP (1+ ETH)",
+      "apply": "Apply Filters"
+    },
+    "table": {
+      "live": "LIVE",
+      "table": "Table",
+      "players": "Players",
+      "dealer": "Dealer",
+      "minBet": "Min Bet",
+      "maxBet": "Max Bet",
+      "joinTable": "Join Table",
+      "joinGame": "Join Game"
+    },
+    "currentlyPlaying": {
+      "title": "Currently Playing",
+      "leave": "Leave",
+      "yourBet": "Your Current Bet",
+      "tableBalance": "Table Balance",
+      "gameStatus": "Game Status",
+      "dealingCards": "Dealing Cards",
+      "returnToTable": "Return to Table"
+    }
+  },
+  "promotions": {
+    "title": "Promotions",
+    "subtitle": "Exclusive bonuses, special offers, and rewards for LUMI players",
+    "searchPromotions": "Search promotions...",
+    "tabs": {
+      "all": "All Promotions",
+      "newPlayer": "New Player Offers",
+      "deposit": "Deposit Bonuses",
+      "loyalty": "Loyalty Rewards"
+    },
+    "featured": {
+      "popular": "POPULAR",
+      "newPlayers": "New Players",
+      "title": "Welcome Bonus Package",
+      "description": "Get a 100% match on your first deposit, plus 50 free spins and exclusive tournament entry for new players",
+      "claimOffer": "Claim Offer",
+      "days": "Days",
+      "hours": "Hours",
+      "mins": "Mins",
+      "secs": "Secs"
+    },
+    "categories": {
+      "title": "Promotion Types",
+      "all": "All Promotions",
+      "newPlayer": "New Player Offers",
+      "deposit": "Deposit Bonuses",
+      "loyalty": "Loyalty Rewards",
+      "seasonal": "Seasonal Promotions",
+      "free": "Free Spins & Bets"
+    },
+    "sections": {
+      "newPlayer": "New Player Offers",
+      "deposit": "Deposit Bonuses",
+      "depositBonuses": "Deposit Bonuses",
+      "freeSpins": "Free Spins & Bets",
+      "loyalty": "Loyalty Rewards",
+      "viewAll": "View All"
+    },
+    "bonuses": {
+      "firstDeposit": {
+        "title": "First Deposit Bonus",
+        "desc": "Get a 100% match on your first deposit up to 2 ETH, plus 50 free spins on selected slot games."
+      },
+      "welcomePackage": {
+        "title": "3-Part Welcome Package",
+        "desc": "Get bonuses on your first three deposits: 100% up to 2 ETH, 50% up to 2 ETH, and 50% up to 1 ETH."
+      },
+      "weeklyReload": {
+        "title": "Weekly Reload Bonus",
+        "desc": "Get a 50% reload bonus up to 1 ETH every weekend. Perfect for extending your gaming sessions."
+      },
+      "hot": "HOT",
+      "weekly": "WEEKLY",
+      "match100": "100% MATCH",
+      "upTo5ETH": "UP TO 5 ETH",
+      "match50": "50% MATCH",
+      "newPlayers": "New Players",
+      "allPlayers": "All Players",
+      "validFor30Days": "Valid for 30 days",
+      "validFriSun": "Valid Fri-Sun",
+      "wagering35x": "35x Wagering",
+      "wagering40x": "40x Wagering",
+      "minDeposit": "Min. Deposit"
+    },
+    "details": {
+      "newPlayers": "New Players",
+      "allPlayers": "All Players",
+      "validFor": "Valid for 30 days",
+      "wagering": "Wagering",
+      "minDeposit": "Min. Deposit",
+      "claimBonus": "Claim Bonus",
+      "optIn": "Opt In",
+      "getSpins": "Get Spins"
+    },
+    "myBonuses": {
+      "title": "My Active Bonuses",
+      "expiresIn": "Expires in",
+      "bonusRemaining": "Bonus Remaining",
+      "wageringProgress": "Wagering Progress",
+      "viewDetails": "View Details",
+      "viewAll": "View All Bonuses"
+    },
+    "loyaltyProgram": {
+      "title": "Loyalty Program",
+      "goldLevel": "Gold Level",
+      "pointsToNext": "Points to Next Level",
+      "currentPoints": "Current Points"
+    }
+  },
+  "tournaments": {
+    "title": "Tournaments",
+    "subtitle": "Compete in competitive gaming events with massive blockchain prize pools",
+    "searchTournaments": "Search tournaments...",
+    "tabs": {
+      "live": "Live Now",
+      "upcoming": "Upcoming",
+      "results": "Recent Results",
+      "my": "My Tournaments"
+    },
+    "featured": {
+      "liveNow": "LIVE NOW",
+      "prizePool": "Prize Pool",
+      "players": "Players",
+      "yourRank": "Your Rank",
+      "joinTournament": "Join Tournament",
+      "title": "LUMI Grand Championship",
+      "description": "The ultimate tournament featuring multiple casino games with a massive prize pool and exclusive NFT rewards for top players",
+      "days": "Days",
+      "hours": "Hours",
+      "mins": "Mins",
+      "secs": "Secs"
+    },
+    "categories": {
+      "title": "Tournament Categories",
+      "all": "All Tournaments",
+      "blackjack": "Blackjack Tourneys",
+      "roulette": "Roulette Competitions",
+      "slots": "Slots Tournaments",
+      "multiGame": "Multi-Game Events",
+      "vip": "VIP Tournaments"
+    },
+    "sections": {
+      "live": "Live Tournaments",
+      "upcoming": "Upcoming Tournaments",
+      "recent": "Recent Results",
+      "viewAll": "View All"
+    },
+    "details": {
+      "entry": "Entry",
+      "players": "Players",
+      "registered": "Registered",
+      "endsIn": "Ends in",
+      "startsIn": "Starts in",
+      "topPayout": "Top Payout",
+      "progress": "Tournament Progress",
+      "regProgress": "Registration Progress",
+      "yourRank": "You're currently",
+      "joinNow": "Join Now",
+      "registerNow": "Register Now",
+      "viewDetails": "View Details"
+    },
+    "myStats": {
+      "title": "My Tournament Stats",
+      "active": "Active Tournaments",
+      "won": "Tournaments Won",
+      "totalWinnings": "Total Winnings",
+      "globalRank": "Global Rank"
+    },
+    "leaderboard": {
+      "title": "Global Leaderboard",
+      "thisMonth": "This Month",
+      "thisWeek": "This Week",
+      "allTime": "All Time",
+      "tournamentsWon": "Tournaments Won",
+      "thisWeekChange": "this week",
+      "viewComplete": "View Complete Rankings"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account and view your gaming statistics",
+    "hero": {
+      "title": "Experience Blockchain",
+      "subtitle": "Premium Gaming Platform",
+      "description": "Safe, transparent, and fair gaming experience with massive game selection and exclusive benefits. Join LUMI now",
+      "startPlaying": "Start Playing",
+      "learnMore": "Learn More"
+    },
+    "personal": {
+      "title": "Personal Profile",
+      "vipMember": "VIP Gold Member",
+      "registrationDate": "Registration Date",
+      "email": "Email",
+      "phone": "Phone",
+      "lastLogin": "Last Login",
+      "today": "Today",
+      "editProfile": "Edit Profile"
+    },
+    "accountOverview": {
+      "title": "Account Overview",
+      "availableBalance": "Available Balance",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "totalDeposits": "Total Deposits",
+      "totalWithdrawals": "Total Withdrawals",
+      "totalWinnings": "Total Winnings",
+      "totalBets": "Total Bets",
+      "recentActivity": "Recent Activity"
+    },
+    "membership": {
+      "title": "Membership Benefits",
+      "levelProgress": "Membership Level Progress",
+      "points": "Points",
+      "currentLevel": "Gold",
+      "nextLevel": "Platinum",
+      "exclusiveBenefits": "Member Exclusive Benefits",
+      "benefit1": "10% Weekly Cashback, No Limit",
+      "benefit2": "Dedicated Account Manager 24/7",
+      "benefit3": "Priority Withdrawals, Within 1 Hour",
+      "benefit4": "Monthly Free 1 ETH Gift Package"
+    },
+    "recommended": {
+      "title": "Recommended For You",
+      "viewAll": "View All",
+      "startPlaying": "Start Playing",
+      "rtp": "RTP",
+      "lowRisk": "Low Risk",
+      "tables": "Tables",
+      "hot": "HOT",
+      "games": {
+        "goldenFortune": "Golden Fortune",
+        "premiumBlackjack": "Premium Blackjack",
+        "liveRoulette": "Live Roulette",
+        "texasHoldem": "Texas Hold'em"
+      },
+      "categories": {
+        "slots": "Slots",
+        "table": "Table",
+        "live": "Live",
+        "poker": "Poker"
+      }
+    },
+    "exclusivePromotions": {
+      "title": "Exclusive Promotions",
+      "limitedTime": "Limited Time",
+      "vipExclusive": "VIP Exclusive",
+      "joinNow": "Join Now",
+      "viewDetails": "View Details",
+      "weekendDouble": {
+        "title": "Weekend Double Deposit",
+        "desc": "Get 150% bonus on weekend deposits, up to 5 ETH"
+      },
+      "goldLeague": {
+        "title": "Gold League Championship",
+        "desc": "Total prize pool 50 ETH, VIP members only, winner takes 20 ETH"
+      }
+    },
+    "giftCenter": {
+      "title": "Gift Center",
+      "unclaimed": "Unclaimed",
+      "newPlayerExclusive": "New Player Exclusive",
+      "depositRewards": "Deposit Rewards",
+      "viewAll": "View All",
+      "claim": "Claim",
+      "deposit": "Deposit",
+      "noDeposit": "No Deposit",
+      "remaining": "Remaining",
+      "firstDeposit": "First Deposit",
+      "wageringNote": "Gifts require wagering requirements after claiming",
+      "close": "Close",
+      "registrationGift": {
+        "title": "Registration Gift",
+        "desc": "0.01 ETH + 20 Free Spins"
+      },
+      "firstDepositDouble": {
+        "title": "First Deposit Double",
+        "desc": "100% Bonus up to 2 ETH"
+      }
+    },
+    "menu": {
+      "profile": "Profile",
+      "balance": "My Balance",
+      "history": "Transaction History",
+      "rewards": "My Rewards",
+      "settings": "Settings",
+      "logout": "Logout",
+      "account": "Account",
+      "vipGold": "VIP Gold"
+    },
+    "footer": {
+      "brandName": "LUMI",
+      "description": "A blockchain-based premium gaming platform providing safe, transparent, and fair gaming experience.",
+      "gamesSection": "Games",
+      "slots": "Slots",
+      "tableGames": "Table Games",
+      "liveCasino": "Live Casino",
+      "poker": "Poker",
+      "sportsBetting": "Sports Betting",
+      "supportSection": "Support",
+      "helpCenter": "Help Center",
+      "faqs": "FAQs",
+      "contactUs": "Contact Us",
+      "depositMethods": "Deposit Methods",
+      "withdrawalInstructions": "Withdrawal Instructions",
+      "legalSection": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "responsibleGaming": "Responsible Gaming",
+      "ageVerification": "Age Verification",
+      "licenseInfo": "License Information",
+      "copyright": "© 2025 LUMI. All rights reserved.",
+      "disclaimer": "18+ Play responsibly. Gambling may lead to addiction, please treat it rationally. This platform is licensed by regulatory authorities."
     }
   }
 }

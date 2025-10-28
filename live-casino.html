@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegitChain | Live Casino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        },
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        live: '#f97316'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            }
+            .gold-gradient {
+                background: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
+            }
+            .live-pulse {
+                animation: pulse 2s infinite;
+            }
+            .table-hover {
+                @apply transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-1;
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(249, 115, 22, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+            }
+        }
+    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased">
+    <!-- Responsible Gambling Notice -->
+    <div class="bg-dark-light border-b border-gold/30 py-2">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+            <p class="text-xs text-gray-300 flex items-center justify-center md:justify-start">
+                <i class="fa fa-info-circle text-gold mr-2"></i>
+                18+ Gamble Responsibly. This platform operates under license number GL-2023-004. Terms apply.
+            </p>
+            <div class="flex space-x-4 mt-2 md:mt-0">
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Help Center</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">LegitChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Games</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
+                    <a href="#" class="text-white hover:text-gold transition-colors border-b-2 border-gold pb-1">Live Casino</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Tournaments</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Promotions</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-300 hover:text-white transition-colors relative">
+                            <i class="fa fa-bell-o"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-gold text-dark text-xs rounded-full flex items-center justify-center">1</span>
+                        </button>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-gray-700"></div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Balance</p>
+                                <p class="text-sm font-medium">12.547 ETH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Live Casino Header -->
+        <div class="mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-display font-bold text-white">Live Casino</h1>
+                    <p class="text-gray-400 mt-1">Experience real-time gaming with professional dealers, all on the blockchain</p>
+                </div>
+                
+                <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                    <div class="relative">
+                        <input type="text" placeholder="Search tables..." class="bg-dark-light border border-gray-700 rounded-md px-3 py-1.5 pl-9 text-sm focus:outline-none focus:border-gold w-full md:w-64">
+                        <i class="fa fa-search absolute left-3 top-2 text-gray-500"></i>
+                    </div>
+                    
+                    <button class="bg-dark-light border border-gray-700 rounded-md p-1.5 hover:border-gold/50 transition-colors">
+                        <i class="fa fa-filter text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Featured Live Table -->
+            <div class="relative rounded-xl overflow-hidden mb-6 group">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-darker via-dark/60 to-transparent z-10"></div>
+                <img src="https://picsum.photos/id/1059/1600/400" alt="Premium Blackjack Table" class="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 z-20 flex flex-col justify-end p-6 md:p-8">
+                    <div class="flex items-center mb-3">
+                        <span class="flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full mr-2 live-pulse">
+                            <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                            LIVE
+                        </span>
+                        <span class="text-gray-300 text-sm">Premium Blackjack • Table #128</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-white text-shadow mb-2">VIP Blackjack Lounge</h2>
+                    <p class="text-gray-300 mb-4 max-w-2xl">Play with our exclusive VIP dealer in a private blackjack table with enhanced limits and special rewards</p>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex -space-x-2">
+                                <img src="https://picsum.photos/id/1012/100/100" alt="Player" class="w-8 h-8 rounded-full border-2 border-dark-light">
+                                <img src="https://picsum.photos/id/1025/100/100" alt="Player" class="w-8 h-8 rounded-full border-2 border-dark-light">
+                                <img src="https://picsum.photos/id/1074/100/100" alt="Player" class="w-8 h-8 rounded-full border-2 border-dark-light">
+                                <div class="w-8 h-8 rounded-full bg-dark-light border-2 border-dark-light flex items-center justify-center text-xs font-medium">+5</div>
+                            </div>
+                            <span class="text-sm">8 Players</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-300">Min Bet:</span>
+                            <span class="text-sm font-medium">0.1 ETH</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-300">Max Bet:</span>
+                            <span class="text-sm font-medium">5 ETH</span>
+                        </div>
+                        
+                        <button class="gold-gradient text-dark font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity ml-auto">
+                            Join Table
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Column - Casino Categories & Filters -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Game Categories</h2>
+                    </div>
+                    
+                    <div class="p-2">
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md bg-dark border-l-4 border-gold pl-3 -ml-4">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-play-circle-o text-gold mr-3"></i>
+                                        <span>All Live Games</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">42</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-cards text-gray-400 mr-3"></i>
+                                        <span>Blackjack</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">12</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-diamond text-gray-400 mr-3"></i>
+                                        <span>Roulette</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">8</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-th text-gray-400 mr-3"></i>
+                                        <span>Baccarat</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">6</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-sort-numeric-asc text-gray-400 mr-3"></i>
+                                        <span>Game Shows</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">5</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-puzzle-piece text-gray-400 mr-3"></i>
+                                        <span>Poker</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">4</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-child text-gray-400 mr-3"></i>
+                                        <span>Other Games</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">7</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="p-5 border-t border-gray-800">
+                        <h3 class="text-sm font-medium mb-3">Filters</h3>
+                        
+                        <!-- Bet Limits -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Bet Limits</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Low (0.001 - 0.01 ETH)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Medium (0.01 - 0.1 ETH)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">High (0.1 - 1 ETH)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">VIP (1+ ETH)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Dealer Language -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Dealer Language</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">English</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Spanish</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Chinese</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Russian</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Providers -->
+                        <div>
+                            <h4 class="text-xs text-gray-400 mb-2">Providers</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">LegitChain Studios</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Blockchain Gaming</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">LiveStream Pro</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-5 py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Column - Live Casino Tables -->
+            <div class="lg:col-span-2 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-hide pr-2">
+                <!-- Blackjack Tables -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Blackjack</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Table 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1063/600/300" alt="Classic Blackjack" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #304
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">Classic Blackjack</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">6 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: Sarah</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.01 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">0.5 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Table 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1068/600/300" alt="VIP Blackjack" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #108
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">VIP Blackjack</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">3 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1074/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: Michael</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.2 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">2 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Table 3 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1071/600/300" alt="Speed Blackjack" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #512
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">Speed Blackjack</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">8 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1027/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: Emma</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.005 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">0.1 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Roulette Tables -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Roulette</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Table 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1065/600/300" alt="European Roulette" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #215
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">European Roulette</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">11 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1066/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: James</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.01 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">1 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Table 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1070/600/300" alt="French Roulette" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #422
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">French Roulette</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">5 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1077/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: Sophie</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.05 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">3 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Shows -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Live Game Shows</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Game Show 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1072/600/300" alt="Crypto Wheel" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                    POPULAR
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">Crypto Wheel</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">42 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1083/100/100" alt="Host" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Host: Alex</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.001 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">0.5 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Game
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Game Show 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1073/600/300" alt="Blockchain Bingo" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">Blockchain Bingo</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">28 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1084/100/100" alt="Host" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Host: Olivia</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Ticket Price:</span>
+                                        <span class="ml-1">0.01 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Jackpot:</span>
+                                        <span class="ml-1 text-gold">2.45 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Game
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Baccarat Tables -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Baccarat</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Table 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden table-hover">
+                            <div class="relative">
+                                <img src="https://picsum.photos/id/1076/600/300" alt="Classic Baccarat" class="w-full h-40 object-cover">
+                                <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full live-pulse">
+                                    <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                    LIVE
+                                </div>
+                                <div class="absolute top-2 right-2 bg-dark/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    Table #319
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-medium">Classic Baccarat</h3>
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                        <span class="text-xs">7 Players</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <img src="https://picsum.photos/id/1080/100/100" alt="Dealer" class="w-8 h-8 rounded-full border-2 border-dark-light mr-2">
+                                    <span class="text-sm">Dealer: Daniel</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-sm mb-3">
+                                    <div>
+                                        <span class="text-gray-400">Min Bet:</span>
+                                        <span class="ml-1">0.05 ETH</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Max Bet:</span>
+                                        <span class="ml-1">2 ETH</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    Join Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Live Casino Info & Account -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 space-y-6">
+                    <!-- Currently Playing -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Currently Playing</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-800">
+                                <div class="flex items-center">
+                                    <div class="relative w-12 h-12 rounded-lg overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1063/100/100" alt="Blackjack Table" class="w-full h-full object-cover">
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-live rounded-full border-2 border-dark-light"></div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-medium">Classic Blackjack</h3>
+                                        <p class="text-xs text-gray-400">Table #304</p>
+                                    </div>
+                                </div>
+                                <button class="text-xs text-gold hover:text-gold-light">
+                                    <i class="fa fa-sign-out mr-1"></i> Leave
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-400">Your Current Bet</span>
+                                    <span class="text-sm font-medium">0.1 ETH</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-400">Table Balance</span>
+                                    <span class="text-sm font-medium">0.85 ETH</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-400">Game Status</span>
+                                    <span class="text-sm text-live">Dealing Cards</span>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-4 py-2 bg-dark rounded-lg border border-gold/30 text-gold text-sm font-medium hover:bg-gold/10 transition-colors">
+                                Return to Table
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Balance -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">My Balance</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm text-gray-400">Available Balance</span>
+                                <span class="text-xl font-bold">12.547 ETH</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-5">
+                                <button class="flex items-center justify-center space-x-1 py-2.5 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    <i class="fa fa-plus text-gold"></i>
+                                    <span>Deposit</span>
+                                </button>
+                                <button class="flex items-center justify-center space-x-1 py-2.5 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                    <i class="fa fa-minus text-gray-400"></i>
+                                    <span>Withdraw</span>
+                                </button>
+                            </div>
+                            
+                            <div class="border-t border-gray-800 pt-4">
+                                <h3 class="text-sm font-medium mb-3">Transaction History</h3>
+                                
+                                <div class="space-y-3 max-h-48 overflow-y-auto scrollbar-hide">
+                                    <!-- Transaction 1 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-trophy text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Blackjack Win</p>
+                                                <p class="text-xs text-gray-500">Just now</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-success">+0.35 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 2 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-danger/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-arrow-up text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Table Bet</p>
+                                                <p class="text-xs text-gray-500">5 min ago</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-danger">-0.1 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 3 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-trophy text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Roulette Win</p>
+                                                <p class="text-xs text-gray-500">28 min ago</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-success">+0.75 ETH</span>
+                                    </div>
+                                    
+                                    <!-- Transaction 4 -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center mr-3">
+                                                <i class="fa fa-arrow-down text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm">Deposit</p>
+                                                <p class="text-xs text-gray-500">Today, 14:23</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-medium text-success">+5.00 ETH</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Casino Promotions -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Live Casino Promotions</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="bg-dark rounded-lg border border-gold/20 p-4 mb-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-medium text-gold">Blackjack Bonus</h3>
+                                        <p class="text-xs text-gray-400 mt-1">Get 10% cashback on all blackjack losses this week</p>
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
+                                        <i class="fa fa-cards text-gold"></i>
+                                    </div>
+                                </div>
+                                <button class="w-full py-1.5 bg-gold/10 rounded-lg border border-gold/30 text-gold text-xs font-medium hover:bg-gold/20 transition-colors">
+                                    Opt In Now
+                                </button>
+                            </div>
+                            
+                            <div class="bg-dark rounded-lg border border-gray-700 p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-medium">New Live Games</h3>
+                                        <p class="text-xs text-gray-400 mt-1">Play our new Crypto Wheel and get 5 free spins</p>
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                                        <i class="fa fa-gift text-gray-300"></i>
+                                    </div>
+                                </div>
+                                <button class="w-full py-1.5 bg-transparent rounded-lg border border-gray-600 text-gray-300 text-xs font-medium hover:border-gold/30 hover:text-gold transition-colors">
+                                    Learn More
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- How to Play -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">How to Play</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="space-y-3">
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">1</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Choose Your Game</p>
+                                        <p class="text-xs text-gray-400">Select from our variety of live dealer games</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">2</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Join a Table</p>
+                                        <p class="text-xs text-gray-400">Select a table with your preferred betting limits</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">3</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Place Your Bets</p>
+                                        <p class="text-xs text-gray-400">Use your balance to place bets on the table</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">4</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Play & Win</p>
+                                        <p class="text-xs text-gray-400">Winnings are automatically credited to your account</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a href="#" class="text-center block text-sm text-gold hover:text-gold-light mt-4">
+                                Watch Tutorial <i class="fa fa-play-circle-o ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Responsible Gambling Footer Bar -->
+    <div class="bg-dark-light border-t border-gray-800 py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Gambling Addiction Help</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Self-Exclusion</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Age Verification</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-gray-500">18+ Only</span>
+                    <div class="flex space-x-3">
+                        <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/105/40/20" alt="Fair Gaming" class="h-5 opacity-70">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div class="md:col-span-2">
+                    <div class="text-gold text-2xl font-display font-bold mb-4">LegitChain</div>
+                    <p class="text-gray-400 text-sm mb-4 max-w-md">
+                        Experience the thrill of live casino gaming with professional dealers, all on the blockchain for complete transparency and fairness.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Live Casino</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Blackjack</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Roulette</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Baccarat</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Game Shows</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Poker</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">License Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Jurisdiction Restrictions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-xs">© 2023 LegitChain. All rights reserved.</p>
+                <p class="text-gray-500 text-xs mt-2 md:mt-0">
+                    Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Table joining functionality
+            const joinButtons = document.querySelectorAll('button:contains("Join Table"), button:contains("Join Game")');
+            
+            // Add click effect to join buttons
+            joinButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Change button text to indicate loading
+                    const originalText = this.textContent;
+                    this.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> Joining...';
+                    this.disabled = true;
+                    
+                    // Simulate table joining process
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fa fa-check mr-1"></i> Joined';
+                        this.classList.remove('border-gray-700');
+                        this.classList.add('border-success', 'text-success');
+                        
+                        // Reset after a delay
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                            this.classList.remove('border-success', 'text-success');
+                            this.classList.add('border-gray-700');
+                        }, 2000);
+                    }, 1500);
+                });
+            });
+            
+            // Simulate live player count updates
+            function updatePlayerCounts() {
+                const playerCountElements = document.querySelectorAll('.flex.items-center i.fa-user + span.text-xs');
+                
+                playerCountElements.forEach(el => {
+                    // Get current count and add random variation
+                    let currentCount = parseInt(el.textContent.match(/\d+/)[0]);
+                    const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
+                    
+                    // Ensure count stays reasonable
+                    if (currentCount + change > 0) {
+                        currentCount += change;
+                        el.textContent = `${currentCount} Players`;
+                    }
+                });
+                
+                // Update every 30 seconds
+                setTimeout(updatePlayerCounts, 30000);
+            }
+            
+            // Start player count updates
+            setTimeout(updatePlayerCounts, 10000);
+        });
+    </script>
+</body>
+</html>

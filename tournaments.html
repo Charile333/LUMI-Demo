@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegitChain | Tournaments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            light: '#d4af37',
+                            DEFAULT: '#b8860b',
+                            dark: '#85651e'
+                        },
+                        dark: {
+                            light: '#1a1a1a',
+                            DEFAULT: '#121212',
+                            darker: '#0a0a0a'
+                        },
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        live: '#f97316',
+                        primary: '#3b82f6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Playfair Display', 'serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            }
+            .gold-gradient {
+                background: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
+            }
+            .tournament-card-hover {
+                @apply transition-all duration-300 hover:border-gold/50 hover:shadow-lg hover:shadow-gold/5 hover:-translate-y-1;
+            }
+            .countdown-item {
+                @apply bg-dark-light rounded-lg w-12 h-12 flex flex-col items-center justify-center border border-gray-700;
+            }
+        }
+    </style>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-white font-sans antialiased">
+    <!-- Responsible Gambling Notice -->
+    <div class="bg-dark-light border-b border-gold/30 py-2">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+            <p class="text-xs text-gray-300 flex items-center justify-center md:justify-start">
+                <i class="fa fa-info-circle text-gold mr-2"></i>
+                18+ Gamble Responsibly. This platform operates under license number GL-2023-004. Terms apply.
+            </p>
+            <div class="flex space-x-4 mt-2 md:mt-0">
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Help Center</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="text-gold text-2xl font-display font-bold">LegitChain</div>
+                <div class="hidden md:block h-4 w-px bg-gray-700 mx-2"></div>
+                <nav class="hidden md:flex space-x-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Games</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Sports</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Live Casino</a>
+                    <a href="#" class="text-white hover:text-gold transition-colors border-b-2 border-gold pb-1">Tournaments</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition-colors border-b-2 border-transparent pb-1 hover:border-gray-700">Promotions</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-300 hover:text-white transition-colors relative">
+                            <i class="fa fa-trophy text-gold"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-gold text-dark text-xs rounded-full flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-gray-700"></div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Balance</p>
+                                <p class="text-sm font-medium">8.752 ETH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Tournaments Header -->
+        <div class="mb-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-display font-bold text-white">Tournaments</h1>
+                    <p class="text-gray-400 mt-1">Compete in competitive gaming events with massive blockchain prize pools</p>
+                </div>
+                
+                <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                    <div class="relative">
+                        <input type="text" placeholder="Search tournaments..." class="bg-dark-light border border-gray-700 rounded-md px-3 py-1.5 pl-9 text-sm focus:outline-none focus:border-gold w-full md:w-64">
+                        <i class="fa fa-search absolute left-3 top-2 text-gray-500"></i>
+                    </div>
+                    
+                    <button class="bg-dark-light border border-gray-700 rounded-md p-1.5 hover:border-gold/50 transition-colors">
+                        <i class="fa fa-filter text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tournament Tabs -->
+            <div class="flex border border-gray-800 rounded-lg overflow-hidden mb-6">
+                <button class="flex-1 py-2.5 text-center bg-gold text-dark font-medium">Live Now</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">Upcoming</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">Recent Results</button>
+                <button class="flex-1 py-2.5 text-center bg-dark-light text-gray-300 hover:text-white transition-colors">My Tournaments</button>
+            </div>
+            
+            <!-- Featured Tournament -->
+            <div class="relative rounded-xl overflow-hidden mb-8 group">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-darker via-dark/70 to-transparent z-10"></div>
+                <img src="https://picsum.photos/id/1060/1600/400" alt="Grand Championship" class="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 z-20 flex flex-col justify-end p-6 md:p-8">
+                    <div class="flex items-center mb-3">
+                        <span class="flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full mr-2">
+                            <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                            LIVE NOW
+                        </span>
+                        <span class="text-gray-300 text-sm">Prize Pool: 100 ETH • 245 Players</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-display font-bold text-white text-shadow mb-2">LegitChain Grand Championship</h2>
+                    <p class="text-gray-300 mb-4 max-w-2xl">The ultimate tournament featuring multiple casino games with a massive prize pool and exclusive NFT rewards for top players</p>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex space-x-2">
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="days">02</span>
+                                <span class="text-xs text-gray-400">Days</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="hours">18</span>
+                                <span class="text-xs text-gray-400">Hours</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="minutes">45</span>
+                                <span class="text-xs text-gray-400">Mins</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="text-lg font-bold" id="seconds">33</span>
+                                <span class="text-xs text-gray-400">Secs</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3 ml-auto">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                                    <i class="fa fa-trophy text-gold text-xs"></i>
+                                </div>
+                                <span class="text-sm">Your Rank: #37</span>
+                            </div>
+                            
+                            <button class="gold-gradient text-dark font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                                Join Tournament
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Column - Tournament Categories & Filters -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="p-5 border-b border-gray-800">
+                        <h2 class="text-lg font-semibold">Tournament Categories</h2>
+                    </div>
+                    
+                    <div class="p-2">
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md bg-dark border-l-4 border-gold pl-3 -ml-4">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-trophy text-gold mr-3"></i>
+                                        <span>All Tournaments</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">38</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-cards text-gray-400 mr-3"></i>
+                                        <span>Blackjack Tourneys</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">12</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-diamond text-gray-400 mr-3"></i>
+                                        <span>Roulette Competitions</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">8</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-gamepad text-gray-400 mr-3"></i>
+                                        <span>Slots Tournaments</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">9</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-users text-gray-400 mr-3"></i>
+                                        <span>Multi-Game Events</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">5</span>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="#" class="flex items-center justify-between p-2 rounded-md hover:bg-dark transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-star text-gray-400 mr-3"></i>
+                                        <span>VIP Tournaments</span>
+                                    </div>
+                                    <span class="bg-dark text-xs px-1.5 py-0.5 rounded-full">4</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="p-5 border-t border-gray-800">
+                        <h3 class="text-sm font-medium mb-3">Filters</h3>
+                        
+                        <!-- Entry Fee -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Entry Fee</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Free to Enter</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Low (0.01 - 0.1 ETH)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Medium (0.1 - 1 ETH)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">High (1+ ETH)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Prize Pool -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Minimum Prize Pool</h4>
+                            <select class="w-full bg-dark border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                                <option>Any Prize Pool</option>
+                                <option>5+ ETH</option>
+                                <option>10+ ETH</option>
+                                <option>50+ ETH</option>
+                                <option>100+ ETH</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Duration -->
+                        <div class="mb-5">
+                            <h4 class="text-xs text-gray-400 mb-2">Duration</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Daily</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0" checked>
+                                    <span class="ml-2 text-sm">Weekly</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Monthly</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-4 w-4 bg-dark border-gray-700 rounded text-gold focus:ring-0">
+                                    <span class="ml-2 text-sm">Special Events</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-5 py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Column - Tournaments List -->
+            <div class="lg:col-span-2 space-y-6 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-hide pr-2">
+                <!-- Live Tournaments -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Live Tournaments</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Tournament 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1061/600/400" alt="Blackjack Masters" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                        LIVE
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        15 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Blackjack Masters</h3>
+                                        <span class="text-xs text-gray-400">Entry: 0.1 ETH</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">87 Players</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Ends in 6h 24m</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Top 10 Payout</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Tournament Progress</span>
+                                            <span class="text-gray-400">68%</span>
+                                        </div>
+                                        <div class="w-full bg-dark rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 68%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="flex -space-x-1 mr-2">
+                                                <img src="https://picsum.photos/id/1012/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1025/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1074/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                            </div>
+                                            <span class="text-xs text-gray-400">You're currently #12</span>
+                                        </div>
+                                        
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tournament 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1062/600/400" alt="Roulette Royale" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                        LIVE
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        10 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Roulette Royale</h3>
+                                        <span class="text-xs text-gray-400">Entry: 0.05 ETH</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">124 Players</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Ends in 12h 15m</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Top 15 Payout</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Tournament Progress</span>
+                                            <span class="text-gray-400">42%</span>
+                                        </div>
+                                        <div class="w-full bg-dark rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 42%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="flex -space-x-1 mr-2">
+                                                <img src="https://picsum.photos/id/1027/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1066/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1077/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                            </div>
+                                            <span class="text-xs text-gray-400">You're currently #45</span>
+                                        </div>
+                                        
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tournament 3 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1063/600/400" alt="Slot Masters" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-live text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <span class="w-2 h-2 bg-white rounded-full mr-1"></span>
+                                        LIVE
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        25 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Slot Masters Championship</h3>
+                                        <span class="text-xs text-gray-400">Entry: Free</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">342 Players</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Ends in 3h 40m</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Top 20 Payout</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Tournament Progress</span>
+                                            <span class="text-gray-400">85%</span>
+                                        </div>
+                                        <div class="w-full bg-dark rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center">
+                                            <div class="flex -space-x-1 mr-2">
+                                                <img src="https://picsum.photos/id/1083/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1084/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                                <img src="https://picsum.photos/id/1080/100/100" alt="Player" class="w-6 h-6 rounded-full border border-dark-light">
+                                            </div>
+                                            <span class="text-xs text-gray-400">You're currently #28</span>
+                                        </div>
+                                        
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            Join Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Tournaments -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Upcoming Tournaments</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Tournament 1 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1064/600/400" alt="Baccarat High Rollers" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-dark/70 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-calendar-o mr-1"></i>
+                                        Starts Soon
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        50 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Baccarat High Rollers</h3>
+                                        <span class="text-xs text-gray-400">Entry: 1 ETH</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">24 Registered</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Starts in 8h 30m</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Top 5 Payout</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Registration Progress</span>
+                                            <span class="text-gray-400">48%</span>
+                                        </div>
+                                        <div class="w-full bg-dark rounded-full h-1.5">
+                                            <div class="bg-gray-600 h-1.5 rounded-full" style="width: 48%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            Register Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tournament 2 -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1065/600/400" alt="Weekend Warrior" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-dark/70 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-calendar-o mr-1"></i>
+                                        Upcoming
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        30 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Weekend Warrior Challenge</h3>
+                                        <span class="text-xs text-gray-400">Entry: 0.2 ETH</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-user text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">78 Registered</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-clock-o text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Starts in 2d 5h</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa fa-trophy text-gray-400 text-xs mr-1"></i>
+                                            <span class="text-xs">Top 15 Payout</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Registration Progress</span>
+                                            <span class="text-gray-400">39%</span>
+                                        </div>
+                                        <div class="w-full bg-dark rounded-full h-1.5">
+                                            <div class="bg-gray-600 h-1.5 rounded-full" style="width: 39%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            Register Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Results -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-display font-bold">Recent Results</h2>
+                        <a href="#" class="text-sm text-gold hover:text-gold-light">View All</a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Completed Tournament -->
+                        <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden tournament-card-hover">
+                            <div class="flex flex-col md:flex-row">
+                                <div class="relative md:w-1/3">
+                                    <img src="https://picsum.photos/id/1066/600/400" alt="Daily Blackjack" class="w-full h-40 md:h-full object-cover">
+                                    <div class="absolute top-2 left-2 flex items-center bg-dark/70 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        <i class="fa fa-trophy mr-1"></i>
+                                        Completed
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-gold text-dark text-xs font-bold px-2 py-0.5 rounded-full">
+                                        8 ETH
+                                    </div>
+                                </div>
+                                <div class="p-4 md:w-2/3">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium">Daily Blackjack Challenge</h3>
+                                        <span class="text-xs text-gray-400">Yesterday</span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h4 class="text-xs font-medium mb-2">Winners:</h4>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center">
+                                                <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center text-dark text-xs font-bold mr-2">1</div>
+                                                <img src="https://picsum.photos/id/1025/100/100" alt="Winner" class="w-6 h-6 rounded-full mr-2">
+                                                <span class="text-xs">@crypto_wiz</span>
+                                                <span class="ml-auto text-xs text-success">3.2 ETH</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-dark text-xs font-bold mr-2">2</div>
+                                                <img src="https://picsum.photos/id/1012/100/100" alt="Winner" class="w-6 h-6 rounded-full mr-2">
+                                                <span class="text-xs">@betmaster</span>
+                                                <span class="ml-auto text-xs text-success">2.0 ETH</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-bold mr-2">3</div>
+                                                <img src="https://picsum.photos/id/1074/100/100" alt="Winner" class="w-6 h-6 rounded-full mr-2">
+                                                <span class="text-xs">@lucky_player</span>
+                                                <span class="ml-auto text-xs text-success">1.2 ETH</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="py-1.5 px-3 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Tournament Stats & Leaderboards -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-20 space-y-6">
+                    <!-- My Tournament Stats -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">My Tournament Stats</h2>
+                        </div>
+                        
+                        <div class="p-5">
+                            <div class="grid grid-cols-2 gap-4 mb-5">
+                                <div class="bg-dark rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-400 mb-1">Active Tournaments</p>
+                                    <p class="text-2xl font-bold">4</p>
+                                </div>
+                                <div class="bg-dark rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-400 mb-1">Tournaments Won</p>
+                                    <p class="text-2xl font-bold text-gold">7</p>
+                                </div>
+                                <div class="bg-dark rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-400 mb-1">Total Winnings</p>
+                                    <p class="text-2xl font-bold text-success">34.85 ETH</p>
+                                </div>
+                                <div class="bg-dark rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-400 mb-1">Global Rank</p>
+                                    <p class="text-2xl font-bold">#128</p>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-gray-800 pt-4">
+                                <h3 class="text-sm font-medium mb-3">Recent Performance</h3>
+                                <canvas id="tournamentChart" height="180"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Global Leaderboard -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                            <h2 class="text-lg font-semibold">Global Leaderboard</h2>
+                            <select class="bg-dark border border-gray-700 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-gold">
+                                <option>This Month</option>
+                                <option>This Week</option>
+                                <option>All Time</option>
+                            </select>
+                        </div>
+                        
+                        <div class="divide-y divide-gray-800">
+                            <!-- Top Player 1 -->
+                            <div class="p-3 flex items-center bg-dark/50 border-l-4 border-gold">
+                                <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center text-dark text-xs font-bold mr-3">1</div>
+                                <img src="https://picsum.photos/id/1074/100/100" alt="Top Player" class="w-8 h-8 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">@blockchain_bet</p>
+                                    <p class="text-xs text-gray-400">42 Tournaments Won</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">128.5 ETH</p>
+                                    <p class="text-xs text-gold">+12 this week</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Player 2 -->
+                            <div class="p-3 flex items-center hover:bg-dark/30 transition-colors">
+                                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-dark text-xs font-bold mr-3">2</div>
+                                <img src="https://picsum.photos/id/1025/100/100" alt="Top Player" class="w-8 h-8 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">@crypto_wiz</p>
+                                    <p class="text-xs text-gray-400">37 Tournaments Won</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">97.2 ETH</p>
+                                    <p class="text-xs text-success">+8 this week</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Player 3 -->
+                            <div class="p-3 flex items-center hover:bg-dark/30 transition-colors">
+                                <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-bold mr-3">3</div>
+                                <img src="https://picsum.photos/id/1012/100/100" alt="Top Player" class="w-8 h-8 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">@betmaster</p>
+                                    <p class="text-xs text-gray-400">31 Tournaments Won</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">84.7 ETH</p>
+                                    <p class="text-xs text-danger">-2 this week</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Player 4 -->
+                            <div class="p-3 flex items-center hover:bg-dark/30 transition-colors">
+                                <div class="w-6 h-6 rounded-full bg-dark flex items-center justify-center text-gray-400 text-xs font-bold mr-3 border border-gray-700">4</div>
+                                <img src="https://picsum.photos/id/1027/100/100" alt="Top Player" class="w-8 h-8 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">@lucky_streak</p>
+                                    <p class="text-xs text-gray-400">28 Tournaments Won</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">76.3 ETH</p>
+                                    <p class="text-xs text-success">+5 this week</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Top Player 5 -->
+                            <div class="p-3 flex items-center hover:bg-dark/30 transition-colors">
+                                <div class="w-6 h-6 rounded-full bg-dark flex items-center justify-center text-gray-400 text-xs font-bold mr-3 border border-gray-700">5</div>
+                                <img src="https://picsum.photos/id/1066/100/100" alt="Top Player" class="w-8 h-8 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">@high_roller</p>
+                                    <p class="text-xs text-gray-400">24 Tournaments Won</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">68.9 ETH</p>
+                                    <p class="text-xs text-success">+3 this week</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 border-t border-gray-800">
+                            <a href="#" class="text-center block text-sm text-gold hover:text-gold-light">
+                                View Complete Rankings
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Tournament Prizes -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">Tournament Prizes</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="space-y-4">
+                                <div class="bg-dark rounded-lg p-3 border border-gold/20">
+                                    <div class="flex items-start">
+                                        <div class="w-10 h-10 rounded-full gold-gradient flex items-center justify-center mr-3 flex-shrink-0">
+                                            <i class="fa fa-trophy text-dark"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gold">Grand Champion NFT</h3>
+                                            <p class="text-xs text-gray-400 mt-1">Exclusive NFT awarded to monthly tournament winners, granting VIP access and special rewards</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-dark rounded-lg p-3">
+                                    <div class="flex items-start">
+                                        <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3 flex-shrink-0">
+                                            <i class="fa fa-percent text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium">Fee Discounts</h3>
+                                            <p class="text-xs text-gray-400 mt-1">Top 10 players receive reduced fees on all tournament entries for 30 days</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-dark rounded-lg p-3">
+                                    <div class="flex items-start">
+                                        <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3 flex-shrink-0">
+                                            <i class="fa fa-key text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-sm font-medium">VIP Tournament Access</h3>
+                                            <p class="text-xs text-gray-400 mt-1">Exclusive tournaments with higher prize pools for top-ranked players</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- How Tournaments Work -->
+                    <div class="bg-dark-light rounded-xl border border-gray-800 overflow-hidden">
+                        <div class="p-5 border-b border-gray-800">
+                            <h2 class="text-lg font-semibold">How Tournaments Work</h2>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="space-y-3">
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">1</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Register for a Tournament</p>
+                                        <p class="text-xs text-gray-400">Pay the entry fee or join free tournaments to participate</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">2</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Compete in Games</p>
+                                        <p class="text-xs text-gray-400">Play the specified games to earn tournament points</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">3</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Climb the Leaderboard</p>
+                                        <p class="text-xs text-gray-400">Earn points based on your performance to move up the rankings</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="w-6 h-6 rounded-full gold-gradient flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
+                                        <span class="text-dark text-xs font-bold">4</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium">Win Prizes</p>
+                                        <p class="text-xs text-gray-400">Top performers receive ETH prizes and exclusive rewards</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-4 py-2 bg-dark rounded-lg border border-gray-700 text-sm font-medium hover:border-gold/50 transition-colors">
+                                Tournament Rules
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Responsible Gambling Footer Bar -->
+    <div class="bg-dark-light border-t border-gray-800 py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex flex-wrap justify-center gap-4 mb-4 md:mb-0">
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Gambling Addiction Help</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Self-Exclusion</a>
+                    <a href="#" class="text-xs text-gray-400 hover:text-gold transition-colors">Age Verification</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-gray-500">18+ Only</span>
+                    <div class="flex space-x-3">
+                        <img src="https://picsum.photos/id/103/40/20" alt="Age Verification" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/104/40/20" alt="Secure Gaming" class="h-5 opacity-70">
+                        <img src="https://picsum.photos/id/105/40/20" alt="Fair Gaming" class="h-5 opacity-70">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-dark-light border-t border-gray-800 py-10">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div class="md:col-span-2">
+                    <div class="text-gold text-2xl font-display font-bold mb-4">LegitChain</div>
+                    <p class="text-gray-400 text-sm mb-4 max-w-md">
+                        Compete in thrilling tournaments with blockchain-based prize pools. Our platform ensures fair competition and transparent payouts for all participants.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-telegram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-discord"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-gold transition-colors"><i class="fa fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Tournaments</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Live Now</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Upcoming</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Past Results</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Rules & Info</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Prizes & Rewards</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Responsible Gambling</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">License Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-gold transition-colors">Jurisdiction Restrictions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-xs">© 2023 LegitChain. All rights reserved.</p>
+                <p class="text-gray-500 text-xs mt-2 md:mt-0">
+                    Gambling can be addictive. Play responsibly. Licensed and regulated by the Gaming Authority under license number GL-2023-004.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Countdown timer for featured tournament
+            function updateCountdown() {
+                // Set end date for demonstration (2 days from now)
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + 2);
+                endDate.setHours(18, 45, 33);
+                
+                const now = new Date();
+                const diff = endDate - now;
+                
+                // Calculate days, hours, minutes, seconds
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Update DOM elements
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+            
+            // Update countdown immediately and then every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Tournament registration/join functionality
+            const joinButtons = document.querySelectorAll('button:contains("Join Now"), button:contains("Register Now")');
+            
+            joinButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalText = this.textContent;
+                    this.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> Processing...';
+                    this.disabled = true;
+                    
+                    // Simulate registration process
+                    setTimeout(() => {
+                        if (originalText.includes('Register')) {
+                            this.innerHTML = '<i class="fa fa-check mr-1"></i> Registered';
+                        } else {
+                            this.innerHTML = '<i class="fa fa-check mr-1"></i> Joined';
+                        }
+                        this.classList.remove('border-gray-700');
+                        this.classList.add('border-success', 'text-success');
+                    }, 1500);
+                });
+            });
+            
+            // Performance chart
+            const ctx = document.getElementById('tournamentChart').getContext('2d');
+            const tournamentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                    datasets: [{
+                        label: 'Tournament Points',
+                        data: [450, 620, 580, 720, 680, 950, 820, 1050],
+                        borderColor: '#b8860b',
+                        backgroundColor: 'rgba(184, 134, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

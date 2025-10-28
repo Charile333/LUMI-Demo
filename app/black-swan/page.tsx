@@ -883,17 +883,15 @@ export default function BlackSwanPage() {
                           <span className="text-amber-500">&gt;</span> Chart: {(() => {
                             const eventYear = new Date(selectedEvent.timestamp).getFullYear();
                             const asset = selectedEvent.asset.replace('/', '');
-                            let displayExchange = 'BINANCE';
                             let displaySymbol = asset;
                             
                             if (eventYear < 2017 && asset === 'BTCUSDT') {
-                              displayExchange = 'BITSTAMP';
                               displaySymbol = 'BTCUSD';
                             } else if (asset === 'ALTCOINS') {
                               displaySymbol = 'BTCUSDT';
                             }
                             
-                            return `${displayExchange}:${displaySymbol}`;
+                            return displaySymbol;
                           })()} | Event: {selectedEvent.date} | Window: {timeRange}h
                         </div>
                         <div className="flex items-center gap-2 text-xs font-mono">
@@ -976,7 +974,6 @@ export default function BlackSwanPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-500/60"></span>
-                  <span className="text-amber-400 font-mono text-xs">BINANCE API</span>
                 </div>
               </div>
 
