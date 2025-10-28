@@ -214,55 +214,7 @@ export default function LotteryPage() {
         </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Featured Game 1 */}
-                  <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
-                    <div className="relative">
-                      <img src="https://picsum.photos/id/1050/600/300" alt="Crypto Riches Slot" className="w-full h-40 object-cover" />
-                      <div className="absolute top-2 right-2 bg-[#b8860b] text-[#121212] text-xs font-bold px-2 py-1 rounded">{t('lottery.featured.hot')}</div>
-            </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{t('lottery.featured.cryptoRiches')}</h3>
-                        <div className="flex items-center">
-                          <i className="fa fa-star text-[#b8860b] text-xs"></i>
-                          <span className="text-xs ml-1">4.8/5</span>
-            </div>
-            </div>
-                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.cryptoRichesDesc')}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{t('lottery.featured.cryptoRichesMaxWin')}</span>
-                        <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          {t('lottery.featured.playNow')}
-                        </button>
-            </div>
-          </div>
-        </div>
-                  
-                  {/* Featured Game 2 */}
-                  <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
-                    <div className="relative">
-                      <img src="https://picsum.photos/id/1053/600/300" alt="Blockchain Blackjack" className="w-full h-40 object-cover" />
-                      <div className="absolute top-2 right-2 bg-[#121212] text-[#b8860b] text-xs font-bold px-2 py-1 rounded border border-[#b8860b]/30">{t('lottery.featured.live')}</div>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{t('lottery.featured.blockchainBlackjack')}</h3>
-                        <div className="flex items-center">
-                          <i className="fa fa-star text-[#b8860b] text-xs"></i>
-                          <span className="text-xs ml-1">4.9/5</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.blockchainBlackjackDesc')}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{t('lottery.featured.blackjackMinBet')}</span>
-                        <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
-                          {t('lottery.featured.playNow')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Featured Game 3 - Texas Hold'em Poker */}
+                  {/* Featured Game 1 - Texas Hold'em Poker */}
                   <div className="bg-[#1a1a1a] rounded-xl border border-[#b8860b]/40 overflow-hidden transition-all duration-300 hover:border-[#b8860b] hover:shadow-xl hover:shadow-[#b8860b]/20 hover:-translate-y-2 relative">
                     <div className="relative">
                       <img src="https://picsum.photos/id/1054/600/300" alt="Texas Hold'em Poker" className="w-full h-40 object-cover brightness-90" />
@@ -298,6 +250,54 @@ export default function LotteryPage() {
                           {t('lottery.featured.texasHoldemPlayers')}
                         </span>
                         <button className="px-4 py-1.5 rounded-md text-sm font-bold bg-gradient-to-r from-[#b8860b] to-[#d4af37] text-[#121212] hover:opacity-90 transition-all duration-200 shadow-lg shadow-[#b8860b]/30">
+                          {t('lottery.featured.playNow')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Featured Game 2 */}
+                  <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                    <div className="relative">
+                      <img src="https://picsum.photos/id/1050/600/300" alt="Crypto Riches Slot" className="w-full h-40 object-cover" />
+                      <div className="absolute top-2 right-2 bg-[#b8860b] text-[#121212] text-xs font-bold px-2 py-1 rounded">{t('lottery.featured.hot')}</div>
+            </div>
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium">{t('lottery.featured.cryptoRiches')}</h3>
+                        <div className="flex items-center">
+                          <i className="fa fa-star text-[#b8860b] text-xs"></i>
+                          <span className="text-xs ml-1">4.8/5</span>
+            </div>
+            </div>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.cryptoRichesDesc')}</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{t('lottery.featured.cryptoRichesMaxWin')}</span>
+                        <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
+                          {t('lottery.featured.playNow')}
+                        </button>
+            </div>
+          </div>
+        </div>
+                  
+                  {/* Featured Game 3 */}
+                  <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden transition-all duration-300 hover:border-[#b8860b]/50 hover:shadow-lg hover:shadow-[#b8860b]/5 hover:-translate-y-1">
+                    <div className="relative">
+                      <img src="https://picsum.photos/id/1053/600/300" alt="Blockchain Blackjack" className="w-full h-40 object-cover" />
+                      <div className="absolute top-2 right-2 bg-[#121212] text-[#b8860b] text-xs font-bold px-2 py-1 rounded border border-[#b8860b]/30">{t('lottery.featured.live')}</div>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium">{t('lottery.featured.blockchainBlackjack')}</h3>
+                        <div className="flex items-center">
+                          <i className="fa fa-star text-[#b8860b] text-xs"></i>
+                          <span className="text-xs ml-1">4.9/5</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-3">{t('lottery.featured.blockchainBlackjackDesc')}</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{t('lottery.featured.blackjackMinBet')}</span>
+                        <button className="px-3 py-1.5 rounded-md text-sm font-medium bg-[#121212] border border-gray-700 hover:border-[#b8860b]/50 transition-all duration-200">
                           {t('lottery.featured.playNow')}
                         </button>
                       </div>
