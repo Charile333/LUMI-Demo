@@ -57,6 +57,11 @@ export default function WalletProvider({ children }: WalletProviderProps) {
             setAddress(account);
             setIsConnected(true);
             
+            // ✅ 保存到 localStorage（刷新后恢复连接）
+            localStorage.setItem('wallet_connected', 'true');
+            localStorage.setItem('wallet_address', account);
+            console.log('✅ 钱包连接状态已保存');
+            
             // 初始化ClobClient
             try {
               // 创建ethers提供者和签名器 (ethers v5)
@@ -92,6 +97,10 @@ export default function WalletProvider({ children }: WalletProviderProps) {
           setAddress(account);
           setIsConnected(true);
           
+          // ✅ 更新 localStorage
+          localStorage.setItem('wallet_connected', 'true');
+          localStorage.setItem('wallet_address', account);
+          
           // 重新初始化ClobClient
           try {
             // 创建ethers提供者和签名器 (ethers v5)
@@ -111,6 +120,10 @@ export default function WalletProvider({ children }: WalletProviderProps) {
           setIsConnected(false);
           setIsClientInitialized(false);
           setClientError(null);
+          
+          // ✅ 清除 localStorage
+          localStorage.removeItem('wallet_connected');
+          localStorage.removeItem('wallet_address');
         }
       };
       
@@ -138,6 +151,10 @@ export default function WalletProvider({ children }: WalletProviderProps) {
       if (accounts && accounts.length > 0) {
         setAddress(accounts[0]);
         setIsConnected(true);
+        
+        // ✅ 保存连接状态到 localStorage
+        localStorage.setItem('wallet_connected', 'true');
+        localStorage.setItem('wallet_address', accounts[0]);
         
         // 初始化ClobClient
           try {
@@ -168,6 +185,10 @@ export default function WalletProvider({ children }: WalletProviderProps) {
     setIsConnected(false);
     setIsClientInitialized(false);
     setClientError(null);
+    
+    // ✅ 清除 localStorage
+    localStorage.removeItem('wallet_connected');
+    localStorage.removeItem('wallet_address');
   };
 
   // 提供钱包上下文值

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * 清理低活跃度话题的 API 端点
  * 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { ConnectWallet } from '@/components/wallet/ConnectWallet';
+import { MarketCard } from '@/components/MarketCard';
 import Link from 'next/link';
 
 // 合约配置
@@ -27,6 +28,19 @@ interface Market {
   reward: string;
   resolved: boolean;
   payouts?: string[];
+}
+
+interface MarketCardData {
+  id: number;
+  title: string;
+  description: string;
+  blockchain_status: string;
+  interested_users: number;
+  views: number;
+  activity_score: number;
+  condition_id?: string;
+  main_category?: string;
+  priority_level?: string;
 }
 
 export default function BlockchainMarketsPage() {
@@ -200,76 +214,29 @@ export default function BlockchainMarketsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {markets.map((market) => (
-              <div
-                key={market.questionId}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-              >
-                <div className="p-6">
-                  {/* Status Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        market.resolved
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {market.resolved ? '已解析' : '进行中'}
-                    </span>
-                    <span className="text-sm text-gray-500">{market.reward} USDC</span>
-                  </div>
+            {markets.map((market, index) => {
+              // 将 Market 转换为 MarketCardData 格式
+              const marketCardData: MarketCardData = {
+                id: index + 1,
+                title: market.title,
+                description: market.description,
+                blockchain_status: market.resolved ? 'created' : 'created', // 从区块链加载的都是已激活的
+                interested_users: Math.floor(Math.random() * 20) + 5, // 模拟感兴趣用户数
+                views: Math.floor(Math.random() * 500) + 100, // 模拟浏览量
+                activity_score: Math.floor(Math.random() * 100), // 模拟活跃度分数
+                condition_id: market.conditionId,
+                main_category: 'crypto',
+                priority_level: parseFloat(market.reward) > 100 ? 'hot' : undefined
+              };
 
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {market.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                    {market.description}
-                  </p>
-
-                  {/* Result (if resolved) */}
-                  {market.resolved && market.payouts && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">结果</div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-semibold">
-                          {market.payouts[0] === '1' ? '✅ YES' : '❌ NO'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/trade/${market.conditionId}`}
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 font-medium text-sm"
-                    >
-                      交易
-                    </Link>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(market.conditionId);
-                        alert('Market ID 已复制！');
-                      }}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm"
-                    >
-                      📋
-                    </button>
-                  </div>
-
-                  {/* Market ID */}
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="text-xs text-gray-500 font-mono truncate">
-                      ID: {market.conditionId.slice(0, 10)}...{market.conditionId.slice(-8)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              return (
+                <MarketCard 
+                  key={market.questionId}
+                  market={marketCardData}
+                  showPrice={true}
+                />
+              );
+            })}
           </div>
         )}
 

@@ -1,4 +1,4 @@
-// 📊 市场卡片组件（完整版）
+// 📊 市场卡片组件（完整版 - 带实时价格）
 
 'use client';
 
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { MarketActivationStatus } from './MarketActivationStatus';
 import { TradeButton } from './TradeButton';
 import { InterestedButton } from './InterestedButton';
+import { useMarketPrice } from '@/hooks/useMarketPrice';
 
 interface MarketCardProps {
   market: {
@@ -21,11 +22,18 @@ interface MarketCardProps {
     main_category?: string;
     priority_level?: string;
   };
+  showPrice?: boolean; // 是否显示价格（默认 true）
 }
 
-export function MarketCard({ market: initialMarket }: MarketCardProps) {
+export function MarketCard({ market: initialMarket, showPrice = true }: MarketCardProps) {
   const { t } = useTranslation();
   const [market, setMarket] = useState(initialMarket);
+  
+  // 🔥 获取实时价格（仅在已激活的市场获取）
+  const price = useMarketPrice(
+    market.id, 
+    showPrice && market.blockchain_status === 'created'
+  );
 
   // 处理感兴趣更新
   const handleInterestedUpdate = (newCount: number) => {
@@ -56,6 +64,13 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
       emerging: 'bg-orange-100 text-orange-800'
     };
     return colors[category] || 'bg-gray-100 text-gray-800';
+  };
+  
+  // 获取流动性指示器
+  const getLiquidityIndicator = (spread: number) => {
+    if (spread < 0.02) return { color: 'text-green-500', icon: '🟢', label: t('market.highLiquidity') };
+    if (spread < 0.10) return { color: 'text-yellow-500', icon: '🟡', label: t('market.mediumLiquidity') };
+    return { color: 'text-red-500', icon: '🔴', label: t('market.lowLiquidity') };
   };
 
   return (
@@ -113,6 +128,57 @@ export function MarketCard({ market: initialMarket }: MarketCardProps) {
           </div>
         )}
       </div>
+
+      {/* 价格显示区域 - 仅在已激活的市场显示 */}
+      {showPrice && market.blockchain_status === 'created' && !price.loading && (
+        <div className="px-6 pb-4">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100">
+            {/* YES/NO 概率 */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-sm font-medium text-gray-600">YES</span>
+                <span className="text-2xl font-bold text-green-600">
+                  {price.probability.toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span className="text-sm font-medium text-gray-600">NO</span>
+                <span className="text-2xl font-bold text-red-600">
+                  {(100 - price.probability).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+            
+            {/* 价格详情 */}
+            <div className="flex items-center justify-between text-xs text-gray-600 pt-2 border-t border-blue-200">
+              <div>
+                <span className="text-gray-500">买价:</span>
+                <span className="ml-1 font-semibold text-green-600">${price.bestBid.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">卖价:</span>
+                <span className="ml-1 font-semibold text-red-600">${price.bestAsk.toFixed(2)}</span>
+              </div>
+              <div className={getLiquidityIndicator(price.spread).color}>
+                <span>{getLiquidityIndicator(price.spread).icon}</span>
+                <span className="ml-1 font-semibold">
+                  {(price.spread * 100).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+            
+            {/* 价差警告 */}
+            {price.spread >= 0.10 && (
+              <div className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+                <span>⚠️</span>
+                <span>价差较大，交易成本较高</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 激活状态 */}
       <div className="px-6 pb-4">

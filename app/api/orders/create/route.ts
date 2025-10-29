@@ -204,34 +204,55 @@ export async function POST(request: NextRequest) {
 
     // 5. 更新市场数据（交易量和参与者）
     try {
-      // 计算总交易量
-      const { data: marketOrders } = await supabaseAdmin
-        .from('orders')
-        .select('quantity, price')
+      // 计算总交易量（基于成交的 trades 表）
+      const { data: trades } = await supabaseAdmin
+        .from('trades')
+        .select('amount, price')
         .eq('market_id', marketId);
       
-      const totalVolume = marketOrders?.reduce((sum, o) => {
-        return sum + (parseFloat(o.quantity) * parseFloat(o.price));
+      const totalVolume = trades?.reduce((sum, t) => {
+        return sum + (parseFloat(t.amount) * parseFloat(t.price));
       }, 0) || 0;
       
-      // 统计唯一参与者
-      const { data: uniqueUsers } = await supabaseAdmin
+      // 统计唯一参与者（订单创建者 + 交易参与者）
+      const { data: orderUsers } = await supabaseAdmin
         .from('orders')
         .select('user_address')
         .eq('market_id', marketId);
       
-      const participants = new Set(uniqueUsers?.map(o => o.user_address)).size;
+      const { data: tradeUsers } = await supabaseAdmin
+        .from('trades')
+        .select('maker_address, taker_address')
+        .eq('market_id', marketId);
+      
+      const allUsers = new Set<string>();
+      orderUsers?.forEach(o => allUsers.add(o.user_address.toLowerCase()));
+      tradeUsers?.forEach(t => {
+        allUsers.add(t.maker_address.toLowerCase());
+        allUsers.add(t.taker_address.toLowerCase());
+      });
+      
+      const participants = allUsers.size;
       
       // 更新市场表
-      await supabaseAdmin
+      const { error: updateError } = await supabaseAdmin
         .from('markets')
         .update({
-          volume: totalVolume.toFixed(2),
-          participants: participants
+          volume: totalVolume,
+          participants: participants,
+          updated_at: new Date().toISOString()
         })
         .eq('id', marketId);
       
-      console.log('✅ 市场数据已更新:', { totalVolume, participants });
+      if (updateError) {
+        console.error('❌ 更新市场数据失败:', updateError);
+      } else {
+        console.log('✅ 市场数据已更新:', { 
+          marketId, 
+          totalVolume: totalVolume.toFixed(2), 
+          participants 
+        });
+      }
     } catch (error) {
       console.error('⚠️ 更新市场数据失败（非致命错误）:', error);
     }

@@ -3,6 +3,9 @@ import { fetchPolymarketMarkets } from '@/lib/polymarket/api';
 import { transformPolymarketMarkets, filterMarketsByCategoryType } from '@/lib/polymarket/transformer';
 import { CategoryType } from '@/lib/types/market';
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/polymarket/markets
  * 获取 Polymarket 的真实市场数据并转换为项目格式

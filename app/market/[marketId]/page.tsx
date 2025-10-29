@@ -127,40 +127,64 @@ export default function MarketDetailPage() {
   }, [marketId]);
 
   // 2. 加载初始价格（HTTP）- 作为后备
-  useEffect(() => {
+  const fetchPrices = async () => {
     if (!marketId) return;
 
-    const fetchPrices = async () => {
-      try {
-        const response = await fetch(`/api/orders/book?marketId=${marketId}&outcome=1`);
-        const data = await response.json();
+    try {
+      // 添加时间戳避免缓存
+      const response = await fetch(`/api/orders/book?marketId=${marketId}&outcome=1&t=${Date.now()}`);
+      const data = await response.json();
 
-        if (data.success && data.orderBook) {
-          const bestBid = data.orderBook.buy?.[0]?.price
-            ? parseFloat(data.orderBook.buy[0].price)
-            : 0.49;
+      if (data.success && data.orderBook) {
+        let bestBid = data.orderBook.bids?.[0]?.price
+          ? parseFloat(data.orderBook.bids[0].price)
+          : 0;
 
-          const bestAsk = data.orderBook.sell?.[0]?.price
-            ? parseFloat(data.orderBook.sell[0].price)
-            : 0.51;
+        let bestAsk = data.orderBook.asks?.[0]?.price
+          ? parseFloat(data.orderBook.asks[0].price)
+          : 0;
 
-          const midPrice = (bestBid + bestAsk) / 2;
-
-          setPrices({
-            yes: midPrice,
-            no: 1 - midPrice,
-            probability: midPrice * 100,
-            bestBid,
-            bestAsk
-          });
+        // 处理单边订单情况
+        if (bestBid === 0 && bestAsk > 0) {
+          bestBid = Math.max(0.01, bestAsk - 0.05);
+        } else if (bestAsk === 0 && bestBid > 0) {
+          bestAsk = Math.min(0.99, bestBid + 0.05);
+        } else if (bestBid === 0 && bestAsk === 0) {
+          bestBid = 0.49;
+          bestAsk = 0.51;
         }
-      } catch (err) {
-        console.error('获取价格失败:', err);
-      }
-    };
 
-    // 只在初始加载时获取一次
+        const midPrice = (bestBid + bestAsk) / 2;
+
+        setPrices({
+          yes: midPrice,
+          no: 1 - midPrice,
+          probability: midPrice * 100,
+          bestBid,
+          bestAsk
+        });
+        
+        console.log('📊 价格已更新（HTTP）:', { 
+          marketId, 
+          bestBid, 
+          bestAsk, 
+          midPrice: midPrice.toFixed(4),
+          probability: (midPrice * 100).toFixed(1) + '%'
+        });
+      }
+    } catch (err) {
+      console.error('获取价格失败:', err);
+    }
+  };
+
+  useEffect(() => {
+    // 初始加载价格
     fetchPrices();
+    
+    // 每10秒刷新一次价格（更频繁，确保交易后快速更新）
+    const interval = setInterval(fetchPrices, 10000);
+    
+    return () => clearInterval(interval);
   }, [marketId]);
 
   // 3. 🔥 WebSocket 实时价格更新
@@ -414,34 +438,84 @@ export default function MarketDetailPage() {
           </div>
 
           {/* YES/NO 概率显示 */}
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex items-center px-6 py-3 bg-green-500/10 border-2 border-green-500/30 rounded-xl">
-              <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
-              <div>
-                <span className="text-sm font-medium text-gray-300 mr-2">YES</span>
-                <span className="text-2xl font-bold text-green-400">
-                  {prices.probability.toFixed(1)}%
-                </span>
+          <div className="space-y-3">
+            {/* 主要价格显示 */}
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex items-center px-6 py-3 bg-green-500/10 border-2 border-green-500/30 rounded-xl">
+                <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                <div>
+                  <span className="text-sm font-medium text-gray-300 mr-2">YES</span>
+                  <span className="text-2xl font-bold text-green-400">
+                    {prices.probability.toFixed(1)}%
+                  </span>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ${prices.yes.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center px-6 py-3 bg-red-500/10 border-2 border-red-500/30 rounded-xl">
+                <div className="w-3 h-3 rounded-full bg-red-500 mr-3"></div>
+                <div>
+                  <span className="text-sm font-medium text-gray-300 mr-2">NO</span>
+                  <span className="text-2xl font-bold text-red-400">
+                    {(100 - prices.probability).toFixed(1)}%
+                  </span>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ${prices.no.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+              {/* WebSocket 连接状态 */}
+              <div className={`flex items-center px-3 py-2 rounded-lg text-xs ${
+                wsConnected ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-500'
+              }`}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  wsConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+                }`}></div>
+                {wsConnected ? t('orderbook.realtimeConnection') : t('common.loading')}
               </div>
             </div>
-            <div className="flex items-center px-6 py-3 bg-red-500/10 border-2 border-red-500/30 rounded-xl">
-              <div className="w-3 h-3 rounded-full bg-red-500 mr-3"></div>
-              <div>
-                <span className="text-sm font-medium text-gray-300 mr-2">NO</span>
-                <span className="text-2xl font-bold text-red-400">
-                  {(100 - prices.probability).toFixed(1)}%
+            
+            {/* 价格详情 - 买价/卖价/价差 */}
+            <div className="flex flex-wrap gap-2 items-center text-xs">
+              <div className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                <span className="text-gray-400 mr-2">买价:</span>
+                <span className="text-green-400 font-semibold">${prices.bestBid.toFixed(2)}</span>
+              </div>
+              <div className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                <span className="text-gray-400 mr-2">卖价:</span>
+                <span className="text-red-400 font-semibold">${prices.bestAsk.toFixed(2)}</span>
+              </div>
+              <div className={`px-3 py-1.5 rounded-lg border ${
+                (prices.bestAsk - prices.bestBid) < 0.02
+                  ? 'bg-green-500/10 border-green-500/30 text-green-400'
+                  : (prices.bestAsk - prices.bestBid) < 0.10
+                  ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400'
+                  : 'bg-red-500/10 border-red-500/30 text-red-400'
+              }`}>
+                <span className="text-gray-400 mr-2">价差:</span>
+                <span className="font-semibold">
+                  ${(prices.bestAsk - prices.bestBid).toFixed(3)} ({((prices.bestAsk - prices.bestBid) * 100).toFixed(1)}%)
                 </span>
+                {(prices.bestAsk - prices.bestBid) < 0.02 && <span className="ml-1">🟢</span>}
+                {(prices.bestAsk - prices.bestBid) >= 0.02 && (prices.bestAsk - prices.bestBid) < 0.10 && <span className="ml-1">🟡</span>}
+                {(prices.bestAsk - prices.bestBid) >= 0.10 && <span className="ml-1">🔴</span>}
               </div>
             </div>
-            {/* WebSocket 连接状态 */}
-            <div className={`flex items-center px-3 py-2 rounded-lg text-xs ${
-              wsConnected ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-500'
-            }`}>
-              <div className={`w-2 h-2 rounded-full mr-2 ${
-                wsConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
-              }`}></div>
-              {wsConnected ? t('orderbook.realtimeConnection') : t('common.loading')}
-            </div>
+            
+            {/* 价差警告 */}
+            {(prices.bestAsk - prices.bestBid) >= 0.10 && (
+              <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2">
+                <span className="text-amber-400 text-sm">⚠️</span>
+                <div className="flex-1">
+                  <div className="text-sm text-amber-400 font-medium">价差较大</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    当前价差为 {((prices.bestAsk - prices.bestBid) * 100).toFixed(1)}%，交易成本较高。
+                    买入价: ${prices.bestAsk.toFixed(2)} | 卖出价: ${prices.bestBid.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -506,7 +580,12 @@ export default function MarketDetailPage() {
                 currentPriceNo={prices.no}
                 bestBid={prices.bestBid}
                 bestAsk={prices.bestAsk}
-                onSuccess={fetchMarket}
+                onSuccess={async () => {
+                  // 订单成功后立即刷新市场数据和价格
+                  await fetchMarket();
+                  await fetchPrices();
+                  console.log('✅ 订单成功，已刷新市场数据和价格');
+                }}
               />
             </div>
           </div>

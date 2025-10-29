@@ -4,8 +4,12 @@ import { Pool, QueryResult } from 'pg';
 // 数据库连接池
 let pool: Pool | null = null;
 
+// 检测是否在 Vercel serverless 环境
+const isVercel = process.env.VERCEL === '1';
+
 /**
  * 获取数据库连接池
+ * 针对 Vercel serverless 环境优化
  */
 export function getPool(): Pool {
   if (!pool) {
@@ -20,19 +24,34 @@ export function getPool(): Pool {
       throw new Error('DATABASE_URL 环境变量未设置 - 订单系统需要 PostgreSQL 数据库连接');
     }
     
-    pool = new Pool({
+    // Vercel serverless 环境优化配置
+    const poolConfig = isVercel ? {
       connectionString,
-      max: 20, // 最大连接数
+      max: 1, // serverless 环境中减少连接数
+      idleTimeoutMillis: 10000, // 减少空闲超时
+      connectionTimeoutMillis: 5000, // 增加连接超时
+      ssl: {
+        rejectUnauthorized: false // Supabase 需要
+      }
+    } : {
+      connectionString,
+      max: 20, // 开发环境保持较多连接
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
-    });
+    };
+    
+    pool = new Pool(poolConfig);
     
     // 错误处理
     pool.on('error', (err) => {
       console.error('❌ PostgreSQL 连接池错误:', err);
+      // 在 serverless 环境中重置连接池
+      if (isVercel) {
+        pool = null;
+      }
     });
     
-    console.log('✅ PostgreSQL 连接池已创建');
+    console.log(`✅ PostgreSQL 连接池已创建 (${isVercel ? 'Vercel' : 'Local'} 模式)`);
   }
   
   return pool;
