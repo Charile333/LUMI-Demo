@@ -273,10 +273,10 @@
     "helpCenter": "帮助中心",
     "games": "游戏",
     "sports": "体育",
-    "liveCasino": "真人娱乐场",
+    "liveCasino": "实时游戏",
     "tournaments": "锦标赛",
     "promotions": "促销活动",
-    "backToMarket": "返回市场",
+    "backToMarket": "返回LUMI竞技场",
     "lotteryGame": "彩票游戏",
     "balance": "余额",
     "banner": {
@@ -289,7 +289,7 @@
       "title": "游戏分类",
       "slots": "老虎机",
       "slotsCount": "48 个游戏",
-      "liveCasinoTitle": "真人娱乐场",
+      "liveCasinoTitle": "实时游戏",
       "liveCasinoCount": "12 个桌子",
       "sportsbook": "体育博彩",
       "sportsbookCount": "24 项运动",
@@ -388,7 +388,7 @@
         "howItWorks": "玩法说明",
         "support": "客服支持"
       },
-      "backToLottery": "返回博彩",
+      "backToLottery": "返回竞技场",
       "connectWallet": "连接钱包",
       "title": "Fortune Chain 彩票",
       "subtitle": "可证明公平的区块链彩票，透明开奖，即时到账至您的钱包",
@@ -462,17 +462,17 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "brandDescription": "持牌区块链博彩平台，提供公平可证明的游戏、透明运营和即时支付。请理性博彩。",
-      "description": "持牌区块链博彩平台，提供公平可证明的游戏、透明运营和即时支付。请理性博彩。",
+      "brandDescription": "",
+      "description": "",
       "gamesSection": "游戏",
       "gamesTitle": "游戏",
       "slotsLink": "老虎机",
-      "liveCasinoLink": "真人娱乐场",
+      "liveCasinoLink": "实时游戏",
       "sportsBettingLink": "体育博彩",
       "esportsLink": "电竞",
       "tournamentsLink": "锦标赛",
       "slots": "老虎机",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "sportsBetting": "体育博彩",
       "esports": "电竞",
       "tournaments": "锦标赛",
@@ -520,7 +520,7 @@
     }
   },
   "landing": {
-    "soon": "即将推出",
+    "soon": "LUMI",
     "betaTag": "测试版即将推出 (Q4)",
     "description": "加密货币市场工具——专注于链上黑天鹅风险信号、不确定性量化测量、博彩平台和预测市场平台",
     "scrollDown": "向下滚动",
@@ -590,7 +590,7 @@
     "nav": {
       "games": "游戏",
       "sports": "体育",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "tournaments": "锦标赛",
       "promotions": "促销活动",
       "backToMarkets": "返回市场"
@@ -749,7 +749,7 @@
     }
   },
   "liveCasino": {
-    "title": "真人娱乐场",
+    "title": "实时游戏",
     "subtitle": "在区块链上体验专业荷官的实时游戏",
     "searchTables": "搜索桌台...",
     "banner": {
@@ -763,7 +763,7 @@
     "nav": {
       "games": "游戏",
       "sports": "体育",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "tournaments": "锦标赛",
       "promotions": "促销活动",
       "backToMarkets": "返回市场"
@@ -782,7 +782,7 @@
     },
     "categories": {
       "title": "游戏分类",
-      "allLive": "所有真人游戏",
+      "allLive": "所有实时游戏",
       "blackjack": "二十一点",
       "roulette": "轮盘",
       "baccarat": "百家乐",
@@ -831,8 +831,8 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "体验专业荷官的真人娱乐场游戏，所有游戏都在区块链上，确保完全透明和公平。",
-      "liveCasinoSection": "真人娱乐场",
+      "description": "",
+      "liveCasinoSection": "实时游戏",
       "blackjack": "二十一点",
       "roulette": "轮盘",
       "baccarat": "百家乐",
@@ -867,7 +867,7 @@
     "nav": {
       "games": "游戏",
       "sports": "体育",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "tournaments": "锦标赛",
       "promotions": "促销活动",
       "backToMarkets": "返回市场"
@@ -995,7 +995,7 @@
     "nav": {
       "games": "游戏",
       "sports": "体育",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "tournaments": "锦标赛",
       "promotions": "促销活动",
       "backToMarkets": "返回市场"
@@ -1257,7 +1257,7 @@
       "gamesSection": "游戏",
       "slots": "老虎机",
       "tableGames": "桌游",
-      "liveCasino": "真人娱乐场",
+      "liveCasino": "实时游戏",
       "poker": "扑克",
       "sportsBetting": "体育博彩",
       "supportSection": "支持",

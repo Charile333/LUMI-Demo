@@ -273,10 +273,10 @@
     "helpCenter": "Help Center",
     "games": "Games",
     "sports": "Sports",
-    "liveCasino": "Live Casino",
+    "liveCasino": "Live Gaming",
     "tournaments": "Tournaments",
     "promotions": "Promotions",
-    "backToMarket": "Back to Market",
+    "backToMarket": "Back to LUMI Arena",
     "lotteryGame": "Lottery Game",
     "balance": "Balance",
     "banner": {
@@ -289,7 +289,7 @@
       "title": "Game Categories",
       "slots": "Slots",
       "slotsCount": "48 Games",
-      "liveCasinoTitle": "Live Casino",
+      "liveCasinoTitle": "Live Gaming",
       "liveCasinoCount": "12 Tables",
       "sportsbook": "Sportsbook",
       "sportsbookCount": "24 Sports",
@@ -388,7 +388,7 @@
         "howItWorks": "How It Works",
         "support": "Support"
       },
-      "backToLottery": "Back to Lottery",
+      "backToLottery": "Back to Arena",
       "connectWallet": "Connect Wallet",
       "title": "Fortune Chain Lottery",
       "subtitle": "Provably fair blockchain lottery with transparent draws and instant payouts directly to your wallet",
@@ -462,17 +462,17 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "brandDescription": "A licensed blockchain gambling platform offering provably fair games, transparent operations, and instant payouts. Gamble responsibly.",
-      "description": "A licensed blockchain gambling platform offering provably fair games, transparent operations, and instant payouts. Gamble responsibly.",
+      "brandDescription": "",
+      "description": "",
       "gamesSection": "Games",
       "gamesTitle": "Games",
       "slotsLink": "Slots",
-      "liveCasinoLink": "Live Casino",
+      "liveCasinoLink": "Live Gaming",
       "sportsBettingLink": "Sports Betting",
       "esportsLink": "Esports",
       "tournamentsLink": "Tournaments",
       "slots": "Slots",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "sportsBetting": "Sports Betting",
       "esports": "Esports",
       "tournaments": "Tournaments",
@@ -655,7 +655,7 @@
     "nav": {
       "games": "Games",
       "sports": "Sports",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "tournaments": "Tournaments",
       "promotions": "Promotions",
       "backToMarkets": "Back to Markets"
@@ -815,7 +815,7 @@
     }
   },
   "liveCasino": {
-    "title": "Live Casino",
+    "title": "Live Gaming",
     "subtitle": "Experience real-time gaming with professional dealers, all on the blockchain",
     "searchTables": "Search tables...",
     "banner": {
@@ -829,7 +829,7 @@
     "nav": {
       "games": "Games",
       "sports": "Sports",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "tournaments": "Tournaments",
       "promotions": "Promotions",
       "backToMarkets": "Back to Markets"
@@ -837,7 +837,7 @@
     "balance": "Balance",
     "categories": {
       "title": "Game Categories",
-      "allLive": "All Live Games",
+      "allLive": "All Live Gaming",
       "blackjack": "Blackjack",
       "roulette": "Roulette",
       "baccarat": "Baccarat",
@@ -897,8 +897,8 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "Experience live casino gaming with professional dealers, all on the blockchain for complete transparency and fairness.",
-      "liveCasinoSection": "Live Casino",
+      "description": "",
+      "liveCasinoSection": "Live Gaming",
       "blackjack": "Blackjack",
       "roulette": "Roulette",
       "baccarat": "Baccarat",
@@ -933,7 +933,7 @@
     "nav": {
       "games": "Games",
       "sports": "Sports",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "tournaments": "Tournaments",
       "promotions": "Promotions",
       "backToMarkets": "Back to Markets"
@@ -1061,7 +1061,7 @@
     "nav": {
       "games": "Games",
       "sports": "Sports",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "tournaments": "Tournaments",
       "promotions": "Promotions",
       "backToMarkets": "Back to Markets"
@@ -1298,7 +1298,7 @@
       "gamesSection": "Games",
       "slots": "Slots",
       "tableGames": "Table Games",
-      "liveCasino": "Live Casino",
+      "liveCasino": "Live Gaming",
       "poker": "Poker",
       "sportsBetting": "Sports Betting",
       "supportSection": "Support",

@@ -36,11 +36,19 @@ const NavLink = ({
 interface NavbarProps {
   activeCategory?: string;
   onCategoryChange?: (categoryId: string) => void;
+  subCategories?: Array<{ id: string; name: string }>;
+  activeSubCategory?: string;
+  onSubCategoryChange?: (subCategoryId: string) => void;
 }
 
-const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps) => {
+const Navbar = ({ 
+  activeCategory = 'automotive', 
+  onCategoryChange,
+  subCategories = [],
+  activeSubCategory = 'all',
+  onSubCategoryChange
+}: NavbarProps) => {
   const { t } = useTranslation()
-  const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
 
   // 六大赛道分类数据
@@ -59,8 +67,8 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
       // 如果提供了回调函数，使用回调（主页模式）
       onCategoryChange(categoryId);
     } else {
-      // 如果没有提供回调函数，使用路由跳转（详细页面模式）
-      router.push(`/?category=${categoryId}`);
+      // 如果没有提供回调函数，使用路由跳转到市场分类页面
+      router.push(`/markets/${categoryId}`);
     }
   }
 
@@ -69,8 +77,8 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
       <div className="container mx-auto px-4">
         {/* Top Row with Logo, Search, and Actions */}
         <div className="flex items-center justify-between py-[0.375rem] border-b border-secondary/20 gap-4" style={{height: '80px'}}>
-          {/* Left Side: Logo and Search - 固定在左上角 */}
-          <div className="flex items-center flex-grow gap-4">
+          {/* Left Side: Logo - 固定在左上角 */}
+          <div className="flex items-center">
             {/* Logo with Image */}
             <button 
               onClick={() => handleCategoryClick('automotive')}
@@ -87,29 +95,13 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
                 />
               </div>
             </button>
-
-            {/* Search Bar */}
-            <div className="relative flex-grow min-w-0 hidden lg:block">
-              <input
-                type="text"
-                placeholder={t('nav.searchPlaceholder')}
-                className="w-full py-[0.55rem] px-[1.1rem] bg-gray-50 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 text-[0.935rem]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-[1.1rem] w-[1.1rem] text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
           </div>
           
           {/* Right Side: Action Buttons */}
           <div className="flex items-center space-x-3">
-            {/* 余额显示 */}
+            {/* 余额显示 - 使用suppressHydrationWarning避免服务端渲染不匹配 */}
             <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-              <span className="text-sm text-gray-600">{t('nav.balance')}:</span>
+              <span className="text-sm text-gray-600" suppressHydrationWarning>{t('nav.balance')}:</span>
               <span className="text-sm font-bold text-gray-900">$0.00</span>
             </div>
             
@@ -119,29 +111,28 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
             {/* 钱包连接组件 */}
             <WalletConnect />
             
-            {/* 用户菜单 */}
-            <button className="p-2 text-gray-700 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        {/* Mobile Search Bar */}
-        <div className="py-2.5 lg:hidden border-b border-secondary/20">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={t('nav.searchPlaceholder')}
-              className="w-full py-2 px-4 bg-gray-50 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+            {/* 用户菜单下拉 */}
+            <div className="relative group">
+              <button className="p-2 text-gray-700 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                </svg>
+              </button>
+              {/* 下拉菜单 */}
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="py-2">
+                  <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" suppressHydrationWarning>
+                    {t('profile.title')}
+                  </a>
+                  <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" suppressHydrationWarning>
+                    {t('nav.balance')}
+                  </a>
+                  <div className="border-t border-gray-200 my-1"></div>
+                  <button className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                    {t('wallet.disconnect')}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -244,7 +235,7 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
         </div>
 
         {/* Categories Navigation - 垂直拉伸5% */}
-        <div className="py-[0.656rem] overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <div className="py-[0.656rem] overflow-x-auto whitespace-nowrap scrollbar-hide border-b border-secondary/20">
           <div className="flex space-x-6 min-w-max">
             {categories.map((category) => (
               <NavLink
@@ -262,6 +253,27 @@ const Navbar = ({ activeCategory = 'automotive', onCategoryChange }: NavbarProps
             </button>
           </div>
         </div>
+
+        {/* Sub-Categories Navigation - 如果有子分类则显示 */}
+        {subCategories.length > 0 && (
+          <div className="py-2 overflow-x-auto whitespace-nowrap scrollbar-hide bg-white border-t border-gray-200">
+            <div className="flex space-x-3 min-w-max">
+              {subCategories.map((subCat) => (
+                <button
+                  key={subCat.id}
+                  onClick={() => onSubCategoryChange?.(subCat.id)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeSubCategory === subCat.id
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white border border-gray-300 text-gray-700 hover:border-purple-400 hover:text-purple-600'
+                  }`}
+                >
+                  {subCat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   )
