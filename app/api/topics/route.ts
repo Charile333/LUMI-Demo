@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+// 强制动态渲染
+export const dynamic = 'force-dynamic';
+
 // 获取所有话题
 export async function GET() {
   try {
