@@ -348,7 +348,7 @@ export default function LumiSoonPage() {
         }
       `}} />
       <Script src="/wormhole-background.js" strategy="afterInteractive" />
-      <div className="font-sans relative min-h-screen bg-black" data-page="landing">
+      <div className="font-sans relative min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#0a0a0a] to-[#080808]" data-page="landing">
       {/* 左上角Logo - 固定在顶部，与语言切换器垂直居中对齐 */}
       <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)' }}>
         <Image 
@@ -908,7 +908,11 @@ export default function LumiSoonPage() {
       {/* 添加必要的样式 */}
       <style jsx global>{`
         body {
-          background: #000 !important;
+          background: #0a0a0a !important;
+          background-image: 
+            radial-gradient(circle at 20% 30%, rgba(30, 30, 35, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(25, 25, 30, 0.2) 0%, transparent 50%),
+            linear-gradient(135deg, #0d0d0d 0%, #0a0a0a 50%, #080808 100%) !important;
           padding-top: 0 !important;
           overflow-y: auto;
           overflow-x: hidden;
@@ -935,7 +939,7 @@ export default function LumiSoonPage() {
           height: 100%;
           z-index: 1;
           pointer-events: none;
-          background-color: #000000;
+          background: linear-gradient(135deg, #0d0d0d 0%, #0a0a0a 50%, #080808 100%);
         }
 
         /* 只在landing页面显示cascading waves */
@@ -1004,7 +1008,7 @@ export default function LumiSoonPage() {
         }
 
         ::-webkit-scrollbar-track {
-          background: #000000;
+          background: #0d0d0d;
           border: 1px solid #1a4d2e;
         }
 
@@ -1020,13 +1024,13 @@ export default function LumiSoonPage() {
         }
 
         ::-webkit-scrollbar-corner {
-          background: #000000;
+          background: #0d0d0d;
         }
 
         /* Firefox 滚动条 */
         * {
           scrollbar-width: thin;
-          scrollbar-color: #0f5132 #000000;
+          scrollbar-color: #0f5132 #0d0d0d;
         }
 
         /* 动态下滑指引样式 - 双V形箭头 */

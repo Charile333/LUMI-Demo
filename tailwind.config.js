@@ -37,6 +37,13 @@ module.exports = {
         accent: {
           DEFAULT: '#1f2937',
           50: 'rgba(31, 41, 55, 0.5)'
+        },
+        background: {
+          darkest: '#080808',
+          darker: '#0a0a0a',
+          dark: '#0d0d0d',
+          elevated: '#111111',
+          card: '#151515'
         }
       },
       fontFamily: {
