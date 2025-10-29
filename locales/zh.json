@@ -655,7 +655,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "持牌区块链体育博彩平台，提供透明赔率、实时投注和即时支付。请理性博彩。",
+      "description": "",
       "sportsSection": "体育",
       "football": "足球",
       "basketball": "篮球",
@@ -959,7 +959,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "在我们的区块链游戏平台上享受独家促销和红利。所有优惠均具有透明条款和公平条件。",
+      "description": "",
       "promotionsSection": "促销活动",
       "newPlayerOffers": "新玩家优惠",
       "depositBonuses": "存款红利",
@@ -1117,7 +1117,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "参加激动人心的锦标赛，赢取基于区块链的奖金池。我们的平台确保公平竞争和透明的所有参与者奖励。",
+      "description": "",
       "tournamentsSection": "锦标赛",
       "liveNow": "正在进行",
       "upcoming": "即将开始",

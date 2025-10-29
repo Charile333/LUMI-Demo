@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     console.log('[API] 获取用户订单:', { address, status, limit });
     
     // 构建查询
-    let whereClause = 'WHERE o.maker_address = $1';
+    let whereClause = 'WHERE o.user_address = $1';
     const params: any[] = [address.toLowerCase()];
     
     if (status && status !== 'all') {

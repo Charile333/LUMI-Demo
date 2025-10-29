@@ -41,46 +41,39 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
   
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-          <div className="text-gray-500">加载订单簿...</div>
-        </div>
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto mb-2"></div>
+        <div className="text-gray-400">加载订单簿...</div>
       </div>
     );
   }
   
   if (!orderBook) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="text-center py-8 text-gray-500">暂无订单数据</div>
-      </div>
+      <div className="text-center py-8 text-gray-400">暂无订单数据</div>
     );
   }
   
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold">订单簿</h3>
-        
-        {/* YES/NO 切换 */}
         <div className="flex gap-2">
           <button
             onClick={() => setOutcome(1)}
-            className={`px-3 py-1 rounded-lg text-sm font-semibold ${
+            className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
               outcome === 1
-                ? 'bg-purple-500 text-white'
-                : 'bg-gray-100 text-gray-600'
+                ? 'bg-green-500 text-white'
+                : 'bg-white/5 border border-white/10 text-gray-400 hover:border-green-500/50'
             }`}
           >
             YES
           </button>
           <button
             onClick={() => setOutcome(0)}
-            className={`px-3 py-1 rounded-lg text-sm font-semibold ${
+            className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
               outcome === 0
-                ? 'bg-purple-500 text-white'
-                : 'bg-gray-100 text-gray-600'
+                ? 'bg-red-500 text-white'
+                : 'bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/50'
             }`}
           >
             NO
@@ -89,7 +82,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       </div>
       
       {/* 表头 */}
-      <div className="grid grid-cols-3 gap-2 mb-2 text-xs font-semibold text-gray-500 border-b pb-2">
+      <div className="grid grid-cols-3 gap-2 mb-2 text-xs font-semibold text-gray-400 border-b border-white/10 pb-2">
         <div>价格</div>
         <div className="text-right">数量</div>
         <div className="text-right">订单数</div>
@@ -97,7 +90,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       
       {/* 卖单（从低到高，反序显示） */}
       <div className="mb-4">
-        <div className="text-xs font-semibold text-red-600 mb-1">
+        <div className="text-xs font-semibold text-red-400 mb-1">
           卖单 (ASK)
         </div>
         {orderBook.asks && orderBook.asks.length > 0 ? (
@@ -105,11 +98,11 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
             {orderBook.asks.slice(0, 10).reverse().map((ask: any, i: number) => {
               const totalValue = parseFloat(ask.price) * parseFloat(ask.total_amount);
               return (
-                <div key={i} className="grid grid-cols-3 gap-2 text-sm hover:bg-red-50 rounded px-2 py-1 transition-colors">
-                  <div className="text-red-600 font-mono font-semibold">
+                <div key={i} className="grid grid-cols-3 gap-2 text-sm hover:bg-red-500/10 rounded px-2 py-1 transition-colors">
+                  <div className="text-red-400 font-mono font-semibold">
                     {parseFloat(ask.price).toFixed(3)}
                   </div>
-                  <div className="text-right text-gray-700">
+                  <div className="text-right text-gray-300">
                     {parseFloat(ask.total_amount).toFixed(0)}
                   </div>
                   <div className="text-right text-gray-500 text-xs">
@@ -126,9 +119,9 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       
       {/* 价差 */}
       {orderBook.spread !== null && (
-        <div className="py-2 px-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg text-center mb-4 border border-purple-200">
-          <div className="text-xs text-gray-600 mb-1">价差</div>
-          <div className="text-lg font-bold text-purple-600">
+        <div className="py-2 px-3 bg-white/5 border border-amber-400/30 rounded-lg text-center mb-4">
+          <div className="text-xs text-gray-400 mb-1">价差</div>
+          <div className="text-lg font-bold text-amber-400">
             {orderBook.spread.toFixed(4)}
           </div>
           <div className="text-xs text-gray-500">
@@ -139,7 +132,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       
       {/* 买单（从高到低） */}
       <div>
-        <div className="text-xs font-semibold text-green-600 mb-1">
+        <div className="text-xs font-semibold text-green-400 mb-1">
           买单 (BID)
         </div>
         {orderBook.bids && orderBook.bids.length > 0 ? (
@@ -147,11 +140,11 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
             {orderBook.bids.slice(0, 10).map((bid: any, i: number) => {
               const totalValue = parseFloat(bid.price) * parseFloat(bid.total_amount);
               return (
-                <div key={i} className="grid grid-cols-3 gap-2 text-sm hover:bg-green-50 rounded px-2 py-1 transition-colors">
-                  <div className="text-green-600 font-mono font-semibold">
+                <div key={i} className="grid grid-cols-3 gap-2 text-sm hover:bg-green-500/10 rounded px-2 py-1 transition-colors">
+                  <div className="text-green-400 font-mono font-semibold">
                     {parseFloat(bid.price).toFixed(3)}
                   </div>
-                  <div className="text-right text-gray-700">
+                  <div className="text-right text-gray-300">
                     {parseFloat(bid.total_amount).toFixed(0)}
                   </div>
                   <div className="text-right text-gray-500 text-xs">
@@ -167,7 +160,7 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
       </div>
       
       {/* 更新时间 */}
-      <div className="mt-4 pt-3 border-t text-xs text-gray-500 text-center">
+      <div className="mt-4 pt-3 border-t border-white/10 text-xs text-gray-500 text-center">
         最后更新: {new Date(orderBook.updatedAt).toLocaleTimeString()}
       </div>
     </div>

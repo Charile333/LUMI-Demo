@@ -15,6 +15,7 @@ interface OrderFormProps {
   currentPriceNo?: number;
   bestBid?: number;  // 最佳买价（用户可以卖出的价格）
   bestAsk?: number;  // 最佳卖价（用户需要买入的价格）
+  onSuccess?: () => void;  // 订单成功回调
 }
 
 export default function OrderForm({ 
@@ -23,7 +24,8 @@ export default function OrderForm({
   currentPriceYes = 0.5,
   currentPriceNo = 0.5,
   bestBid = 0.49,
-  bestAsk = 0.51
+  bestAsk = 0.51,
+  onSuccess
 }: OrderFormProps) {
   const { address: account, isConnected } = useWallet();
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
@@ -101,6 +103,11 @@ export default function OrderForm({
         
         // 重置表单
         setAmount('10');
+        
+        // 触发回调刷新页面数据
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         throw new Error(result.error);
       }
@@ -128,30 +135,30 @@ export default function OrderForm({
     <div>
       {/* 钱包状态提示 */}
       {!isConnected ? (
-        <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-          <p className="text-sm text-purple-800 text-center">
+        <div className="mb-4 p-4 bg-amber-400/10 border border-amber-400/30 rounded-lg">
+          <p className="text-sm text-amber-400 text-center">
             请先在页面顶部连接钱包
           </p>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-          <div className="text-sm text-purple-800">
+        <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
+          <div className="text-sm text-gray-300">
             已连接: {account?.substring(0, 6)}...{account?.substring(38)}
           </div>
         </div>
       )}
       
       {/* 市场实时价格 */}
-      <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-        <div className="text-xs font-semibold text-purple-900 mb-2">实时市场价格</div>
+      <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
+        <div className="text-xs font-semibold text-amber-400 mb-2">实时市场价格</div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
-            <div className="text-gray-600 text-xs">买价 (Bid)</div>
-            <div className="font-bold text-green-600">${bestBid.toFixed(2)}</div>
+            <div className="text-gray-400 text-xs">买价 (Bid)</div>
+            <div className="font-bold text-green-400">${bestBid.toFixed(2)}</div>
           </div>
           <div>
-            <div className="text-gray-600 text-xs">卖价 (Ask)</div>
-            <div className="font-bold text-red-600">${bestAsk.toFixed(2)}</div>
+            <div className="text-gray-400 text-xs">卖价 (Ask)</div>
+            <div className="font-bold text-red-400">${bestAsk.toFixed(2)}</div>
           </div>
         </div>
         <div className="text-xs text-gray-500 mt-1">
@@ -167,7 +174,7 @@ export default function OrderForm({
           className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
             outcome === 1
               ? 'bg-green-500 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/5 border border-white/10 text-gray-400 hover:border-green-500/50'
           }`}
         >
           <div>YES</div>
@@ -179,7 +186,7 @@ export default function OrderForm({
           className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
             outcome === 0
               ? 'bg-red-500 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/5 border border-white/10 text-gray-400 hover:border-red-500/50'
           }`}
         >
           <div>NO</div>
@@ -195,7 +202,7 @@ export default function OrderForm({
           className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
             side === 'buy'
               ? 'bg-green-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/5 border border-white/10 text-gray-400 hover:border-green-600/50'
           }`}
         >
           买入
@@ -206,7 +213,7 @@ export default function OrderForm({
           className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
             side === 'sell'
               ? 'bg-red-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/5 border border-white/10 text-gray-400 hover:border-red-600/50'
           }`}
         >
           卖出
@@ -215,15 +222,15 @@ export default function OrderForm({
       
       {/* 市场价格（只读显示） */}
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-2">
+        <label className="block text-sm font-semibold mb-2 text-gray-300">
           成交价格（市价）
         </label>
-        <div className="w-full px-4 py-3 bg-gray-50 border-2 border-purple-200 rounded-lg">
+        <div className="w-full px-4 py-3 bg-white/5 border-2 border-amber-400/30 rounded-lg">
           <div className="flex justify-between items-center">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-amber-400">
               ${marketPrice.toFixed(2)}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-400">
               {side === 'buy' ? '买入价' : '卖出价'}
             </span>
           </div>
@@ -235,7 +242,7 @@ export default function OrderForm({
       
       {/* 数量 */}
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-2 flex justify-between items-center">
+        <label className="block text-sm font-semibold mb-2 flex justify-between items-center text-gray-300">
           <span>数量（股）</span>
           <div className="flex gap-1">
             {['10', '50', '100', '500'].map((val) => (
@@ -244,7 +251,7 @@ export default function OrderForm({
                 type="button"
                 onClick={() => setAmount(val)}
                 disabled={submitting || !isConnected}
-                className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded disabled:opacity-50"
+                className="px-2 py-1 text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded disabled:opacity-50"
               >
                 {val}
               </button>
@@ -258,35 +265,35 @@ export default function OrderForm({
           min="1"
           step="1"
           disabled={submitting || !isConnected}
-          className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2 bg-white/5 border-2 border-white/10 text-white rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
           placeholder="输入数量"
         />
       </div>
       
       {/* 交易摘要 */}
-      <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-200 rounded-lg space-y-2">
+      <div className="mb-4 p-4 bg-white/5 border-2 border-white/10 rounded-lg space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">成交价格:</span>
-          <span className="font-bold text-gray-900">${marketPrice.toFixed(2)} / 股</span>
+          <span className="text-gray-400">成交价格:</span>
+          <span className="font-bold text-gray-200">${marketPrice.toFixed(2)} / 股</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">数量:</span>
-          <span className="font-bold text-gray-900">{amount} 股</span>
+          <span className="text-gray-400">数量:</span>
+          <span className="font-bold text-gray-200">{amount} 股</span>
         </div>
-        <div className="border-t border-gray-300 pt-2 mt-2"></div>
+        <div className="border-t border-white/10 pt-2 mt-2"></div>
         <div className="flex justify-between text-base">
-          <span className="text-gray-700 font-semibold">
+          <span className="text-gray-300 font-semibold">
             {side === 'buy' ? '需支付:' : '将收到:'}
           </span>
-          <span className="font-bold text-lg text-purple-600">
+          <span className="font-bold text-lg text-amber-400">
             ${estimatedCost} USDC
           </span>
         </div>
         {side === 'buy' && (
-          <div className="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-300">
+          <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-white/10">
             预测正确可获得: ${(parseFloat(amount) * 1).toFixed(2)} USDC
             <br />
-            潜在收益: <span className="text-green-600 font-semibold">+${potentialProfit} USDC</span>
+            潜在收益: <span className="text-green-400 font-semibold">+${potentialProfit} USDC</span>
           </div>
         )}
       </div>

@@ -833,43 +833,9 @@ export default function BlackSwanPage() {
                           crashEnd={selectedEvent.crashEnd}
                         />
                       </div>
-                      <div className="mt-2 space-y-1">
+                      <div className="mt-2">
                         <div className="text-stone-500 font-mono text-xs">
                           <span className="text-amber-500">&gt;</span> Chart: {selectedEvent.asset} | Event: {selectedEvent.date} | Duration: {selectedEvent.duration}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs font-mono flex-wrap">
-                          <span className="text-stone-400">时间段标记：</span>
-                          <span className="text-yellow-400 font-bold">▼开始</span>
-                          <span className="text-stone-400">→</span>
-                          <span className="text-red-500 font-bold text-sm">⚡最低点▲</span>
-                          <span className="text-stone-400">→</span>
-                          <span className="text-green-400 font-bold">▼恢复</span>
-                        </div>
-                        <div className="bg-emerald-900/20 border border-emerald-600/40 rounded px-3 py-2 mt-2">
-                          <div className="flex items-start gap-2">
-                            <span className="text-emerald-400 text-lg flex-shrink-0">✅</span>
-                            <div className="text-xs font-mono space-y-1">
-                              <div className="text-emerald-300 font-bold">
-                                智能崩盘时间段分析：
-                              </div>
-                              <div className="text-stone-300">
-                                ✓ <span className="text-emerald-400">折线图</span>清晰展示价格走势（前后6小时）
-                              </div>
-                              <div className="text-stone-300">
-                                ✓ <span className="text-emerald-400">三点标记</span>：<span className="text-yellow-400">▼开始</span> → <span className="text-red-500">⚡最低▲</span> → <span className="text-green-400">▼恢复</span>
-                              </div>
-                              <div className="text-stone-300">
-                                ✓ <span className="text-red-500">最低点</span>位于图表下方，<span className="text-emerald-400">精确定位</span>
-                              </div>
-                              <div className="text-stone-500 text-[10px] mt-1 flex items-center gap-2">
-                                <span>💡 Lightweight Charts + 币安API</span>
-                                <span>|</span>
-                                <span>🕒 UTC时区</span>
-                                <span>|</span>
-                                <span>📈 固定前后6小时范围</span>
-                              </div>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     </div>

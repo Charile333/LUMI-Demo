@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -216,9 +216,6 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('ALL');
   const [selectedSubCategory, setSelectedSubCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
-  const subCategoryScrollRef = useRef<HTMLDivElement>(null);
   
   // 🎯 快速交易弹窗状态
   const [quickTradeModal, setQuickTradeModal] = useState<{
@@ -240,38 +237,6 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
   // 🔥 使用 WebSocket 获取实时价格
   const marketIds = markets.map(m => m.id);
   const { pricesMap, connected: wsConnected } = useMarketListWebSocket(marketIds);
-
-  // 滚动子分类列表
-  const scrollSubCategories = (direction: 'left' | 'right') => {
-    if (subCategoryScrollRef.current) {
-      const scrollAmount = 300;
-      const newScrollLeft = subCategoryScrollRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
-      subCategoryScrollRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-    }
-  };
-
-  // 检查滚动位置并更新箭头显示状态
-  const checkScrollPosition = () => {
-    if (subCategoryScrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = subCategoryScrollRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  useEffect(() => {
-    const scrollContainer = subCategoryScrollRef.current;
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', checkScrollPosition);
-      checkScrollPosition();
-      // 监听窗口大小变化
-      window.addEventListener('resize', checkScrollPosition);
-      return () => {
-        scrollContainer.removeEventListener('scroll', checkScrollPosition);
-        window.removeEventListener('resize', checkScrollPosition);
-      };
-    }
-  }, [config.subCategories]);
 
   // 时间筛选辅助函数
   const filterByTimeRange = (markets: any[]) => {
@@ -335,110 +300,27 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Navbar - 不传递子分类，子分类移到搜索区域 */}
+      {/* Navbar - 传递筛选栏相关props */}
       <Navbar 
         activeCategory={category}
+        showFilters={true}
+        subCategories={config.subCategories}
+        activeSubCategory={selectedSubCategory}
+        onSubCategoryChange={setSelectedSubCategory}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedTimeRange={selectedTimeRange}
+        onTimeRangeChange={setSelectedTimeRange}
       />
       
-      {/* 占位符 - 为固定的导航栏留出空间（不包括子分类） */}
-      <div style={{ height: 'calc(80px + 60px + 57px - 40px)' }}></div>
-      
-      {/* Filters - 固定在导航栏下方，包含子分类 */}
-      <div className="fixed top-[calc(80px+60px+57px)] left-0 right-0 z-[95] bg-zinc-950/95 backdrop-blur-sm border-b border-white/5 pt-4">
-        <div className="container mx-auto px-4 pb-2">
-          <div className="flex gap-4 items-center flex-nowrap">
-            {/* Search Box */}
-            <div className="relative w-80 flex-shrink-0 min-w-[320px]">
-              <input
-                type="text"
-                placeholder={t('common.searchMarkets')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 pl-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400 transition-colors"
-              />
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-amber-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-
-            {/* Sub-Categories with Scroll Arrows */}
-            <div className="flex-1 relative min-w-0 overflow-hidden">
-              {showLeftArrow && (
-                <button
-                  onClick={() => scrollSubCategories('left')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-zinc-900 hover:bg-zinc-800 rounded-full p-1.5 transition-colors border border-white/10"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-              )}
-              <div 
-                ref={subCategoryScrollRef}
-                className="overflow-x-auto scrollbar-hide px-6 py-1"
-                style={{ maxWidth: '100%' }}
-              >
-                <div className="flex gap-2 min-w-max items-center">
-                  {config.subCategories.map((subCat: any) => (
-                    <button
-                      key={subCat.id}
-                      onClick={() => setSelectedSubCategory(subCat.id)}
-                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                        selectedSubCategory === subCat.id
-                          ? 'bg-amber-400 text-black'
-                          : 'bg-white/5 border border-white/10 text-gray-300 hover:border-white/20 hover:text-white'
-                      }`}
-                    >
-                      {subCat.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {showRightArrow && (
-                <button
-                  onClick={() => scrollSubCategories('right')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-zinc-900 hover:bg-zinc-800 rounded-full p-1.5 transition-colors border border-white/10"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Time Range Filter */}
-            <div className="flex gap-2 flex-shrink-0 ml-auto">
-              {['1D', '1W', '1M', '3M', 'ALL'].map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setSelectedTimeRange(range)}
-                  className={`w-14 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap flex items-center justify-center flex-shrink-0 ${
-                    selectedTimeRange === range
-                      ? 'bg-white/10 text-amber-400 border border-amber-400'
-                      : 'bg-white/5 border border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200'
-                  }`}
-                >
-                  {range}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 占位符 - 为固定的搜索筛选区域留出空间 */}
-      <div style={{ height: '56px' }}></div>
+      {/* 占位符 - 为固定的导航栏留出空间（含筛选栏） */}
+      <div className="h-[265px]"></div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-6 -mt-32">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-12 max-w-[1600px]">
         {/* Markets Grid */}
         {wsConnected && (
-          <div className="mb-2 flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg w-fit">
+          <div className="mb-3 flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg w-fit">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-green-400">实时价格已连接</span>
           </div>
@@ -474,14 +356,14 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
 
         {/* 卡片网格 */}
         {!loading && !error && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {marketsWithRealtimePrices.map((market) => (
             <div
               key={market.id}
-              className="bg-zinc-900 rounded-xl border border-white/10 hover:border-amber-400/50 transition-all duration-300 group overflow-hidden min-h-[350px] flex flex-col"
+              className="bg-zinc-900 rounded-xl border border-white/10 hover:border-amber-400/50 transition-all duration-300 group overflow-hidden flex flex-col"
             >
               {/* Card Header - Title with Trend */}
-              <Link href={`/market/${market.id}`} className="block p-6 pb-4">
+              <Link href={`/market/${market.id}`} className="block p-5 pb-3">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="text-lg font-semibold text-white group-hover:text-amber-400 transition-colors flex-1">
                     {market.title}
@@ -536,9 +418,9 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
               </Link>
 
               {/* Card Body */}
-              <div className="px-6 pb-4">
+              <div className="px-5 pb-5">
                 {/* Probability and Stats */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div>
                     <div className="text-xs text-gray-500 mb-1">当前概率</div>
                     <div className="text-3xl font-bold text-amber-400">{market.probability}%</div>
@@ -550,7 +432,7 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                 </div>
 
                 {/* YES/NO Buttons - 快速交易 */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-2 gap-3 mb-3">
                   <button 
                     onClick={(e) => {
                       e.preventDefault();
@@ -565,9 +447,9 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                         side: 'YES'
                       });
                     }}
-                    className="bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 hover:border-green-500/50 rounded-lg py-3 px-4 transition-all group/btn"
+                    className="bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 hover:border-green-500/50 rounded-lg py-2.5 px-4 transition-all group/btn"
                   >
-                    <div className="text-green-400 font-bold text-lg mb-1">YES</div>
+                    <div className="text-green-400 font-bold text-lg mb-0.5">YES</div>
                     <div className="text-green-400/70 text-xs">{market.probability}¢</div>
                   </button>
                   <button 
@@ -584,15 +466,15 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                         side: 'NO'
                       });
                     }}
-                    className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg py-3 px-4 transition-all group/btn"
+                    className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg py-2.5 px-4 transition-all group/btn"
                   >
-                    <div className="text-red-400 font-bold text-lg mb-1">NO</div>
+                    <div className="text-red-400 font-bold text-lg mb-0.5">NO</div>
                     <div className="text-red-400/70 text-xs">{100 - market.probability}¢</div>
                   </button>
                 </div>
 
                 {/* Market Info */}
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-white/5">
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-2.5 border-t border-white/5">
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={faChartLine} className="mr-1.5 text-amber-400" />
                     <span>{market.volume}</span>

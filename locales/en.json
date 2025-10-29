@@ -721,7 +721,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "A licensed blockchain sports betting platform offering transparent odds, live betting, and instant payouts. Gamble responsibly.",
+      "description": "",
       "sportsSection": "Sports",
       "football": "Football",
       "basketball": "Basketball",
@@ -1025,7 +1025,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "Enjoy exclusive promotions and bonuses on our blockchain gaming platform. All offers come with transparent terms and fair conditions.",
+      "description": "",
       "promotionsSection": "Promotions",
       "newPlayerOffers": "New Player Offers",
       "depositBonuses": "Deposit Bonuses",
@@ -1158,7 +1158,7 @@
     },
     "footer": {
       "brandName": "LUMI",
-      "description": "Participate in exciting tournaments and win blockchain-based prize pools. Our platform ensures fair play and transparent rewards for all participants.",
+      "description": "",
       "tournamentsSection": "Tournaments",
       "liveNow": "Live Now",
       "upcoming": "Upcoming",

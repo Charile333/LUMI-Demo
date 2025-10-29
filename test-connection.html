@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Connection Test</title>
+</head>
+<body>
+    <h1>Supabase连接测试</h1>
+    <button onclick="testAPI()">测试API</button>
+    <button onclick="testSupabase()">测试Supabase直连</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.textContent = '测试中...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/crash-events');
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'API错误: ' + error.message;
+            }
+        }
+
+        async function testSupabase() {
+            const result = document.getElementById('result');
+            result.textContent = '测试Supabase直连...';
+            
+            const SUPABASE_URL = 'https://bepwgrvplikstxcffbzh.supabase.co';
+            const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // 需要替换
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/crash_events?select=*&order=event_date.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Supabase错误: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+

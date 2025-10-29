@@ -20,7 +20,6 @@ body {
   color: rgb(var(--foreground-rgb));
   background: #ffffff;
   overflow: visible;
-  padding-top: 14rem;
 }
 
 @layer utilities {

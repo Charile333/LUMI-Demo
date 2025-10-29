@@ -1,5 +1,6 @@
 /**
- * 🔍 查询2025年10月10-11日的BTC和ETH崩盘数据
+ * 🔍 重新获取所有历史崩盘事件的准确数据
+ * 使用1小时K线从币安API查询
  */
 
 const https = require('https');
@@ -43,17 +44,17 @@ function getBinanceKlines(symbol, interval, startTime, endTime) {
   });
 }
 
-async function analyzeCrashPeriod(symbol, startDate, endDate) {
+async function analyzeCrashPeriod(symbol, startDate, endDate, eventName) {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`🔍 分析 ${symbol} (${startDate} ~ ${endDate})`);
+  console.log(`🔍 分析 ${eventName}: ${symbol} (${startDate} ~ ${endDate})`);
   console.log('='.repeat(60));
   
   const startTime = new Date(startDate + 'T00:00:00Z').getTime();
   const endTime = new Date(endDate + 'T23:59:59Z').getTime();
   
   try {
-    // 获取5分钟K线数据
-    const klines = await getBinanceKlines(symbol, '5m', startTime, endTime);
+    // 使用1小时K线数据
+    const klines = await getBinanceKlines(symbol, '1h', startTime, endTime);
     
     if (klines.length === 0) {
       console.error(`❌ 无数据可用`);
@@ -103,7 +104,7 @@ async function analyzeCrashPeriod(symbol, startDate, endDate) {
       crashEndTime = highestTime;
     }
     
-    // 寻找恢复点
+    // 寻找恢复点（价格回升2%以上）
     for (let i = lowestIndex + 1; i < klines.length; i++) {
       if (klines[i].close > lowestPrice * 1.02) {
         crashEndTime = klines[i].time;
@@ -112,6 +113,7 @@ async function analyzeCrashPeriod(symbol, startDate, endDate) {
     }
     
     const result = {
+      eventName: eventName,
       symbol: symbol,
       crashStart: {
         timestamp: new Date(crashStartTime).toISOString(),
@@ -134,10 +136,6 @@ async function analyzeCrashPeriod(symbol, startDate, endDate) {
         from: highestPrice.toFixed(2),
         to: lowestPrice.toFixed(2),
         percentage: crashPercentage
-      },
-      period: {
-        start: new Date(startTime).toISOString(),
-        end: new Date(endTime).toISOString()
       }
     };
     
@@ -145,15 +143,12 @@ async function analyzeCrashPeriod(symbol, startDate, endDate) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`🟠 最高点: ${result.crashStart.time} UTC`);
     console.log(`   价格: $${result.crashStart.price}`);
-    console.log(`   ISO: ${result.crashStart.timestamp}`);
     console.log('');
     console.log(`🔴 最低点: ${result.lowestPoint.time} UTC`);
     console.log(`   价格: $${result.lowestPoint.price}`);
-    console.log(`   ISO: ${result.lowestPoint.timestamp}`);
     console.log('');
     console.log(`🟢 恢复点: ${result.crashEnd.time} UTC`);
     console.log(`   价格: $${result.crashEnd.price}`);
-    console.log(`   ISO: ${result.crashEnd.timestamp}`);
     console.log('');
     console.log(`📉 崩盘幅度: ${crashPercentage}%`);
     console.log(`⏱️  持续时间: ${durationHours}小时`);
@@ -167,20 +162,37 @@ async function analyzeCrashPeriod(symbol, startDate, endDate) {
   }
 }
 
+// 定义所有需要查询的事件
+const EVENTS = [
+  // 2025年1011事件
+  { name: 'BTC 1011事件', symbol: 'BTCUSDT', startDate: '2025-10-10', endDate: '2025-10-11', id: 'btc_2025-10-10' },
+  { name: 'ETH 1011事件', symbol: 'ETHUSDT', startDate: '2025-10-10', endDate: '2025-10-11', id: 'eth_2025-10-10' },
+  
+  // 2022年FTX崩盘
+  { name: 'FTT崩盘', symbol: 'FTTUSDT', startDate: '2022-11-07', endDate: '2022-11-09', id: 'ftt_2022-11-08' },
+  { name: 'BTC FTX崩盘', symbol: 'BTCUSDT', startDate: '2022-11-08', endDate: '2022-11-10', id: 'btc_2022-11-09' },
+  
+  // 2022年LUNA崩盘
+  { name: 'LUNA崩盘', symbol: 'LUNAUSDT', startDate: '2022-05-08', endDate: '2022-05-11', id: 'luna_2022-05-10' },
+  
+  // 2020年COVID黑色星期四
+  { name: 'BTC COVID黑色星期四', symbol: 'BTCUSDT', startDate: '2020-03-11', endDate: '2020-03-13', id: 'btc_2020-03-12' },
+];
+
 async function main() {
-  console.log('🚀 开始查询 2025-10-10 至 2025-10-11 的崩盘数据...\n');
+  console.log('🚀 开始重新获取所有历史崩盘事件数据（使用1小时K线）...\n');
   
   const results = [];
   
-  // 查询BTC
-  const btcResult = await analyzeCrashPeriod('BTCUSDT', '2025-10-10', '2025-10-11');
-  if (btcResult) results.push({ name: 'BTC', ...btcResult });
-  
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // 查询ETH
-  const ethResult = await analyzeCrashPeriod('ETHUSDT', '2025-10-10', '2025-10-11');
-  if (ethResult) results.push({ name: 'ETH', ...ethResult });
+  for (const event of EVENTS) {
+    const result = await analyzeCrashPeriod(event.symbol, event.startDate, event.endDate, event.name);
+    if (result) {
+      results.push({ ...result, id: event.id });
+    }
+    
+    // 避免API限流
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
   
   // 输出汇总
   console.log('\n\n');
@@ -194,7 +206,7 @@ async function main() {
   }
   
   results.forEach((r, index) => {
-    console.log(`${index + 1}. ${r.name}/USDT`);
+    console.log(`${index + 1}. ${r.eventName}`);
     console.log(`   最高点: $${r.crashStart.price} (${r.crashStart.timestamp})`);
     console.log(`   最低点: $${r.lowestPoint.price} (${r.lowestPoint.timestamp})`);
     console.log(`   崩盘幅度: ${r.crashPercentage}%`);
@@ -209,14 +221,13 @@ async function main() {
   
   results.forEach(r => {
     const assetName = r.symbol.replace('USDT', '');
-    const id = `${assetName.toLowerCase()}_2025-10-10`;
     console.log(`{`);
-    console.log(`  id: '${id}',`);
-    console.log(`  date: '2025-10-10',`);
+    console.log(`  id: '${r.id}',`);
+    console.log(`  date: '${r.id.split('_')[1]}',`);
     console.log(`  asset: '${assetName}/USDT',`);
     console.log(`  crashPercentage: '${r.crashPercentage}',`);
     console.log(`  duration: '${r.duration}',`);
-    console.log(`  description: '${assetName} 2025年10月崩盘：价格从$${r.crashStart.price}跌至$${r.lowestPoint.price}',`);
+    console.log(`  description: '${r.eventName}：价格从$${r.crashStart.price}跌至$${r.lowestPoint.price}',`);
     console.log(`  timestamp: '${r.lowestPoint.timestamp}',  // ✅ 真实最低点时刻`);
     console.log(`  crashStart: '${r.crashStart.timestamp}',  // 🟠 崩盘开始时刻`);
     console.log(`  crashEnd: '${r.crashEnd.timestamp}',      // 🟢 崩盘结束时刻`);
@@ -230,11 +241,6 @@ async function main() {
 }
 
 main().catch(console.error);
-
-
-
-
-
 
 
 

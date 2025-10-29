@@ -12,7 +12,7 @@ export default function LiveCasinoPage() {
   const [activeCategory, setActiveCategory] = useState('all');
 
   return (
-    <div className="bg-[#121212] text-white font-sans antialiased -mt-56">
+    <div className="bg-[#121212] text-white font-sans antialiased">
       {/* SOON Banner */}
       <div className="bg-gradient-to-r from-[#b8860b] via-[#d4af37] to-[#b8860b] py-3 border-b border-[#d4af37]/50">
         <div className="container mx-auto px-4 flex items-center justify-center">

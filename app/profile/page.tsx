@@ -28,7 +28,7 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="bg-[#121212] text-white font-sans antialiased -mt-56 min-h-screen">
+    <div className="bg-[#121212] text-white font-sans antialiased min-h-screen">
       {/* Overlay */}
       {(showGiftCenter || showProfileMenu) && (
         <div className="fixed inset-0 bg-black/50 z-40" style={{ backdropFilter: 'blur(1px)' }}></div>

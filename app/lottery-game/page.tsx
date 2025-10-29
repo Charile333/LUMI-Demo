@@ -51,7 +51,7 @@ export default function LotteryGamePage() {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
       </Head>
       
-      <div className="bg-[#121212] text-white font-sans antialiased -mt-56">
+      <div className="bg-[#121212] text-white font-sans antialiased">
         {/* SOON Banner */}
         <div className="bg-gradient-to-r from-[#b8860b] via-[#d4af37] to-[#b8860b] py-3 border-b border-[#d4af37]/50">
           <div className="container mx-auto px-4 flex items-center justify-center">

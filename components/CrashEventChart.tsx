@@ -29,7 +29,6 @@ export default function CrashEventChart({
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [klineCount, setKlineCount] = useState(0);
 
   useEffect(() => {
     if (!chartContainerRef.current) {
@@ -245,8 +244,6 @@ export default function CrashEventChart({
         throw new Error(`无数据可用于此时间范围 (${eventDate})`);
       }
 
-      setKlineCount(klineData.length);
-
       // 设置折线数据
       if (seriesRef.current && chartRef.current) {
         console.log('');
@@ -286,54 +283,7 @@ export default function CrashEventChart({
         console.log('=================================================');
         console.log('');
 
-        // 🎯 添加崩盘时间段标记（优化版）
-        const markers = [];
-        
-        // 1. 崩盘开始标记（黄色向下箭头）- 只在有真实数据时显示
-        if (crashStart && crashEnd) {
-          markers.push({
-            time: crashStartTimestamp as any,
-            position: 'aboveBar' as const,
-            color: '#FFC107',  // 金黄色（醒目）
-            shape: 'arrowDown' as const,
-            text: '开始▼',
-            size: 1.5,
-          });
-        }
-        
-        // 2. 崩盘最低点（红色箭头，下方显示）- 始终显示
-        markers.push({
-          time: eventTimestamp as any,
-          position: 'belowBar' as const,  // 改为下方，更准确
-          color: '#FF1744',  // 鲜红色（强调）
-          shape: 'arrowUp' as const,  // 从下方向上指，更直观
-          text: '⚡最低点',
-          size: 2,
-        });
-        
-        // 3. 崩盘结束标记（绿色向上箭头）- 只在有真实数据时显示
-        if (crashStart && crashEnd) {
-          markers.push({
-            time: crashEndTimestamp as any,
-            position: 'aboveBar' as const,  // 改为上方
-            color: '#00E676',  // 亮绿色（醒目）
-            shape: 'arrowDown' as const,  // 从上方向下指
-            text: '▼恢复',
-            size: 1.5,
-          });
-        }
-        
-        seriesRef.current.setMarkers(markers);
-        
-        console.log('✅ 时间段标记已添加:', markers.length, '个');
-        if (crashStart && crashEnd) {
-          console.log('   🟠 崩盘开始 →', new Date(crashStartTimestamp * 1000).toLocaleString('zh-CN'));
-          console.log('   🔴 最低点 →', new Date(eventTimestamp * 1000).toLocaleString('zh-CN'));
-          console.log('   🟢 崩盘结束 →', new Date(crashEndTimestamp * 1000).toLocaleString('zh-CN'));
-        } else {
-          console.log('   🔴 最低点 →', new Date(eventTimestamp * 1000).toLocaleString('zh-CN'));
-          console.log('   ⚠️ 缺少真实的崩盘开始和结束数据');
-        }
+        // 图表标记已移除，保持图表清爽简洁
 
         // 稍等后再次确认时间范围（确保设置生效）
         setTimeout(() => {
@@ -404,20 +354,6 @@ export default function CrashEventChart({
         </div>
       )}
       
-      {/* 成功加载后的信息 */}
-      {!loading && !error && (
-        <div className="mt-2 space-y-1">
-          <div className="text-xs font-mono text-stone-500 flex items-center gap-4 flex-wrap">
-            <span>✅ 已加载 {klineCount} 个数据点</span>
-            <span>📊 数据来源: Binance API</span>
-            <span>⚡ 事件点已标记</span>
-          </div>
-          <div className="text-xs font-mono text-stone-600 flex items-center gap-3 flex-wrap">
-            <span>🕒 图表时区: UTC</span>
-            <span>📍 事件时间: {new Date(eventTimestamp * 1000).toLocaleString('zh-CN')}</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

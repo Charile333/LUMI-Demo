@@ -275,11 +275,11 @@ export class MatchingEngine {
     const result = await db.query(
       `UPDATE orders
        SET status = 'cancelled', updated_at = NOW()
-       WHERE order_id = $1
-         AND maker_address = $2
+       WHERE id = $1
+         AND user_address = $2
          AND status IN ('open', 'partial')
        RETURNING *`,
-      [orderId, userAddress]
+      [orderId, userAddress.toLowerCase()]
     );
     
     return result.rows.length > 0;
@@ -295,37 +295,33 @@ export class MatchingEngine {
     // 买单（bids）
     const bidsResult = await db.query(
       `SELECT price, 
-              SUM(remaining_amount) as total_amount,
+              SUM(quantity - filled_quantity) as total_amount,
               COUNT(*) as order_count
        FROM orders
        WHERE market_id = $1
-         AND outcome = $2
          AND side = 'buy'
          AND status IN ('open', 'partial')
-         AND remaining_amount > 0
-         AND expiration > $3
+         AND (quantity - filled_quantity) > 0
        GROUP BY price
        ORDER BY price DESC
        LIMIT 20`,
-      [marketId, outcome, Math.floor(Date.now() / 1000)]
+      [marketId]
     );
     
     // 卖单（asks）
     const asksResult = await db.query(
       `SELECT price, 
-              SUM(remaining_amount) as total_amount,
+              SUM(quantity - filled_quantity) as total_amount,
               COUNT(*) as order_count
        FROM orders
        WHERE market_id = $1
-         AND outcome = $2
          AND side = 'sell'
          AND status IN ('open', 'partial')
-         AND remaining_amount > 0
-         AND expiration > $3
+         AND (quantity - filled_quantity) > 0
        GROUP BY price
        ORDER BY price ASC
        LIMIT 20`,
-      [marketId, outcome, Math.floor(Date.now() / 1000)]
+      [marketId]
     );
     
     return {
