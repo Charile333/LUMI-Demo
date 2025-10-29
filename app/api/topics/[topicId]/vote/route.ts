@@ -1,5 +1,7 @@
+// 🗳️ 话题投票 API - 使用 Supabase 客户端（Vercel 优化版）
+
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic';
@@ -18,16 +20,20 @@ export async function POST(
       );
     }
 
-    // 获取用户信息（简化版）
+    // 获取用户信息
     const userAddress = request.headers.get('x-user-address') || `anonymous-${Date.now()}`;
 
-    // 检查用户是否已经投票
-    const voteCheck = await db.query(
-      `SELECT id FROM topic_votes WHERE topic_id = $1 AND user_address = $2`,
-      [topicId, userAddress]
-    );
+    const supabase = getSupabaseAdmin();
 
-    if (voteCheck.rows.length > 0) {
+    // 检查用户是否已经投票
+    const { data: existingVote } = await supabase
+      .from('topic_votes')
+      .select('id')
+      .eq('topic_id', topicId)
+      .eq('user_address', userAddress)
+      .single();
+
+    if (existingVote) {
       return NextResponse.json(
         { success: false, error: '您已经投过票了' },
         { status: 400 }
@@ -35,36 +41,54 @@ export async function POST(
     }
 
     // 记录投票
-    await db.query(
-      `INSERT INTO topic_votes (topic_id, user_address, voted_at)
-       VALUES ($1, $2, NOW())`,
-      [topicId, userAddress]
-    );
+    const { error: voteError } = await supabase
+      .from('topic_votes')
+      .insert({
+        topic_id: topicId,
+        user_address: userAddress
+      });
 
-    // 增加话题投票数
-    const result = await db.query(
-      `UPDATE user_topics 
-       SET votes = votes + 1 
-       WHERE id = $1 
-       RETURNING votes`,
-      [topicId]
-    );
+    if (voteError) {
+      console.error('记录投票失败:', voteError);
+      throw voteError;
+    }
 
-    if (result.rows.length === 0) {
+    // 先获取当前投票数
+    const { data: currentTopic } = await supabase
+      .from('user_topics')
+      .select('votes')
+      .eq('id', topicId)
+      .single();
+
+    if (!currentTopic) {
       return NextResponse.json(
         { success: false, error: '话题不存在' },
         { status: 404 }
       );
     }
 
+    // 更新投票数
+    const { data: updatedTopic, error: updateError } = await supabase
+      .from('user_topics')
+      .update({ votes: currentTopic.votes + 1 })
+      .eq('id', topicId)
+      .select('votes')
+      .single();
+
+    if (updateError) {
+      console.error('更新投票数失败:', updateError);
+      throw updateError;
+    }
+
     return NextResponse.json({
       success: true,
-      votes: result.rows[0].votes
+      votes: updatedTopic.votes
     });
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error('投票失败:', error);
     return NextResponse.json(
-      { success: false, error: '投票失败' },
+      { success: false, error: '投票失败: ' + (error.message || '未知错误') },
       { status: 500 }
     );
   }
