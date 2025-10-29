@@ -373,9 +373,9 @@ export default function LumiSoonPage() {
             </div>
           </div>
 
-          {/* 核心 "SOON" 区域 */}
+          {/* 核心 "LUMI" 区域 */}
           <div className="animate-breathe max-w-4xl mx-auto">
-            <p className="text-6xl md:text-9xl font-black text-white mb-6 text-glow" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>{t('landing.soon')}</p>
+            <p className="text-6xl md:text-9xl font-black mb-6 gradient-text-lumi" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', letterSpacing: '-0.02em'}}>{t('landing.soon')}</p>
             <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed" style={{fontFamily: 'Inter, system-ui, -apple-system, sans-serif', fontWeight: '400'}}>
               {t('landing.description')}
             </p>
@@ -454,10 +454,10 @@ export default function LumiSoonPage() {
               </span>
             </div>
             <div className="chevron-container">
-              <svg className="chevron chevron-1" width="60" height="60" viewBox="0 0 60 60">
+              <svg className="chevron chevron-1" width="50" height="50" viewBox="0 0 60 60">
                 <polyline points="10,20 30,40 50,20" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <svg className="chevron chevron-2" width="60" height="60" viewBox="0 0 60 60">
+              <svg className="chevron chevron-2" width="50" height="50" viewBox="0 0 60 60">
                 <polyline points="10,20 30,40 50,20" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
@@ -791,6 +791,36 @@ export default function LumiSoonPage() {
             0 0 24px rgba(255, 255, 255, 0.2);
         }
 
+        /* LUMI 高级艺术字 - 白紫配色 */
+        .gradient-text-lumi {
+          color: #ffffff;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          position: relative;
+          text-transform: uppercase;
+          /* 多层阴影打造立体感 */
+          text-shadow: 
+            /* 紫色描边层 */
+            -1px -1px 0 #a855f7,
+            1px -1px 0 #a855f7,
+            -1px 1px 0 #a855f7,
+            1px 1px 0 #a855f7,
+            -2px -2px 0 #9333ea,
+            2px -2px 0 #9333ea,
+            -2px 2px 0 #9333ea,
+            2px 2px 0 #9333ea,
+            /* 立体深度 */
+            0 3px 0 #7c3aed,
+            0 6px 0 #6d28d9,
+            0 9px 0 #5b21b6,
+            0 12px 0 #4c1d95,
+            /* 深色阴影 */
+            0 15px 20px rgba(0, 0, 0, 0.4),
+            0 20px 40px rgba(0, 0, 0, 0.3);
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
         .terminal-font {
           font-family: 'Courier New', Courier, monospace;
         }
@@ -850,7 +880,7 @@ export default function LumiSoonPage() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          height: 100px;
+          height: 85px;
         }
 
         .chevron {

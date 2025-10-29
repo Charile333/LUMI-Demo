@@ -18,14 +18,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const showCreateButton = pathname !== '/' && (
     pathname?.startsWith('/markets') ||
     pathname?.startsWith('/market/') ||
-    pathname?.startsWith('/trade/') ||
-    pathname?.startsWith('/automotive') ||
-    pathname?.startsWith('/tech-ai') ||
-    pathname?.startsWith('/economy-social') ||
-    pathname?.startsWith('/sports-gaming') ||
-    pathname?.startsWith('/entertainment-culture') ||
-    pathname?.startsWith('/science-education') ||
-    pathname?.startsWith('/crypto-web3')
+    pathname?.startsWith('/trade/')
   );
   
   return (

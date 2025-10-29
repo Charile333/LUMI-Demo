@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
+import CrashEventChart from '@/components/CrashEventChart';
 
-// TradingView Widget 声明
+// TradingView Widget 声明（已弃用，改用 Lightweight Charts）
 declare global {
   interface Window {
     TradingView: any;
@@ -20,6 +21,8 @@ interface CrashEvent {
   crashPercentage: number;
   duration: string;
   description: string;
+  crashStart?: string;  // 🟠 崩盘开始时刻（真实数据）
+  crashEnd?: string;    // 🟢 崩盘结束时刻（真实数据）
   details?: {
     previous_price?: number;
     current_price?: number;
@@ -41,16 +44,16 @@ export default function BlackSwanPage() {
   const { t, i18n } = useTranslation();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('all'); // 'all' 或具体日期
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
-  const [timeRange, setTimeRange] = useState<number>(3); // 默认3小时
+  // 移除 timeRange 状态 - 现在使用固定的前后6小时范围
   const [realtimeData, setRealtimeData] = useState<RealtimeAlert[]>([]);
   const [crashEvents, setCrashEvents] = useState<CrashEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalAlerts: 0, monitoredAssets: 0 });
   const [mounted, setMounted] = useState(false); // 防止 hydration 错误
   
-  // TradingView Widget 容器引用
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const widgetInstanceRef = useRef<any>(null);
+  // TradingView Widget 容器引用（已弃用，保留以供参考）
+  // const chartContainerRef = useRef<HTMLDivElement>(null);
+  // const widgetInstanceRef = useRef<any>(null);
 
   // 客户端挂载标记
   useEffect(() => {
@@ -389,7 +392,10 @@ export default function BlackSwanPage() {
     }
   };
 
-  // TradingView Widget 初始化
+  // ===== 已弃用：TradingView Widget 初始化 =====
+  // 现在使用 Lightweight Charts + 币安API
+  // 保留此代码以供参考
+  /*
   useEffect(() => {
     if (!selectedEvent) return;
 
@@ -428,25 +434,37 @@ export default function BlackSwanPage() {
           exchange = 'BINANCE';
         }
         
-        // 根据时间范围确定图表间隔
-        let interval: string = '60'; // 默认1小时
-        if (timeRange === 1) interval = '15';
-        else if (timeRange === 3) interval = '60';
-        else if (timeRange === 6) interval = '240';
-        else if (timeRange === 12) interval = 'D';
-        else if (timeRange === 24) interval = 'D';
+        // 根据时间范围确定图表间隔（优化后）
+        let interval: string = '15'; // 默认15分钟
+        if (timeRange === 1) interval = '5';      // 1小时：5分钟K线
+        else if (timeRange === 3) interval = '15';  // 3小时：15分钟K线
+        else if (timeRange === 6) interval = '30';  // 6小时：30分钟K线
+        else if (timeRange === 12) interval = '60'; // 12小时：1小时K线
+        else if (timeRange === 24) interval = '60'; // 24小时：1小时K线
 
-        // 计算事件时间范围 - 让事件时间点在图表中央
+        // 🎯 优化的时间范围算法 - 黄金分割点布局
         const eventDate = new Date(selectedEvent.timestamp);
+        const crashPercentage = Math.abs(selectedEvent.crashPercentage);
+        
         console.log('🔍 Debug - Event timestamp:', selectedEvent.timestamp);
         console.log('🔍 Debug - Parsed event date:', eventDate);
         console.log('🔍 Debug - Time range:', timeRange);
+        console.log('🔍 Debug - Crash percentage:', crashPercentage);
         
-        const hoursBeforeEvent = Math.floor(timeRange / 2); // 事件前的时间
-        const hoursAfterEvent = timeRange - hoursBeforeEvent; // 事件后的时间
+        // 根据崩盘幅度动态调整时间范围（波动性越大，时间范围越宽）
+        const volatilityFactor = Math.min(crashPercentage / 20, 0.5); // 最多增加50%
+        const adjustedTimeRange = timeRange * (1 + volatilityFactor);
         
-        console.log('🔍 Debug - Hours before:', hoursBeforeEvent);
-        console.log('🔍 Debug - Hours after:', hoursAfterEvent);
+        console.log('📊 Volatility factor:', volatilityFactor);
+        console.log('📊 Adjusted time range:', adjustedTimeRange, 'hours');
+        
+        // 使用黄金分割比例（0.382:0.618）- 事件点在38.2%位置
+        // 这样用户可以看到更多的事后反应，符合分析习惯
+        const hoursBeforeEvent = adjustedTimeRange * 0.382; // 事件前38.2%
+        const hoursAfterEvent = adjustedTimeRange * 0.618;  // 事件后61.8%
+        
+        console.log('🔍 Debug - Hours before (38.2%):', hoursBeforeEvent.toFixed(2));
+        console.log('🔍 Debug - Hours after (61.8%):', hoursAfterEvent.toFixed(2));
         
         const fromDate = new Date(eventDate.getTime() - hoursBeforeEvent * 60 * 60 * 1000);
         const toDate = new Date(eventDate.getTime() + hoursAfterEvent * 60 * 60 * 1000);
@@ -465,6 +483,15 @@ export default function BlackSwanPage() {
         console.log('  Event Timestamp:', eventTimestamp);
         console.log('  Selected Event:', selectedEvent);
 
+        // 🎯 方案：由于免费版TradingView限制，添加用户提示
+        console.log('⚠️ TradingView免费版API限制：无法通过代码设置时间范围');
+        console.log('💡 建议：用户需要手动拖动K线图查看历史数据');
+        console.log('');
+        console.log('📍 目标时间点：', new Date(eventTimestamp * 1000).toLocaleString('zh-CN'));
+        console.log('📅 目标日期：', selectedEvent.date);
+        console.log('');
+        
+        // === 创建标准 TradingView Widget ===
         // 创建新的 TradingView Widget
         widgetInstanceRef.current = new window.TradingView.widget({
           width: '100%',
@@ -514,82 +541,17 @@ export default function BlackSwanPage() {
           autosize: true,
           // onChartReady 是配置对象的一部分
           onChartReady: function() {
-            console.log('✅ Chart ready! Now setting time range...');
-            
-            try {
-              const chart = widgetInstanceRef.current.activeChart();
-              console.log('📊 Got active chart');
-              
-              // 🔥 等待数据加载完成后设置时间范围
-              let dataLoadAttempts = 0;
-              const maxAttempts = 10;
-              
-              const waitForDataAndSetRange = () => {
-                dataLoadAttempts++;
-                
-                try {
-                  console.log(`🎯 Attempt ${dataLoadAttempts}: Setting time range...`);
-                  console.log(`   Event time: ${new Date(eventTimestamp * 1000).toLocaleString()}`);
-                  console.log(`   From: ${new Date(fromTimestamp * 1000).toLocaleString()}`);
-                  console.log(`   To: ${new Date(toTimestamp * 1000).toLocaleString()}`);
-                  
-                  // 设置可见范围
-                  chart.setVisibleRange({ 
-                    from: fromTimestamp, 
-                    to: toTimestamp 
-                  }, { 
-                    applyDefaultRightMargin: false 
-                  }).then(() => {
-                    console.log(`✅ Range set successfully on attempt ${dataLoadAttempts}!`);
-                    
-                    // 等待一下再确认设置
-                    setTimeout(() => {
-                      chart.setVisibleRange({ 
-                        from: fromTimestamp, 
-                        to: toTimestamp 
-                      }, { 
-                        applyDefaultRightMargin: false 
-                      }).then(() => {
-                        console.log('✅ Range confirmed and locked!');
-                      });
-                    }, 1000);
-                  }).catch((err: any) => {
-                    console.warn(`⚠️ setVisibleRange failed on attempt ${dataLoadAttempts}:`, err);
-                    
-                    // 如果失败且还有重试次数，继续尝试
-                    if (dataLoadAttempts < maxAttempts) {
-                      setTimeout(waitForDataAndSetRange, 1500);
-                    }
-                  });
-                } catch (err) {
-                  console.error(`❌ Error on attempt ${dataLoadAttempts}:`, err);
-                  
-                  // 如果失败且还有重试次数，继续尝试
-                  if (dataLoadAttempts < maxAttempts) {
-                    setTimeout(waitForDataAndSetRange, 1500);
-                  }
-                }
-              };
-              
-              // 订阅数据加载完成事件（如果可用）
-              try {
-                chart.onDataLoaded().subscribe(null, () => {
-                  console.log('📊 Data loaded event triggered!');
-                  setTimeout(waitForDataAndSetRange, 500);
-                });
-              } catch (e) {
-                console.log('⚠️ onDataLoaded not available, using timeout fallback');
-              }
-              
-              // 使用多个延迟时间尝试设置（fallback机制）
-              const delays = [1500, 3000, 5000, 8000];
-              delays.forEach((delay) => {
-                setTimeout(waitForDataAndSetRange, delay);
-              });
-              
-            } catch (err) {
-              console.error('❌ Error accessing chart:', err);
-            }
+            console.log('✅ Chart ready!');
+            console.log('');
+            console.log('📌 TradingView免费Widget限制说明：');
+            console.log('   - 免费版无法通过API自动跳转到历史时间点');
+            console.log('   - 图表默认显示最新数据');
+            console.log('');
+            console.log('🔍 如何查看历史崩盘数据：');
+            console.log(`   1. 在图表上向左拖动（使用鼠标）`);
+            console.log(`   2. 找到目标日期：${selectedEvent.date}`);
+            console.log(`   3. 目标时间：${new Date(eventTimestamp * 1000).toLocaleString('zh-CN')}`);
+            console.log('');
           }
         });
       }
@@ -606,6 +568,8 @@ export default function BlackSwanPage() {
       }
     };
   }, [selectedEvent, timeRange]);
+  */
+  // ===== 结束：已弃用的TradingView Widget代码 =====
 
   useEffect(() => {
     document.body.style.paddingTop = '0';
@@ -775,40 +739,14 @@ export default function BlackSwanPage() {
                   ))}
                 </div>
 
-                {/* 时间范围选择 */}
+                {/* 时间范围说明（固定为前后6小时）*/}
                 <div className="pt-4 border-t border-amber-900/20">
-                  <label className="block text-xs font-mono text-stone-400 mb-2">
-                    <span className="text-amber-500">&gt;</span> TIME RANGE:
-                  </label>
-                  <div className="grid grid-cols-3 gap-1 mb-1">
-                    {[1, 3, 6].map((hours) => (
-                      <button
-                        key={hours}
-                        onClick={() => setTimeRange(hours)}
-                        className={`px-2 py-1.5 text-xs font-mono transition-all border ${
-                          timeRange === hours
-                            ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 shadow-lg shadow-amber-900/40'
-                            : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
-                        }`}
-                      >
-                        {hours}h
-                      </button>
-                    ))}
+                  <div className="text-xs font-mono text-stone-400">
+                    <span className="text-amber-500">&gt;</span> 时间范围：
                   </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    {[12, 24].map((hours) => (
-                      <button
-                        key={hours}
-                        onClick={() => setTimeRange(hours)}
-                        className={`px-2 py-1.5 text-xs font-mono transition-all border ${
-                          timeRange === hours
-                            ? 'bg-gradient-to-r from-amber-600/70 to-yellow-600/70 text-black border-amber-500/50 shadow-lg shadow-amber-900/40'
-                            : 'bg-zinc-900/60 text-stone-400 border-amber-900/20 hover:border-amber-700/40 hover:bg-zinc-800/60'
-                        }`}
-                      >
-                        {hours}h
-                      </button>
-                    ))}
+                  <div className="mt-2 bg-zinc-950/60 border border-amber-900/30 px-3 py-2 text-xs font-mono">
+                    <div className="text-amber-300">崩盘前6小时 + 崩盘过程 + 崩盘后6小时</div>
+                    <div className="text-stone-500 mt-1">完整展示崩盘事件的前后变化</div>
                   </div>
                 </div>
               </div>
@@ -857,51 +795,81 @@ export default function BlackSwanPage() {
                           <span className="text-amber-500">&gt;</span> Time: {mounted ? formatTime(selectedEvent.timestamp).substring(0, 5) : '--:--'}
                         </div>
                         <div>
-                          <span className="text-amber-500">&gt;</span> Window: {timeRange}h
+                          <span className="text-amber-500">&gt;</span> Duration: {selectedEvent.duration}
                         </div>
                       </div>
                     </div>
 
-                    {/* 图表区域 - TradingView Widget */}
+                    {/* 图表区域 - Lightweight Charts + 币安API */}
                     <div className="flex-shrink-0">
                       <div className="text-amber-400 font-mono text-xs mb-2 flex items-center justify-between">
                         <span><span className="text-amber-500">&gt;</span> {t('blackSwan.priceChart')}:</span>
-                        <span className="text-stone-500">
-                          {t('blackSwan.chartPoweredBy')}
+                        <span className="text-emerald-500 text-[10px]">
+                          🚀 Powered by Lightweight Charts + Binance API
                         </span>
                       </div>
                       <div className="bg-zinc-950 border-2 border-amber-900/30 overflow-hidden shadow-2xl shadow-black/40">
-                        <div 
-                          id="tradingview-widget-container" 
-                          ref={chartContainerRef}
-                          className="w-full bg-zinc-950"
-                          style={{ height: '350px' }}
+                        {/* 🎯 新的图表组件 - 显示崩盘时间段（使用真实数据）*/}
+                        <CrashEventChart
+                          symbol={selectedEvent.asset.replace('ALTCOINS', 'BTC/USDT')}
+                          eventTimestamp={(() => {
+                            // 确保时间戳转换正确
+                            const timestamp = new Date(selectedEvent.timestamp).getTime();
+                            const timestampInSeconds = Math.floor(timestamp / 1000);
+                            console.log('🕒 Event time conversion:', {
+                              original: selectedEvent.timestamp,
+                              parsed: new Date(selectedEvent.timestamp).toLocaleString('zh-CN'),
+                              timestampMs: timestamp,
+                              timestampSec: timestampInSeconds,
+                              hasCrashStart: !!selectedEvent.crashStart,
+                              hasCrashEnd: !!selectedEvent.crashEnd
+                            });
+                            return timestampInSeconds;
+                          })()}
+                          eventDate={selectedEvent.date}
+                          duration={selectedEvent.duration}
+                          crashPercentage={selectedEvent.crashPercentage}
+                          crashStart={selectedEvent.crashStart}
+                          crashEnd={selectedEvent.crashEnd}
                         />
                       </div>
                       <div className="mt-2 space-y-1">
                         <div className="text-stone-500 font-mono text-xs">
-                          <span className="text-amber-500">&gt;</span> Chart: {(() => {
-                            const eventYear = new Date(selectedEvent.timestamp).getFullYear();
-                            const asset = selectedEvent.asset.replace('/', '');
-                            let displaySymbol = asset;
-                            
-                            if (eventYear < 2017 && asset === 'BTCUSDT') {
-                              displaySymbol = 'BTCUSD';
-                            } else if (asset === 'ALTCOINS') {
-                              displaySymbol = 'BTCUSDT';
-                            }
-                            
-                            return displaySymbol;
-                          })()} | Event: {selectedEvent.date} | Window: {timeRange}h
+                          <span className="text-amber-500">&gt;</span> Chart: {selectedEvent.asset} | Event: {selectedEvent.date} | Duration: {selectedEvent.duration}
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-mono">
-                          <span className="text-stone-400">{t('blackSwan.timeline')}:</span>
-                          <span className="text-amber-400">←{Math.floor(timeRange/2)}h {t('blackSwan.before')}</span>
-                          <span className="text-rose-400 font-bold">⚠ {t('blackSwan.crashEvent')}</span>
-                          <span className="text-amber-400">{timeRange - Math.floor(timeRange/2)}h {t('blackSwan.after')}→</span>
+                        <div className="flex items-center gap-2 text-xs font-mono flex-wrap">
+                          <span className="text-stone-400">时间段标记：</span>
+                          <span className="text-yellow-400 font-bold">▼开始</span>
+                          <span className="text-stone-400">→</span>
+                          <span className="text-red-500 font-bold text-sm">⚡最低点▲</span>
+                          <span className="text-stone-400">→</span>
+                          <span className="text-green-400 font-bold">▼恢复</span>
                         </div>
-                        <div className="text-yellow-500 font-mono text-xs">
-                          ⚡ {t('blackSwan.chartAutoFocused')}
+                        <div className="bg-emerald-900/20 border border-emerald-600/40 rounded px-3 py-2 mt-2">
+                          <div className="flex items-start gap-2">
+                            <span className="text-emerald-400 text-lg flex-shrink-0">✅</span>
+                            <div className="text-xs font-mono space-y-1">
+                              <div className="text-emerald-300 font-bold">
+                                智能崩盘时间段分析：
+                              </div>
+                              <div className="text-stone-300">
+                                ✓ <span className="text-emerald-400">折线图</span>清晰展示价格走势（前后6小时）
+                              </div>
+                              <div className="text-stone-300">
+                                ✓ <span className="text-emerald-400">三点标记</span>：<span className="text-yellow-400">▼开始</span> → <span className="text-red-500">⚡最低▲</span> → <span className="text-green-400">▼恢复</span>
+                              </div>
+                              <div className="text-stone-300">
+                                ✓ <span className="text-red-500">最低点</span>位于图表下方，<span className="text-emerald-400">精确定位</span>
+                              </div>
+                              <div className="text-stone-500 text-[10px] mt-1 flex items-center gap-2">
+                                <span>💡 Lightweight Charts + 币安API</span>
+                                <span>|</span>
+                                <span>🕒 UTC时区</span>
+                                <span>|</span>
+                                <span>📈 固定前后6小时范围</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

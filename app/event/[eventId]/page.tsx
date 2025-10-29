@@ -336,14 +336,19 @@ const EventDetailPage = ({ params }: { params: { eventId: string } }) => {
   return (
     <div className="bg-gray-50 text-gray-900 font-sans antialiased min-h-screen">
       {/* 使用统一的导航栏，传递当前分类 */}
-      <Navbar activeCategory={currentCategory} />
+      <Navbar 
+        activeCategory={currentCategory}
+        onCategoryChange={(categoryId) => {
+          router.push(`/markets/${categoryId}`);
+        }}
+      />
 
       {/* Main Content - 增加顶部间距以避免与导航栏重叠 */}
-      <main className="container mx-auto px-4 pt-36 pb-6">
+      <main className="container mx-auto px-4 pt-64 pb-6">
         {/* Breadcrumb */}
         <div className="mb-4 flex items-center text-sm text-gray-600">
           <Link 
-            href={`/LUMI?category=${currentCategory}`}
+            href={`/markets/${currentCategory}`}
             className="hover:text-purple-600 transition-colors"
           >
             {isAutomotiveMarket ? '返回' : 'Back'}
