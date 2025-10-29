@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase-client';
 import { UpdateMarketRequest } from '@/lib/types/market';
 
 // GET - 获取单个市场

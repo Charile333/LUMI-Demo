@@ -7,8 +7,10 @@ import Link from 'next/link';
 import OrderForm from '@/components/trading/OrderForm';
 import OrderBook from '@/components/trading/OrderBook';
 import MyOrders from '@/components/trading/MyOrders';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function MarketDetailPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const marketId = parseInt(params.eventId as string);
@@ -59,7 +61,7 @@ export default function MarketDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading market...</p>
+          <p className="text-gray-600">{t('marketDetail.loading')}</p>
         </div>
       </div>
     );
@@ -69,13 +71,13 @@ export default function MarketDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Market not found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('marketDetail.notFound')}</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <Link
             href="/"
             className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Back to Home
+            {t('marketDetail.backToMarkets')}
           </Link>
         </div>
       </div>
@@ -91,7 +93,7 @@ export default function MarketDetailPage() {
             href="/"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-2"
           >
-            ← Back to Markets
+            ← {t('marketDetail.backToMarkets')}
           </Link>
         </div>
       </div>
@@ -126,19 +128,19 @@ export default function MarketDetailPage() {
               {/* Market Stats */}
               <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Volume</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('marketDetail.volume')}</p>
                   <p className="text-lg font-semibold text-gray-900">
                     ${marketData.volume || 0}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Participants</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('hero.activeTraders')}</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {marketData.participants || 0}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">Status</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('marketDetail.status')}</p>
                   <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
                     marketData.status === 'active' 
                       ? 'bg-green-100 text-green-700'
@@ -146,7 +148,7 @@ export default function MarketDetailPage() {
                       ? 'bg-gray-100 text-gray-700'
                       : 'bg-yellow-100 text-yellow-700'
                   }`}>
-                    {marketData.status}
+                    {t(`market.${marketData.status}`, marketData.status)}
                   </span>
                 </div>
               </div>
@@ -154,21 +156,21 @@ export default function MarketDetailPage() {
 
             {/* Price Chart Placeholder */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Price History</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{t('marketDetail.priceChart')}</h3>
               <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <p className="text-gray-500">Chart coming soon...</p>
+                <p className="text-gray-500">{t('common.loading')}</p>
               </div>
             </div>
 
             {/* Order Book */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Order Book</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{t('marketDetail.orderBook')}</h3>
               <OrderBook marketId={marketId} />
             </div>
 
             {/* My Orders */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">My Orders</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{t('marketDetail.myOrders')}</h3>
               <MyOrders marketId={marketId} />
             </div>
           </div>
@@ -177,7 +179,7 @@ export default function MarketDetailPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-4">
               <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Trade</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{t('marketDetail.trade')}</h3>
                 <OrderForm 
                   marketId={marketId}
                   questionId={marketData.question_id}

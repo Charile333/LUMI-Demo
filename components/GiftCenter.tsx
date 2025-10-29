@@ -71,10 +71,10 @@ export default function GiftCenter() {
         {isOpen && (
           <>
             {/* 遮罩层 */}
-            <div className="fixed inset-0 bg-black/50 z-40" style={{ backdropFilter: 'blur(1px)' }} />
+            <div className="fixed inset-0 bg-black/50 z-[110]" style={{ backdropFilter: 'blur(1px)' }} />
             
             {/* 弹窗内容 */}
-            <div className="absolute right-0 mt-2 w-80 md:w-96 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-50 transform origin-top-right transition-all duration-300 ease-in-out">
+            <div className="absolute right-0 mt-2 w-80 md:w-96 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-[120] transform origin-top-right transition-all duration-300 ease-in-out">
               {/* 弹窗头部 */}
               <div className="p-4 border-b border-gray-800 flex justify-between items-center" suppressHydrationWarning>
                 <h3 className="text-lg font-semibold flex items-center">

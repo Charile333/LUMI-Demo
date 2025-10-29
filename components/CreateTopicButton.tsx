@@ -133,7 +133,7 @@ export function CreateTopicButton() {
 
       {/* 悬浮小窗口 */}
       {isOpen && (
-        <div className="fixed bottom-28 right-8 z-[100] w-[420px] max-h-[calc(100vh-9rem)] bg-zinc-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-amber-400/30 animate-fadeIn">
+        <div className="fixed bottom-28 right-8 z-[110] w-[420px] max-h-[calc(100vh-9rem)] bg-zinc-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-amber-400/30 animate-fadeIn">
           {/* 头部 - 关闭按钮 */}
           <button
             onClick={() => setIsOpen(false)}

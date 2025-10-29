@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface QuickTradeModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function QuickTradeModal({
   market,
   side
 }: QuickTradeModalProps) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0.50);
@@ -152,7 +154,7 @@ export default function QuickTradeModal({
     <>
       {/* 背景遮罩 */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[150] flex items-center justify-center"
         onClick={onClose}
       >
         {/* 弹窗内容 */}
@@ -169,7 +171,7 @@ export default function QuickTradeModal({
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-xl">
-                    Buy {side}
+                    {t('quickTrade.buy')} {side}
                   </h3>
                   <p className="text-white/80 text-sm">
                     ${currentPrice.toFixed(2)} per share
@@ -187,7 +189,7 @@ export default function QuickTradeModal({
 
           {/* 市场信息 */}
           <div className="p-6 border-b border-gray-200">
-            <p className="text-gray-600 text-sm mb-1">Market</p>
+            <p className="text-gray-600 text-sm mb-1">{t('quickTrade.market')}</p>
             <p className="text-gray-900 font-semibold">
               {market.title}
             </p>
@@ -198,7 +200,7 @@ export default function QuickTradeModal({
             {/* 金额输入 */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Amount (USD)
+                {t('quickTrade.amount')}
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg font-semibold">
@@ -208,7 +210,7 @@ export default function QuickTradeModal({
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 text-lg font-semibold border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full pl-10 pr-4 py-3 text-lg font-semibold text-gray-900 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="10"
                   min="1"
                   step="1"
@@ -230,19 +232,19 @@ export default function QuickTradeModal({
             {/* 预估信息 */}
             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Avg price</span>
+                <span className="text-gray-600">{t('quickTrade.avgPrice')}</span>
                 <span className="font-semibold text-gray-900">
                   ${currentPrice.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Shares</span>
+                <span className="text-gray-600">{t('quickTrade.shares')}</span>
                 <span className="font-semibold text-gray-900">
                   {expectedShares.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                <span className="text-gray-600">Potential return</span>
+                <span className="text-gray-600">{t('quickTrade.potentialReturn')}</span>
                 <span className={`font-bold ${potentialReturn > 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {potentialReturn > 0 ? '+' : ''}${potentialReturn.toFixed(2)} 
                   {potentialReturn > 0 && ` (+${((potentialReturn / parseFloat(amount)) * 100).toFixed(0)}%)`}
@@ -253,8 +255,7 @@ export default function QuickTradeModal({
             {/* 提示信息 */}
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
               <p className="text-xs text-purple-800">
-                <strong>Quick trade:</strong> This will create a market order at the best available price.
-                For advanced options, visit the market page.
+                {t('quickTrade.quickTradeNote')}
               </p>
             </div>
           </div>
@@ -272,10 +273,10 @@ export default function QuickTradeModal({
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">⏳</span> Processing...
+                  <span className="animate-spin">⏳</span> {t('quickTrade.processing')}
                 </span>
               ) : (
-                `Buy ${side} for $${amount}`
+                `${t('quickTrade.buyFor')} ${side} ${t('quickTrade.for')} $${amount}`
               )}
             </button>
           </div>

@@ -116,7 +116,7 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
       {isOpen && (
         <>
           <div 
-            style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 110 }}
             onClick={() => setIsOpen(false)}
           />
           <div style={{
@@ -128,7 +128,7 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
             background: dropdownBg,
             border: `2px solid ${dropdownBorder}`,
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-            zIndex: 50,
+            zIndex: 120,
             overflow: 'hidden',
             backdropFilter: 'blur(24px)'
           }}>

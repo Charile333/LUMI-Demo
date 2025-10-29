@@ -12,7 +12,12 @@ export function getPool(): Pool {
     const connectionString = process.env.DATABASE_URL;
     
     if (!connectionString) {
-      throw new Error('DATABASE_URL 环境变量未设置');
+      const errorMsg = '❌ DATABASE_URL 环境变量未设置！\n' +
+        '请在 Vercel Dashboard → Settings → Environment Variables 中添加：\n' +
+        'DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres\n' +
+        '参考文档: VERCEL_环境变量配置指南.md';
+      console.error(errorMsg);
+      throw new Error('DATABASE_URL 环境变量未设置 - 订单系统需要 PostgreSQL 数据库连接');
     }
     
     pool = new Pool({

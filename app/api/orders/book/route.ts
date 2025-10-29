@@ -42,6 +42,19 @@ export async function GET(request: NextRequest) {
     
   } catch (error: any) {
     console.error('获取订单簿失败:', error);
+    
+    // 检查是否是数据库连接错误
+    if (error.message && error.message.includes('DATABASE_URL')) {
+      return NextResponse.json(
+        { 
+          error: '数据库未配置',
+          details: 'DATABASE_URL 环境变量未设置，请在 Vercel 配置中添加 PostgreSQL 连接字符串',
+          helpUrl: 'https://github.com/your-repo/blob/main/VERCEL_环境变量配置指南.md'
+        },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
       { error: error.message || '获取订单簿失败' },
       { status: 500 }

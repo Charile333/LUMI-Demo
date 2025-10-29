@@ -8,6 +8,7 @@ import OrderForm from '@/components/trading/OrderForm';
 import OrderBook from '@/components/trading/OrderBook';
 import MyOrders from '@/components/trading/MyOrders';
 import { useOrderBookWebSocket } from '@/hooks/useWebSocket';
+import { useTranslation } from '@/hooks/useTranslation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendar,
@@ -64,6 +65,7 @@ interface PriceData {
 }
 
 export default function MarketDetailPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const marketId = params.marketId as string;
@@ -311,7 +313,7 @@ export default function MarketDetailPage() {
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">加载中...</p>
+          <p className="text-gray-400">{t('marketDetail.loading')}</p>
         </div>
       </div>
     );
@@ -321,12 +323,12 @@ export default function MarketDetailPage() {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">市场不存在</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('marketDetail.notFound')}</h2>
           <button
             onClick={() => router.back()}
             className="text-amber-400 hover:text-amber-300"
           >
-            返回
+            {t('marketDetail.back')}
           </button>
         </div>
       </div>
@@ -348,10 +350,10 @@ export default function MarketDetailPage() {
             className="hover:text-amber-400 transition-colors flex items-center"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-            返回
+            {t('marketDetail.back')}
           </button>
           <span className="mx-2">/</span>
-          <span className="text-amber-400">{market.main_category}</span>
+          <span className="text-amber-400">{t(`categories.${market.main_category}`)}</span>
           <span className="mx-2">/</span>
           <span className="text-gray-500 truncate max-w-md">{market.title}</span>
         </div>
@@ -382,18 +384,18 @@ export default function MarketDetailPage() {
                 </span>
                 <span className="flex items-center">
                   <FontAwesomeIcon icon={faChartLine} className="mr-2 text-amber-400" />
-                  ${market.volume || 0} 交易量
+                  ${market.volume || 0} {t('marketDetail.volume')}
                 </span>
                 <span className="flex items-center">
                   <FontAwesomeIcon icon={faUsers} className="mr-2 text-amber-400" />
-                  {market.participants || 0} 参与者
+                  {market.participants || 0}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   market.status === 'active'
                     ? 'bg-green-500/10 text-green-400 border border-green-500/30'
                     : 'bg-white/5 text-gray-400 border border-white/10'
                 }`}>
-                  {market.status === 'active' ? '进行中' : '已结束'}
+                  {market.status === 'active' ? t('market.active') : t('market.ended', market.status)}
                 </span>
               </div>
             </div>
@@ -402,11 +404,11 @@ export default function MarketDetailPage() {
             <div className="flex gap-2 mt-4 md:mt-0">
               <button className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg hover:border-amber-400/50 transition-colors bg-white/5">
                 <FontAwesomeIcon icon={faShareAlt} className="text-gray-400" />
-                <span className="text-sm text-gray-300">分享</span>
+                <span className="text-sm text-gray-300">{t('market.share')}</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg hover:border-amber-400/50 transition-colors bg-white/5">
                 <FontAwesomeIcon icon={faBookmark} className="text-gray-400" />
-                <span className="text-sm text-gray-300">收藏</span>
+                <span className="text-sm text-gray-300">{t('market.bookmark')}</span>
               </button>
             </div>
           </div>
@@ -438,7 +440,7 @@ export default function MarketDetailPage() {
               <div className={`w-2 h-2 rounded-full mr-2 ${
                 wsConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
               }`}></div>
-              {wsConnected ? '实时更新' : '连接中...'}
+              {wsConnected ? t('orderbook.realtimeConnection') : t('common.loading')}
             </div>
           </div>
         </div>
@@ -450,7 +452,7 @@ export default function MarketDetailPage() {
             {/* 价格图表 */}
             <div className="bg-zinc-900 rounded-xl shadow-lg border border-white/10 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">概率趋势</h2>
+                <h2 className="text-lg font-semibold text-white">{t('marketDetail.priceChart')}</h2>
                 <div className="flex gap-2">
                   {['1D', '1W', '1M', '3M', 'ALL'].map((range) => (
                     <button
@@ -462,7 +464,7 @@ export default function MarketDetailPage() {
                           : 'bg-white/5 border border-white/10 text-gray-400 hover:border-amber-400/50'
                       }`}
                     >
-                      {range}
+                      {t(`marketDetail.timeRange.${range}`)}
                     </button>
                   ))}
                 </div>
@@ -474,21 +476,21 @@ export default function MarketDetailPage() {
 
             {/* 市场描述 */}
             <div className="bg-zinc-900 rounded-xl shadow-lg border border-white/10 p-6">
-              <h2 className="text-lg font-semibold text-white mb-3">市场描述</h2>
+              <h2 className="text-lg font-semibold text-white mb-3">{t('marketDetail.about')}</h2>
               <p className="text-gray-300 leading-relaxed">
-                {market.description || '暂无描述'}
+                {market.description || t('marketDetail.noActivity')}
               </p>
             </div>
 
             {/* 订单簿 */}
             <div className="bg-zinc-900 rounded-xl shadow-lg border border-white/10 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">订单簿</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">{t('marketDetail.orderBook')}</h2>
               <OrderBook marketId={parseInt(marketId)} outcome={1} />
             </div>
 
             {/* 我的订单 */}
             <div className="bg-zinc-900 rounded-xl shadow-lg border border-white/10 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">我的订单</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">{t('marketDetail.myOrders')}</h2>
               <MyOrders />
             </div>
           </div>
@@ -496,7 +498,7 @@ export default function MarketDetailPage() {
           {/* 右侧：交易面板 */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 bg-zinc-900 rounded-xl shadow-lg border border-white/10 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">交易</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">{t('marketDetail.placeOrder')}</h2>
               <OrderForm
                 marketId={parseInt(marketId)}
                 questionId={market.question_id}

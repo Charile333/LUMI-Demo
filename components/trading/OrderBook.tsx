@@ -3,6 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface OrderBookProps {
   marketId: number;
@@ -10,6 +11,7 @@ interface OrderBookProps {
 }
 
 export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBookProps) {
+  const { t } = useTranslation();
   const [orderBook, setOrderBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [outcome, setOutcome] = useState(initialOutcome || 1); // 1 = YES, 0 = NO
@@ -43,14 +45,14 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto mb-2"></div>
-        <div className="text-gray-400">加载订单簿...</div>
+        <div className="text-gray-400">{t('common.loading')}</div>
       </div>
     );
   }
   
   if (!orderBook) {
     return (
-      <div className="text-center py-8 text-gray-400">暂无订单数据</div>
+      <div className="text-center py-8 text-gray-400">{t('orderbook.noBuyOrders')}</div>
     );
   }
   

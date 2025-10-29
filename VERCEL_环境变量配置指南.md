@@ -113,6 +113,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
+### PostgreSQL 数据库连接（必需 - 用于订单系统）
+```bash
+# 在 Supabase Dashboard → Settings → Database → Connection string
+# 选择 "URI" 格式，将 [YOUR-PASSWORD] 替换为你的数据库密码
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.bepwgrvplikstxcffbzh.supabase.co:5432/postgres
+```
+
+⚠️ **重要**: 如果缺少 DATABASE_URL，以下 API 会返回 500 错误：
+- `/api/orders/book` - 获取订单簿
+- `/api/orders/my-orders` - 获取我的订单
+- `/api/orders/create` - 创建订单
+
 ### 可选配置
 ```bash
 ADMIN_PASSWORD=your_admin_password  # 管理后台密码

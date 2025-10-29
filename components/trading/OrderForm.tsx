@@ -7,6 +7,7 @@ import { ethers } from 'ethers';
 import { useWallet } from '@/app/provider';
 import { signOrder, generateSalt, generateOrderId } from '@/lib/clob/signing';
 import { Order } from '@/lib/clob/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface OrderFormProps {
   marketId: number;
@@ -27,6 +28,7 @@ export default function OrderForm({
   bestAsk = 0.51,
   onSuccess
 }: OrderFormProps) {
+  const { t } = useTranslation();
   const { address: account, isConnected } = useWallet();
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [outcome, setOutcome] = useState(1); // 1 = YES, 0 = NO
@@ -49,12 +51,12 @@ export default function OrderForm({
   // 提交订单
   const handleSubmit = async () => {
     if (!window.ethereum) {
-      alert('请安装 MetaMask 钱包');
+      alert(t('orderForm.installMetaMask'));
       return;
     }
     
     if (!account || !isConnected) {
-      alert('请先在页面顶部连接钱包');
+      alert(t('orderForm.connectWalletFirst'));
       return;
     }
     
@@ -99,7 +101,7 @@ export default function OrderForm({
       const result = await response.json();
       
       if (result.success) {
-        alert(`✅ ${result.message}\n\n订单ID: ${order.orderId}`);
+        alert(`${t('orderForm.orderSuccess')}\n\n${t('orderForm.orderSuccessDetail')}\n\n${t('market.marketId')}: ${order.orderId}`);
         
         // 重置表单
         setAmount('10');
@@ -114,7 +116,13 @@ export default function OrderForm({
       
     } catch (error: any) {
       console.error('提交订单失败:', error);
-      alert('提交失败:\n\n' + error.message);
+      if (error.code === 4001) {
+        alert(t('orderForm.userCancelled'));
+      } else if (error.message?.includes('user rejected')) {
+        alert(t('orderForm.userRejected'));
+      } else {
+        alert(t('orderForm.orderFailed') + ':\n\n' + error.message);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -137,32 +145,32 @@ export default function OrderForm({
       {!isConnected ? (
         <div className="mb-4 p-4 bg-amber-400/10 border border-amber-400/30 rounded-lg">
           <p className="text-sm text-amber-400 text-center">
-            请先在页面顶部连接钱包
+            {t('orderForm.connectWalletFirst')}
           </p>
         </div>
       ) : (
         <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
           <div className="text-sm text-gray-300">
-            已连接: {account?.substring(0, 6)}...{account?.substring(38)}
+            {t('wallet.connect', 'Connected')}: {account?.substring(0, 6)}...{account?.substring(38)}
           </div>
         </div>
       )}
       
       {/* 市场实时价格 */}
       <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
-        <div className="text-xs font-semibold text-amber-400 mb-2">实时市场价格</div>
+        <div className="text-xs font-semibold text-amber-400 mb-2">{t('orderForm.livePrice')}</div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
-            <div className="text-gray-400 text-xs">买价 (Bid)</div>
+            <div className="text-gray-400 text-xs">{t('orderForm.bid')}</div>
             <div className="font-bold text-green-400">${bestBid.toFixed(2)}</div>
           </div>
           <div>
-            <div className="text-gray-400 text-xs">卖价 (Ask)</div>
+            <div className="text-gray-400 text-xs">{t('orderForm.ask')}</div>
             <div className="font-bold text-red-400">${bestAsk.toFixed(2)}</div>
           </div>
         </div>
         <div className="text-xs text-gray-500 mt-1">
-          价差: {spread}¢
+          {t('orderForm.spread')}: {spread}¢
         </div>
       </div>
       
@@ -205,7 +213,7 @@ export default function OrderForm({
               : 'bg-white/5 border border-white/10 text-gray-400 hover:border-green-600/50'
           }`}
         >
-          买入
+          {t('orderForm.buy')}
         </button>
         <button
           onClick={() => handleSideChange('sell')}
@@ -216,14 +224,14 @@ export default function OrderForm({
               : 'bg-white/5 border border-white/10 text-gray-400 hover:border-red-600/50'
           }`}
         >
-          卖出
+          {t('orderForm.sell')}
         </button>
       </div>
       
       {/* 市场价格（只读显示） */}
       <div className="mb-4">
         <label className="block text-sm font-semibold mb-2 text-gray-300">
-          成交价格（市价）
+          {t('orderForm.executionPrice')}
         </label>
         <div className="w-full px-4 py-3 bg-white/5 border-2 border-amber-400/30 rounded-lg">
           <div className="flex justify-between items-center">
@@ -231,19 +239,19 @@ export default function OrderForm({
               ${marketPrice.toFixed(2)}
             </span>
             <span className="text-xs text-gray-400">
-              {side === 'buy' ? '买入价' : '卖出价'}
+              {side === 'buy' ? t('orderForm.ask') : t('orderForm.bid')}
             </span>
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          价格固定为市场价，保证立即成交
+          {t('orderForm.marketPrice')}
         </p>
       </div>
       
       {/* 数量 */}
       <div className="mb-4">
         <label className="block text-sm font-semibold mb-2 flex justify-between items-center text-gray-300">
-          <span>数量（股）</span>
+          <span>{t('orderForm.amount')}</span>
           <div className="flex gap-1">
             {['10', '50', '100', '500'].map((val) => (
               <button
@@ -266,24 +274,24 @@ export default function OrderForm({
           step="1"
           disabled={submitting || !isConnected}
           className="w-full px-4 py-2 bg-white/5 border-2 border-white/10 text-white rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
-          placeholder="输入数量"
+          placeholder={t('orderForm.amount')}
         />
       </div>
       
       {/* 交易摘要 */}
       <div className="mb-4 p-4 bg-white/5 border-2 border-white/10 rounded-lg space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">成交价格:</span>
-          <span className="font-bold text-gray-200">${marketPrice.toFixed(2)} / 股</span>
+          <span className="text-gray-400">{t('orderForm.marketPrice')}:</span>
+          <span className="font-bold text-gray-200">${marketPrice.toFixed(2)} / {t('orderForm.shares')}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">数量:</span>
-          <span className="font-bold text-gray-200">{amount} 股</span>
+          <span className="text-gray-400">{t('market.quantity')}:</span>
+          <span className="font-bold text-gray-200">{amount} {t('orderForm.shares')}</span>
         </div>
         <div className="border-t border-white/10 pt-2 mt-2"></div>
         <div className="flex justify-between text-base">
           <span className="text-gray-300 font-semibold">
-            {side === 'buy' ? '需支付:' : '将收到:'}
+            {t('orderForm.totalCost')}:
           </span>
           <span className="font-bold text-lg text-amber-400">
             ${estimatedCost} USDC
@@ -291,9 +299,9 @@ export default function OrderForm({
         </div>
         {side === 'buy' && (
           <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-white/10">
-            预测正确可获得: ${(parseFloat(amount) * 1).toFixed(2)} USDC
+            {t('orderForm.estimatedShares')}: ${(parseFloat(amount) * 1).toFixed(2)} USDC
             <br />
-            潜在收益: <span className="text-green-400 font-semibold">+${potentialProfit} USDC</span>
+            {t('orderForm.potentialProfit')}: <span className="text-green-400 font-semibold">+${potentialProfit} USDC</span>
           </div>
         )}
       </div>
@@ -309,16 +317,15 @@ export default function OrderForm({
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {submitting 
-          ? '提交中...' 
+          ? t('orderForm.submitting')
           : !isConnected 
-            ? '请先连接钱包'
-            : `确认${side === 'buy' ? '买入' : '卖出'} ${outcome === 1 ? 'YES' : 'NO'}`
+            ? t('orderForm.connectWalletFirst')
+            : `${side === 'buy' ? t('orderForm.confirmBuy') : t('orderForm.confirmSell')} ${outcome === 1 ? 'YES' : 'NO'}`
         }
       </button>
       
       <p className="text-xs text-gray-500 mt-3 text-center">
-        订单将在链下匹配，成交后批量结算到链上<br />
-        订单有效期 7 天，未成交可随时取消
+        {t('orderForm.orderNote')}
       </p>
     </div>
   );

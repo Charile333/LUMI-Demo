@@ -31,7 +31,7 @@ export default function ProfilePage() {
     <div className="bg-[#121212] text-white font-sans antialiased min-h-screen">
       {/* Overlay */}
       {(showGiftCenter || showProfileMenu) && (
-        <div className="fixed inset-0 bg-black/50 z-40" style={{ backdropFilter: 'blur(1px)' }}></div>
+        <div className="fixed inset-0 bg-black/50 z-[110]" style={{ backdropFilter: 'blur(1px)' }}></div>
       )}
 
       {/* Header Navigation */}
@@ -85,7 +85,7 @@ export default function ProfilePage() {
               
               {/* Profile Dropdown */}
               {showProfileMenu && (
-                <div id="profileDropdown" className="absolute right-0 mt-2 w-64 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div id="profileDropdown" className="absolute right-0 mt-2 w-64 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-[120] animate-in fade-in slide-in-from-top-2 duration-300">
                   {/* User Info Header */}
                   <div className="p-4 border-b border-gray-800">
                     <div className="flex items-center space-x-3">
@@ -418,7 +418,7 @@ export default function ProfilePage() {
       
       {/* Gift Center Popup */}
       {showGiftCenter && (
-        <div id="giftCenterPopup" className="fixed right-6 top-20 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-50 w-80 md:w-96 animate-in fade-in slide-in-from-right-2 duration-300">
+        <div id="giftCenterPopup" className="fixed right-6 top-20 bg-[#1a1a1a] rounded-xl border border-gray-800 shadow-2xl shadow-black/50 overflow-hidden z-[120] w-80 md:w-96 animate-in fade-in slide-in-from-right-2 duration-300">
           {/* Popup Header */}
           <div className="p-4 border-b border-gray-800 flex justify-between items-center">
             <h3 className="text-lg font-semibold flex items-center" style={{ fontFamily: "'Playfair Display', serif" }}>
