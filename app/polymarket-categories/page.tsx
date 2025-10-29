@@ -46,7 +46,7 @@ const PolymarketCategoriesPage = () => {
           {/* 标题 */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              📊 Polymarket 分类分析
+              Polymarket 分类分析
             </h1>
             <p className="text-gray-600">
               查看 Polymarket 实际有哪些分类的预测市场

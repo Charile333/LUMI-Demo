@@ -198,7 +198,7 @@ const GridMarketPage = () => {
       world: '🌎',
       crypto: '💰'
     }
-    return icons[category] || '📊'
+    return icons[category] || ''
   }
 
   return (

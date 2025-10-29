@@ -19,13 +19,13 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
 
   // 根据主题选择颜色
   const isDark = theme === 'dark';
-  const bgColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(168, 85, 247, 0.1)';
-  const bgHoverColor = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(168, 85, 247, 0.2)';
-  const borderColor = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(168, 85, 247, 0.3)';
-  const borderHoverColor = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(168, 85, 247, 0.5)';
-  const textColor = isDark ? 'white' : 'rgb(109, 40, 217)';
-  const dropdownBg = isDark ? 'rgb(17, 24, 39)' : 'rgb(255, 255, 255)';
-  const dropdownBorder = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(168, 85, 247, 0.3)';
+  const bgColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(168, 85, 247, 0.1)';
+  const bgHoverColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(168, 85, 247, 0.2)';
+  const borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(168, 85, 247, 0.3)';
+  const borderHoverColor = isDark ? 'rgba(245, 158, 11, 0.5)' : 'rgba(168, 85, 247, 0.5)';
+  const textColor = isDark ? 'rgb(251, 191, 36)' : 'rgb(109, 40, 217)';
+  const dropdownBg = isDark ? 'rgb(24, 24, 27)' : 'rgb(255, 255, 255)';
+  const dropdownBorder = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(168, 85, 247, 0.3)';
 
   if (!mounted) {
     return (
@@ -65,12 +65,12 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
           gap: '0.5rem',
           padding: '0.5rem 1rem',
           borderRadius: '0.5rem',
-          backgroundColor: bgColor,
+          background: bgColor,
           border: `2px solid ${borderColor}`,
           backdropFilter: 'blur(12px)',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          boxShadow: 'none',
           cursor: 'pointer',
-          transition: 'all 0.2s'
+          transition: 'all 0.3s'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = bgHoverColor;
@@ -125,9 +125,9 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
             marginTop: '0.5rem',
             width: '12rem',
             borderRadius: '0.5rem',
-            backgroundColor: dropdownBg,
+            background: dropdownBg,
             border: `2px solid ${dropdownBorder}`,
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
             zIndex: 50,
             overflow: 'hidden',
             backdropFilter: 'blur(24px)'
@@ -143,18 +143,18 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                backgroundColor: currentLanguage === 'en' ? (isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(168, 85, 247, 0.1)') : 'transparent',
-                color: isDark ? (currentLanguage === 'en' ? 'white' : 'rgb(209, 213, 219)') : (currentLanguage === 'en' ? 'rgb(109, 40, 217)' : 'rgb(107, 114, 128)'),
+                backgroundColor: currentLanguage === 'en' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(168, 85, 247, 0.1)') : 'transparent',
+                color: isDark ? (currentLanguage === 'en' ? 'rgb(251, 191, 36)' : 'rgb(209, 213, 219)') : (currentLanguage === 'en' ? 'rgb(109, 40, 217)' : 'rgb(107, 114, 128)'),
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(168, 85, 247, 0.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentLanguage === 'en' ? (isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(168, 85, 247, 0.1)') : 'transparent'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(168, 85, 247, 0.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentLanguage === 'en' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(168, 85, 247, 0.1)') : 'transparent'}
             >
               <span style={{ fontWeight: '600' }}>English</span>
               {currentLanguage === 'en' && (
-                <svg style={{ width: '1.25rem', height: '1.25rem', color: isDark ? 'rgb(74, 222, 128)' : 'rgb(168, 85, 247)' }} fill="currentColor" viewBox="0 0 20 20">
+                <svg style={{ width: '1.25rem', height: '1.25rem', color: isDark ? 'rgb(245, 158, 11)' : 'rgb(168, 85, 247)' }} fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               )}
@@ -170,18 +170,18 @@ export default function LanguageSwitcher({ theme = 'dark' }: LanguageSwitcherPro
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                backgroundColor: currentLanguage === 'zh' ? (isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(168, 85, 247, 0.1)') : 'transparent',
-                color: isDark ? (currentLanguage === 'zh' ? 'white' : 'rgb(209, 213, 219)') : (currentLanguage === 'zh' ? 'rgb(109, 40, 217)' : 'rgb(107, 114, 128)'),
+                backgroundColor: currentLanguage === 'zh' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(168, 85, 247, 0.1)') : 'transparent',
+                color: isDark ? (currentLanguage === 'zh' ? 'rgb(251, 191, 36)' : 'rgb(209, 213, 219)') : (currentLanguage === 'zh' ? 'rgb(109, 40, 217)' : 'rgb(107, 114, 128)'),
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(168, 85, 247, 0.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentLanguage === 'zh' ? (isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(168, 85, 247, 0.1)') : 'transparent'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(168, 85, 247, 0.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = currentLanguage === 'zh' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(168, 85, 247, 0.1)') : 'transparent'}
             >
               <span style={{ fontWeight: '600' }}>中文</span>
               {currentLanguage === 'zh' && (
-                <svg style={{ width: '1.25rem', height: '1.25rem', color: isDark ? 'rgb(74, 222, 128)' : 'rgb(168, 85, 247)' }} fill="currentColor" viewBox="0 0 20 20">
+                <svg style={{ width: '1.25rem', height: '1.25rem', color: isDark ? 'rgb(245, 158, 11)' : 'rgb(168, 85, 247)' }} fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               )}

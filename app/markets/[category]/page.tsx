@@ -334,17 +334,17 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-zinc-950 text-white">
       {/* Navbar - 不传递子分类，子分类移到搜索区域 */}
       <Navbar 
         activeCategory={category}
       />
       
       {/* 占位符 - 为固定的导航栏留出空间（不包括子分类） */}
-      <div style={{ height: 'calc(80px + 60px + 57px)' }}></div>
+      <div style={{ height: 'calc(80px + 60px + 57px - 40px)' }}></div>
       
       {/* Filters - 固定在导航栏下方，包含子分类 */}
-      <div className="fixed top-[calc(80px+60px+57px)] left-0 right-0 z-[95] bg-white pt-4">
+      <div className="fixed top-[calc(80px+60px+57px)] left-0 right-0 z-[95] bg-zinc-950/95 backdrop-blur-sm border-b border-white/5 pt-4">
         <div className="container mx-auto px-4 pb-2">
           <div className="flex gap-4 items-center flex-nowrap">
             {/* Search Box */}
@@ -354,10 +354,10 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                 placeholder={t('common.searchMarkets')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 pl-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400 transition-colors"
               />
               <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-amber-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -371,9 +371,9 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
               {showLeftArrow && (
                 <button
                   onClick={() => scrollSubCategories('left')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white shadow-lg rounded-full p-1.5 transition-all"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-zinc-900 hover:bg-zinc-800 rounded-full p-1.5 transition-colors border border-white/10"
                 >
-                  <svg className="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
@@ -390,8 +390,8 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                       onClick={() => setSelectedSubCategory(subCat.id)}
                       className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                         selectedSubCategory === subCat.id
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-white border border-gray-300 text-gray-700 hover:border-purple-400 hover:text-purple-600'
+                          ? 'bg-amber-400 text-black'
+                          : 'bg-white/5 border border-white/10 text-gray-300 hover:border-white/20 hover:text-white'
                       }`}
                     >
                       {subCat.name}
@@ -402,9 +402,9 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
               {showRightArrow && (
                 <button
                   onClick={() => scrollSubCategories('right')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white shadow-lg rounded-full p-1.5 transition-all"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-zinc-900 hover:bg-zinc-800 rounded-full p-1.5 transition-colors border border-white/10"
                 >
-                  <svg className="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -419,8 +419,8 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                   onClick={() => setSelectedTimeRange(range)}
                   className={`w-14 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap flex items-center justify-center flex-shrink-0 ${
                     selectedTimeRange === range
-                      ? 'bg-purple-100 text-purple-600 border border-purple-300'
-                      : 'bg-white border border-gray-300 text-gray-600 hover:border-purple-400 hover:text-purple-600'
+                      ? 'bg-white/10 text-amber-400 border border-amber-400'
+                      : 'bg-white/5 border border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-200'
                   }`}
                 >
                   {range}
@@ -435,12 +435,12 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
       <div style={{ height: '56px' }}></div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pb-6 -mt-2">
+      <div className="container mx-auto px-4 pb-6 -mt-32">
         {/* Markets Grid */}
         {wsConnected && (
-          <div className="mb-2 flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg w-fit">
+          <div className="mb-2 flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg w-fit">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-green-700">实时价格已连接</span>
+            <span className="text-sm text-green-400">实时价格已连接</span>
           </div>
         )}
         
@@ -448,8 +448,8 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <FontAwesomeIcon icon={config.icon} className="text-6xl text-purple-600 mb-4 animate-pulse" />
-              <p className="text-xl text-gray-600">{t('common.loading')}</p>
+              <FontAwesomeIcon icon={config.icon} className="text-6xl text-amber-400 mb-4 animate-pulse" />
+              <p className="text-xl text-white font-semibold">{t('common.loading')}</p>
               <p className="text-sm text-gray-500 mt-2">{t('common.loadingData')}</p>
             </div>
           </div>
@@ -460,11 +460,11 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <FontAwesomeIcon icon={config.icon} className="text-6xl text-red-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('common.loadFailed')}</h3>
-              <p className="text-gray-500 mb-4">{error}</p>
+              <h3 className="text-xl font-semibold text-white mb-2">{t('common.loadFailed')}</h3>
+              <p className="text-gray-400 mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-6 py-2 bg-amber-400 hover:bg-amber-500 text-black rounded-lg transition-colors font-semibold"
               >
                 {t('common.reload')}
               </button>
@@ -478,12 +478,12 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
           {marketsWithRealtimePrices.map((market) => (
             <div
               key={market.id}
-              className="bg-white rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all duration-300 group overflow-hidden min-h-[350px] flex flex-col"
+              className="bg-zinc-900 rounded-xl border border-white/10 hover:border-amber-400/50 transition-all duration-300 group overflow-hidden min-h-[350px] flex flex-col"
             >
               {/* Card Header - Title with Trend */}
               <Link href={`/market/${market.id}`} className="block p-6 pb-4">
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors flex-1">
+                  <h3 className="text-lg font-semibold text-white group-hover:text-amber-400 transition-colors flex-1">
                     {market.title}
                   </h3>
                   <div className={`flex items-center text-sm font-medium whitespace-nowrap ${
@@ -501,35 +501,35 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                 <div className="flex items-center gap-2 flex-wrap">
                   {/* 优先级标签 */}
                   {market.priorityLevel === 'pinned' && (
-                    <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800 font-medium">
+                    <span className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400 font-medium border border-red-500/30">
                       📌 置顶
                     </span>
                   )}
                   {market.priorityLevel === 'featured' && (
-                    <span className="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800 font-medium">
+                    <span className="px-2 py-1 text-xs rounded bg-amber-400/10 text-amber-400 font-medium border border-amber-400/30">
                       ⭐ 精选
                     </span>
                   )}
                   {market.priorityLevel === 'recommended' && (
-                    <span className="px-2 py-1 text-xs rounded bg-orange-100 text-orange-800 font-medium">
+                    <span className="px-2 py-1 text-xs rounded bg-orange-500/20 text-orange-400 font-medium border border-orange-500/30">
                       🔥 推荐
                     </span>
                   )}
                   
                   {/* 数据来源标签 */}
                   {market.source === 'polymarket' && (
-                    <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+                    <span className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
                       🔴 Polymarket
                     </span>
                   )}
                   {market.source === 'custom' && (
-                    <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                    <span className="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400 border border-green-500/30">
                       📝 自定义
                     </span>
                   )}
                   
                   {/* 分类标签 */}
-                  <span className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">
+                  <span className="px-2 py-1 text-xs rounded bg-white/5 text-gray-400 border border-white/10">
                     {market.category}
                   </span>
                 </div>
@@ -541,11 +541,11 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="text-xs text-gray-500 mb-1">当前概率</div>
-                    <div className="text-3xl font-bold text-purple-600">{market.probability}%</div>
+                    <div className="text-3xl font-bold text-amber-400">{market.probability}%</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-gray-500 mb-1">截止日期</div>
-                    <div className="text-sm text-gray-900">{market.endDate}</div>
+                    <div className="text-xs text-gray-400 mb-1">截止日期</div>
+                    <div className="text-sm text-white">{market.endDate}</div>
                   </div>
                 </div>
 
@@ -592,9 +592,9 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
                 </div>
 
                 {/* Market Info */}
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-200">
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-white/5">
                   <div className="flex items-center">
-                    <FontAwesomeIcon icon={faChartLine} className="mr-1.5 text-purple-600" />
+                    <FontAwesomeIcon icon={faChartLine} className="mr-1.5 text-amber-400" />
                     <span>{market.volume}</span>
                   </div>
                   <div className="flex items-center">
@@ -610,8 +610,8 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
           {marketsWithRealtimePrices.length === 0 && (
             <div className="col-span-full text-center py-12">
               <FontAwesomeIcon icon={config.icon} className="text-6xl text-gray-600 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-500 mb-2">暂无市场</h3>
-              <p className="text-gray-500">请尝试调整筛选条件查看更多结果</p>
+              <h3 className="text-xl font-semibold text-white mb-2">暂无市场</h3>
+              <p className="text-gray-400">请尝试调整筛选条件查看更多结果</p>
             </div>
           )}
         </div>

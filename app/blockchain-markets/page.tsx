@@ -248,7 +248,7 @@ export default function BlockchainMarketsPage() {
                       href={`/trade/${market.conditionId}`}
                       className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 font-medium text-sm"
                     >
-                      📊 交易
+                      交易
                     </Link>
                     <button
                       onClick={() => {

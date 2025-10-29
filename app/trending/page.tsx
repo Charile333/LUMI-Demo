@@ -155,7 +155,7 @@ const TrendingPage = () => {
       Politics: '🏛️',
       Climate: '🌎'
     };
-    return icons[category] || '📊';
+    return icons[category] || '';
   };
 
   return (

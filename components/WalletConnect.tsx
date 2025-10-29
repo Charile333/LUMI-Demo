@@ -39,9 +39,9 @@ export default function WalletConnect() {
     return (
       <div className="flex items-center gap-3">
         {/* 已连接：显示地址 */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-300 rounded-lg">
+        <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/40 rounded-lg">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-sm font-mono text-green-700">
+          <span className="text-sm font-mono text-green-400">
             {formatAddress(address)}
           </span>
         </div>
@@ -49,7 +49,7 @@ export default function WalletConnect() {
         {/* 断开连接按钮 */}
         <button
           onClick={disconnectWallet}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors"
           title={t('wallet.disconnect')}
         >
           {t('wallet.disconnect')}
@@ -62,7 +62,7 @@ export default function WalletConnect() {
     <button
       onClick={handleConnect}
       disabled={isConnecting}
-      className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      className="px-6 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
     >
       {isConnecting ? (
         <>

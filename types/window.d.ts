@@ -9,6 +9,11 @@ declare global {
       removeListener: (event: string, handler: (...args: any[]) => void) => void;
       selectedAddress: string | null;
     };
+    wormholeBackground?: {
+      destroy: () => void;
+      stop: () => void;
+      isAnimating: boolean;
+    };
   }
 }
 
