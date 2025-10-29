@@ -268,7 +268,7 @@ export default function SportsBettingPage() {
                             <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center mr-3">
                               <i className={`fa ${sport.icon} text-xs text-white`}></i>
                             </div>
-                            <span>{t(`sportsBetting.sports.${sport.nameKey}`)}</span>
+                            <span>{String(t(`sportsBetting.sports.${sport.nameKey}`))}</span>
                           </div>
                           <span className="bg-[#121212] text-xs px-1.5 py-0.5 rounded-full">{sport.count}</span>
                         </a>

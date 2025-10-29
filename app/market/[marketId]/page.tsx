@@ -353,7 +353,7 @@ export default function MarketDetailPage() {
             {t('marketDetail.back')}
           </button>
           <span className="mx-2">/</span>
-          <span className="text-amber-400">{t(`categories.${market.main_category}`)}</span>
+          <span className="text-amber-400">{String(t(`categories.${market.main_category}`))}</span>
           <span className="mx-2">/</span>
           <span className="text-gray-500 truncate max-w-md">{market.title}</span>
         </div>
@@ -464,7 +464,7 @@ export default function MarketDetailPage() {
                           : 'bg-white/5 border border-white/10 text-gray-400 hover:border-amber-400/50'
                       }`}
                     >
-                      {t(`marketDetail.timeRange.${range}`)}
+                      {String(t(`marketDetail.timeRange.${range}`))}
                     </button>
                   ))}
                 </div>

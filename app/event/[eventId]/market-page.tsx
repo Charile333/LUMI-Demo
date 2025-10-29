@@ -148,7 +148,7 @@ export default function MarketDetailPage() {
                       ? 'bg-gray-100 text-gray-700'
                       : 'bg-yellow-100 text-yellow-700'
                   }`}>
-                    {t(`market.${marketData.status}`, marketData.status)}
+                    {String(t(`market.${marketData.status}`, marketData.status))}
                   </span>
                 </div>
               </div>

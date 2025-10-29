@@ -4,7 +4,7 @@
 
 import { IDataProvider } from './base';
 import { Market, CategoryType } from '@/lib/types/market';
-import { supabaseAdmin } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase-client';
 
 export class CustomProvider implements IDataProvider {
   name = 'custom';
