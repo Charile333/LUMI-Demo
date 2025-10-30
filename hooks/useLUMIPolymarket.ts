@@ -367,7 +367,11 @@ export function useLUMIPolymarket() {
       ]
     };
 
-    const signature = await signer._signTypedData(domain, types, order);
+    // Type assertion needed because _signTypedData is a private method in ethers v5
+    const signerWithTypedData = signer as ethers.Signer & {
+      _signTypedData: (domain: any, types: any, value: any) => Promise<string>;
+    };
+    const signature = await signerWithTypedData._signTypedData(domain, types, order);
 
     return { order, signature };
   }, [signer, address]);
