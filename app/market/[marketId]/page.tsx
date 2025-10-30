@@ -196,7 +196,9 @@ export default function MarketDetailPage() {
   // 3. 🔥 WebSocket 实时价格更新
   useEffect(() => {
     if (wsOrderBook) {
-      let { bestBid, bestAsk } = wsOrderBook;
+      // 从订单簿数组中提取最佳买价和卖价
+      let bestBid = wsOrderBook.bids?.[0]?.price ?? 0;
+      let bestAsk = wsOrderBook.asks?.[0]?.price ?? 0;
       
       // 处理单边订单情况
       if (bestBid === 0 && bestAsk > 0) {
