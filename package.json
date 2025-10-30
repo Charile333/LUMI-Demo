@@ -32,6 +32,8 @@
     "@polymarket/real-time-data-client": "github:Polymarket/real-time-data-client",
     "@supabase/supabase-js": "^2.76.1",
     "@types/pg": "^8.15.5",
+    "@uma/contracts-node": "^0.4.28",
+    "@uma/sdk": "^0.34.13",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
     "cryptocurrency-icons": "^0.18.1",

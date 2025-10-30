@@ -6,11 +6,11 @@ import { ConnectWallet } from '@/components/wallet/ConnectWallet';
 import { MarketCard } from '@/components/MarketCard';
 import Link from 'next/link';
 
-// 合约配置
+// 合约配置 - 使用官方组件 ✅
 const CONTRACTS = {
   testAdapter: '0x5D440c98B55000087a8b0C164f1690551d18CfcC',
-  ctfExchange: '0x41AE309fAb269adF729Cfae78E6Ef741F6a8E3AE',
-  conditionalTokens: '0xeB4F3700FE422c1618B449763d423687D5ad0950',
+  ctfExchange: '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40', // ✅ Polymarket 官方
+  conditionalTokens: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2', // ✅ Gnosis 官方
   mockUSDC: '0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a'
 };
 

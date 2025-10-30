@@ -6,8 +6,8 @@
 import { db } from '../lib/db';
 import { ethers } from 'ethers';
 
-// 合约配置
-const CTF_EXCHANGE_ADDRESS = '0x41AE309fAb269adF729Cfae78E6Ef741F6a8E3AE';
+// 合约配置 - 使用 Polymarket 官方 CTF Exchange ✅
+const CTF_EXCHANGE_ADDRESS = '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40';
 const CTF_EXCHANGE_ABI = [
   'function fillOrders(tuple[] orders, bytes[] signatures, uint256[] amounts)'
 ];

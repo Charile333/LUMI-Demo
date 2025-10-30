@@ -169,6 +169,20 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
               </div>
             </div>
             
+            {/* 交易量和连接状态 */}
+            <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+              <div className="flex items-center gap-1">
+                <span>📊</span>
+                <span>24h: ${price.volume24h.toFixed(0)}</span>
+              </div>
+              {price.connected && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                  <span className="text-xs">实时</span>
+                </div>
+              )}
+            </div>
+            
             {/* 价差警告 */}
             {price.spread >= 0.10 && (
               <div className="mt-2 text-xs text-amber-600 flex items-center gap-1">

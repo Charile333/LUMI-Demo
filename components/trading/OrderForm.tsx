@@ -16,6 +16,7 @@ interface OrderFormProps {
   currentPriceNo?: number;
   bestBid?: number;  // 最佳买价（用户可以卖出的价格）
   bestAsk?: number;  // 最佳卖价（用户需要买入的价格）
+  polymarket?: any;  // 🎯 Polymarket 集成
   onSuccess?: () => void;  // 订单成功回调
 }
 
@@ -26,6 +27,7 @@ export default function OrderForm({
   currentPriceNo = 0.5,
   bestBid = 0.49,
   bestAsk = 0.51,
+  polymarket,
   onSuccess
 }: OrderFormProps) {
   const { t } = useTranslation();
@@ -63,6 +65,52 @@ export default function OrderForm({
     setSubmitting(true);
     
     try {
+      // 🎯 如果有 Polymarket 集成，优先使用区块链交易
+      if (polymarket && polymarket.isConnected) {
+        console.log('🎯 使用 Polymarket 官方组件执行交易...');
+        
+        // 连接钱包（如果还没连接）
+        if (!polymarket.isConnected) {
+          await polymarket.connect();
+        }
+        
+        // 创建区块链订单
+        const tokenId = outcome === 1 ? 1 : 2; // YES=1, NO=2
+        const { order: polyOrder, signature: polySig } = await polymarket.createOrder(
+          tokenId,
+          parseFloat(amount),
+          marketPrice,
+          side === 'buy' ? 'BUY' : 'SELL'
+        );
+        
+        console.log('📋 Polymarket订单已创建:', polyOrder);
+        
+        // 执行区块链交易
+        const result = await polymarket.fillOrder(polyOrder, polySig);
+        
+        console.log('✅ Polymarket交易成功！', result.transactionHash);
+        
+        alert(`✅ 交易成功！\n\n使用 Polymarket 官方 CTF Exchange\n\n交易哈希: ${result.transactionHash.slice(0, 10)}...\n\n点击确定查看详情`);
+        
+        // 打开区块链浏览器
+        if (result.explorerUrl) {
+          window.open(result.explorerUrl, '_blank');
+        }
+        
+        // 重置表单
+        setAmount('10');
+        
+        // 触发回调刷新页面数据
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        return;
+      }
+      
+      // 📊 默认模式：链下订单簿
+      console.log('📊 使用链下订单簿模式...');
+      
       // 1. 获取 provider 和 signer
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();

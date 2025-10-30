@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMI Polymarket 演示模式（无需代币）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="mb-6 p-4 bg-green-500/20 border border-green-500 rounded-lg">
+            <h2 class="text-xl font-bold text-green-400 mb-2">🎮 演示模式</h2>
+            <p class="text-sm text-green-300">
+                这是一个完整的演示模式，不需要 MetaMask、不需要测试币，可以体验完整流程！
+            </p>
+        </div>
+
+        <h1 class="text-3xl font-bold mb-8">🎯 LUMI Polymarket 功能演示</h1>
+        
+        <!-- 模拟连接钱包 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">1. 模拟连接钱包</h2>
+            <button id="connectBtn" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg">
+                模拟连接
+            </button>
+            <div id="walletInfo" class="mt-4 hidden">
+                <p class="text-green-400">✅ 已连接（模拟）: <span id="walletAddress"></span></p>
+                <p class="text-yellow-400">💰 MATIC: <span id="maticBalance"></span></p>
+                <p class="text-yellow-400">💰 USDC: <span id="usdcBalance"></span></p>
+            </div>
+        </div>
+
+        <!-- 模拟创建市场 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">2. 模拟创建市场</h2>
+            <div class="space-y-4">
+                <input type="text" id="marketTitle" placeholder="市场标题" 
+                    value="比特币会在2025年突破10万美元吗？"
+                    class="w-full bg-gray-700 rounded px-4 py-2">
+                <textarea id="marketDesc" placeholder="市场描述" 
+                    class="w-full bg-gray-700 rounded px-4 py-2 h-24">预测比特币价格是否会在2025年底前突破10万美元大关</textarea>
+                <button id="createMarketBtn" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg">
+                    创建市场（模拟）
+                </button>
+            </div>
+            <div id="marketResult" class="mt-4 hidden">
+                <div class="p-4 bg-green-500/20 border border-green-500 rounded">
+                    <p class="text-green-400 font-bold">✅ 市场创建成功！（模拟）</p>
+                    <p class="text-sm mt-2">QuestionID: <span id="questionId" class="font-mono text-xs"></span></p>
+                    <p class="text-sm">交易哈希: <span id="txHash" class="font-mono text-xs"></span></p>
+                    <a id="txLink" href="#" class="text-blue-400 underline text-sm">查看交易（模拟）</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模拟下注 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">3. 模拟下注</h2>
+            <div class="space-y-4">
+                <input type="text" id="betAmount" placeholder="金额" value="10"
+                    class="w-full bg-gray-700 rounded px-4 py-2">
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="betYesBtn" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg">
+                        押注 YES
+                    </button>
+                    <button id="betNoBtn" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg">
+                        押注 NO
+                    </button>
+                </div>
+            </div>
+            <div id="betResult" class="mt-4 hidden">
+                <div class="p-4 bg-green-500/20 border border-green-500 rounded">
+                    <p class="text-green-400 font-bold">✅ 下注成功！（模拟）</p>
+                    <p class="text-sm mt-2">你押注: <span id="betChoice"></span></p>
+                    <p class="text-sm">金额: <span id="betAmountDisplay"></span> USDC</p>
+                    <p class="text-sm">交易哈希: <span id="betTxHash" class="font-mono text-xs"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模拟结算 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">4. 模拟市场结算</h2>
+            <button id="settleBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg">
+                请求结算（模拟）
+            </button>
+            <div id="settleResult" class="mt-4 hidden">
+                <div class="p-4 bg-purple-500/20 border border-purple-500 rounded">
+                    <p class="text-purple-400 font-bold">✅ 结算请求已提交！（模拟）</p>
+                    <p class="text-sm mt-2">⏳ 等待挑战期结束（约2小时）</p>
+                    <p class="text-sm">交易哈希: <span id="settleTxHash" class="font-mono text-xs"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 说明 -->
+        <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-blue-400 mb-3">💡 这是演示模式</h3>
+            <ul class="space-y-2 text-sm text-blue-300">
+                <li>✅ 不需要安装 MetaMask</li>
+                <li>✅ 不需要测试代币</li>
+                <li>✅ 不需要真实交易</li>
+                <li>✅ 可以体验完整的用户流程</li>
+                <li>⚠️ 所有操作都是模拟的，不会真正上链</li>
+            </ul>
+            <div class="mt-4 p-3 bg-yellow-500/20 border border-yellow-500 rounded">
+                <p class="text-yellow-400 font-bold">🔧 要使用真实区块链？</p>
+                <p class="text-sm text-yellow-300 mt-1">
+                    需要先获取测试代币：<br>
+                    1. 访问 <a href="https://faucet.polygon.technology/" target="_blank" class="underline">Polygon 水龙头</a><br>
+                    2. 选择 Polygon Amoy 网络<br>
+                    3. 获取测试 MATIC<br>
+                    4. 然后访问 <a href="/lumi-integration-example.html" class="underline">真实集成页面</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 生成模拟地址
+        function generateMockAddress() {
+            return '0x' + Array.from({length: 40}, () => 
+                Math.floor(Math.random() * 16).toString(16)
+            ).join('');
+        }
+
+        // 生成模拟哈希
+        function generateMockHash() {
+            return '0x' + Array.from({length: 64}, () => 
+                Math.floor(Math.random() * 16).toString(16)
+            ).join('');
+        }
+
+        let mockAddress = '';
+        let mockQuestionId = '';
+
+        // 模拟连接
+        document.getElementById('connectBtn').addEventListener('click', () => {
+            mockAddress = generateMockAddress();
+            document.getElementById('walletAddress').textContent = 
+                mockAddress.slice(0, 6) + '...' + mockAddress.slice(-4);
+            document.getElementById('maticBalance').textContent = '10.5 MATIC';
+            document.getElementById('usdcBalance').textContent = '1000 USDC';
+            document.getElementById('walletInfo').classList.remove('hidden');
+            
+            console.log('✅ 模拟连接成功');
+            console.log('地址:', mockAddress);
+        });
+
+        // 模拟创建市场
+        document.getElementById('createMarketBtn').addEventListener('click', () => {
+            const title = document.getElementById('marketTitle').value;
+            const desc = document.getElementById('marketDesc').value;
+            
+            if (!title || !desc) {
+                alert('请填写标题和描述');
+                return;
+            }
+
+            mockQuestionId = generateMockHash();
+            const txHash = generateMockHash();
+            
+            document.getElementById('questionId').textContent = mockQuestionId;
+            document.getElementById('txHash').textContent = txHash.slice(0, 10) + '...';
+            document.getElementById('txLink').href = 
+                'https://amoy.polygonscan.com/tx/' + txHash;
+            document.getElementById('marketResult').classList.remove('hidden');
+            
+            console.log('✅ 模拟创建市场成功');
+            console.log('QuestionID:', mockQuestionId);
+            console.log('交易哈希:', txHash);
+            
+            setTimeout(() => {
+                alert('✅ 市场创建成功！\n\n这是模拟模式，所有操作都是假的。\n\n在真实模式下，这会调用 Polymarket 官方合约。');
+            }, 500);
+        });
+
+        // 模拟押注 YES
+        document.getElementById('betYesBtn').addEventListener('click', () => {
+            const amount = document.getElementById('betAmount').value;
+            placeBet('YES', amount);
+        });
+
+        // 模拟押注 NO
+        document.getElementById('betNoBtn').addEventListener('click', () => {
+            const amount = document.getElementById('betAmount').value;
+            placeBet('NO', amount);
+        });
+
+        function placeBet(choice, amount) {
+            const txHash = generateMockHash();
+            
+            document.getElementById('betChoice').textContent = choice;
+            document.getElementById('betAmountDisplay').textContent = amount;
+            document.getElementById('betTxHash').textContent = txHash.slice(0, 10) + '...';
+            document.getElementById('betResult').classList.remove('hidden');
+            
+            console.log('✅ 模拟押注成功');
+            console.log('选择:', choice);
+            console.log('金额:', amount, 'USDC');
+            console.log('交易哈希:', txHash);
+            
+            setTimeout(() => {
+                alert(`✅ 押注 ${choice} 成功！\n\n金额: ${amount} USDC\n\n这是模拟模式。\n\n在真实模式下，这会使用 Polymarket CTF Exchange 执行交易。`);
+            }, 500);
+        }
+
+        // 模拟结算
+        document.getElementById('settleBtn').addEventListener('click', () => {
+            const txHash = generateMockHash();
+            
+            document.getElementById('settleTxHash').textContent = txHash.slice(0, 10) + '...';
+            document.getElementById('settleResult').classList.remove('hidden');
+            
+            console.log('✅ 模拟结算请求成功');
+            console.log('交易哈希:', txHash);
+            
+            setTimeout(() => {
+                alert('✅ 结算请求已提交！\n\n这是模拟模式。\n\n在真实模式下，这会调用 UMA 官方预言机进行结算。');
+            }, 500);
+        });
+
+        // 初始化日志
+        console.log('🎮 LUMI Polymarket 演示模式已加载');
+        console.log('这是一个完全模拟的环境，不需要真实的区块链交互');
+        console.log('你可以体验完整的用户流程，而不需要任何测试代币');
+    </script>
+</body>
+</html>
+
+
+
+

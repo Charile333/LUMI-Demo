@@ -3,11 +3,13 @@
 import { ethers } from 'ethers';
 import { db } from '@/lib/db';
 
-// 合约地址配置
+// 合约地址配置 - 完整 Polymarket 系统 🔮
 const CONTRACTS = {
-  adapter: '0x5D440c98B55000087a8b0C164f1690551d18CfcC',
-  mockUSDC: '0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a',
-  ctf: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2'
+  adapter: '0xaBf0e29946C63fa1920E00bEA95dDADeF70FD80C',
+  umaOracle: '0x263351499f82C107e540B01F0Ca959843e22464a',
+  conditionalTokens: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2',
+  exchange: '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40',
+  mockUSDC: '0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a'
 };
 
 const ADAPTER_ABI = [

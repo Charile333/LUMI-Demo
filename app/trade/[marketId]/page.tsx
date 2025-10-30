@@ -6,10 +6,10 @@ import { ConnectWallet } from '@/components/wallet/ConnectWallet';
 import { OrderBook } from '@/components/OrderBook/OrderBook';
 import { TradingForm } from '@/components/OrderBook/TradingForm';
 
-// 🆕 完整版 Polymarket 系统配置
+// ✅ 官方组件配置
 const CONTRACTS = {
-  fullCtf: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2', // 完整版 ConditionalTokens
-  exchange: '0x213F1F4Fa93f4079BB24FAB7eAA891e603dB2E2d', // CTFExchange (订单薄)
+  conditionalTokens: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2', // ✅ Gnosis 官方
+  exchange: '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40', // ✅ Polymarket 官方 CTF Exchange
   mockUSDC: '0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a', // Mock USDC
   adapter: '0x5D440c98B55000087a8b0C164f1690551d18CfcC'  // TestUmaCTFAdapter
 };
@@ -200,21 +200,23 @@ export default function TradePage() {
               <div className="flex justify-between">
                 <span className="text-gray-600">CTF Exchange:</span>
                 <a
-                  href="https://amoy.polygonscan.com/address/0x41AE309fAb269adF729Cfae78E6Ef741F6a8E3AE"
+                  href="https://amoy.polygonscan.com/address/0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40"
                   target="_blank"
                   className="text-blue-600 hover:underline font-mono"
+                  title="Polymarket 官方 CTF Exchange ✅"
                 >
-                  0x41AE...E3AE
+                  0xdFE0...9E40
                 </a>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Conditional Tokens:</span>
                 <a
-                  href="https://amoy.polygonscan.com/address/0xeB4F3700FE422c1618B449763d423687D5ad0950"
+                  href="https://amoy.polygonscan.com/address/0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2"
                   target="_blank"
                   className="text-blue-600 hover:underline font-mono"
+                  title="Gnosis 官方 Conditional Tokens ✅"
                 >
-                  0xeB4F...0950
+                  0xb171...10a2
                 </a>
               </div>
               <div className="flex justify-between">

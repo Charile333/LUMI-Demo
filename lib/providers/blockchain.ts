@@ -7,9 +7,13 @@ import { IDataProvider } from './base';
 import { Market, CategoryType } from '@/lib/types/market';
 import { ethers } from 'ethers';
 
+// 使用 UMA 官方预言机 (Polymarket 同款) 🔮
 const CONTRACTS = {
-  testAdapter: '0x5D440c98B55000087a8b0C164f1690551d18CfcC',
-  rpcUrl: 'https://polygon-amoy-bor-rpc.publicnode.com' // 🆕 稳定的 RPC
+  realAdapter: '0xaBf0e29946C63fa1920E00bEA95dDADeF70FD80C',
+  umaOracle: '0x263351499f82C107e540B01F0Ca959843e22464a',
+  conditionalTokens: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2',
+  exchange: '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40',
+  rpcUrl: 'https://polygon-amoy-bor-rpc.publicnode.com'
 };
 
 const ADAPTER_ABI = [
@@ -37,7 +41,7 @@ export class BlockchainProvider implements IDataProvider {
   constructor() {
     this.provider = new ethers.providers.JsonRpcProvider(CONTRACTS.rpcUrl);
     this.adapter = new ethers.Contract(
-      CONTRACTS.testAdapter,
+      CONTRACTS.realAdapter,  // ✅ 使用真实UMA预言机适配器
       ADAPTER_ABI,
       this.provider
     );

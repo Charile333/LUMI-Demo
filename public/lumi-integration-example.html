@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMI Polymarket 集成示例</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+    <script src="/js/lumi-polymarket-integration.js"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🎯 LUMI Polymarket 集成示例</h1>
+        
+        <!-- 连接钱包 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">1. 连接钱包</h2>
+            <button id="connectBtn" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg">
+                连接 MetaMask
+            </button>
+            <div id="walletInfo" class="mt-4 hidden">
+                <p>✅ 已连接: <span id="walletAddress" class="text-green-400"></span></p>
+                <p>余额: <span id="balance" class="text-yellow-400"></span> USDC</p>
+            </div>
+        </div>
+
+        <!-- 创建市场 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">2. 创建市场 (Conditional Tokens)</h2>
+            <div class="space-y-4">
+                <input type="text" id="marketTitle" placeholder="市场标题" 
+                    class="w-full bg-gray-700 rounded px-4 py-2">
+                <textarea id="marketDesc" placeholder="市场描述" 
+                    class="w-full bg-gray-700 rounded px-4 py-2 h-24"></textarea>
+                <button id="createMarketBtn" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg">
+                    创建市场
+                </button>
+            </div>
+            <div id="marketResult" class="mt-4 hidden">
+                <p class="text-green-400">✅ 市场创建成功！</p>
+                <p>QuestionID: <span id="questionId" class="text-sm font-mono"></span></p>
+                <a id="txLink" href="#" target="_blank" class="text-blue-400 underline">查看交易</a>
+            </div>
+        </div>
+
+        <!-- 下注/交易 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">3. 下注 (CTF Exchange)</h2>
+            <div class="space-y-4">
+                <input type="text" id="betQuestionId" placeholder="QuestionID" 
+                    class="w-full bg-gray-700 rounded px-4 py-2">
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="betYesBtn" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg">
+                        押注 YES
+                    </button>
+                    <button id="betNoBtn" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg">
+                        押注 NO
+                    </button>
+                </div>
+            </div>
+            <div id="betResult" class="mt-4 hidden">
+                <p class="text-green-400">✅ 下注成功！</p>
+                <a id="betTxLink" href="#" target="_blank" class="text-blue-400 underline">查看交易</a>
+            </div>
+        </div>
+
+        <!-- 结算 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">4. 结算 (UMA Oracle)</h2>
+            <div class="space-y-4">
+                <input type="text" id="settleQuestionId" placeholder="QuestionID" 
+                    class="w-full bg-gray-700 rounded px-4 py-2">
+                <button id="requestSettleBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg">
+                    请求 UMA 预言机结算
+                </button>
+                <button id="resolveBtn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg ml-4">
+                    最终结算
+                </button>
+            </div>
+            <div id="settleResult" class="mt-4 hidden">
+                <p class="text-green-400">✅ 结算请求已提交！</p>
+                <p class="text-yellow-400">⏳ 等待挑战期结束（约2小时）</p>
+                <a id="settleTxLink" href="#" target="_blank" class="text-blue-400 underline">查看交易</a>
+            </div>
+        </div>
+
+        <!-- 日志 -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold mb-4">📋 操作日志</h2>
+            <div id="logs" class="bg-black rounded p-4 h-64 overflow-y-auto font-mono text-sm">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 LUMI Polymarket
+        const lumi = new LUMIPolymarket();
+        
+        // 日志函数
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = {
+                'info': 'text-blue-400',
+                'success': 'text-green-400',
+                'error': 'text-red-400',
+                'warning': 'text-yellow-400'
+            }[type];
+            
+            logsDiv.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        // 连接钱包
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                log('正在连接钱包...', 'info');
+                const result = await lumi.init();
+                
+                document.getElementById('walletAddress').textContent = 
+                    result.address.slice(0, 6) + '...' + result.address.slice(-4);
+                document.getElementById('walletInfo').classList.remove('hidden');
+                
+                // 获取余额
+                const balance = await lumi.getBalance(LUMI_CONFIG.contracts.mockUSDC);
+                document.getElementById('balance').textContent = balance;
+                
+                log('✅ 钱包连接成功: ' + result.address, 'success');
+            } catch (error) {
+                log('❌ 连接失败: ' + error.message, 'error');
+            }
+        });
+
+        // 创建市场
+        document.getElementById('createMarketBtn').addEventListener('click', async () => {
+            try {
+                const title = document.getElementById('marketTitle').value;
+                const description = document.getElementById('marketDesc').value;
+                
+                if (!title || !description) {
+                    log('⚠️ 请填写标题和描述', 'warning');
+                    return;
+                }
+                
+                log('📝 正在创建市场: ' + title, 'info');
+                
+                // 🎯 使用免费模式（仅测试）
+                log('💡 使用免费测试模式（不需要代币）', 'info');
+                
+                try {
+                    const result = await lumi.createMarket(title, description, 1); // 改为1 USDC
+                    
+                    document.getElementById('questionId').textContent = result.questionId;
+                    document.getElementById('txLink').href = result.explorerUrl;
+                    document.getElementById('marketResult').classList.remove('hidden');
+                    
+                    log('✅ 市场创建成功！QuestionID: ' + result.questionId, 'success');
+                    log('🔗 交易: ' + result.transactionHash, 'success');
+                } catch (createError) {
+                    // 如果创建失败，显示详细错误
+                    log('❌ 创建失败，详细错误:', 'error');
+                    log('错误类型: ' + createError.code, 'error');
+                    log('错误信息: ' + createError.message, 'error');
+                    
+                    // 提供解决建议
+                    if (createError.message.includes('insufficient funds')) {
+                        log('💡 解决方案: 需要获取测试代币', 'warning');
+                        log('1. 访问 https://faucet.polygon.technology/', 'info');
+                        log('2. 选择 Polygon Amoy', 'info');
+                        log('3. 粘贴你的钱包地址获取测试 MATIC', 'info');
+                        
+                        // 显示用户地址
+                        const address = await lumi.signer.getAddress();
+                        log('你的地址: ' + address, 'info');
+                    } else if (createError.message.includes('user rejected')) {
+                        log('💡 你取消了交易', 'warning');
+                    } else if (createError.message.includes('network')) {
+                        log('💡 请确保切换到 Polygon Amoy 测试网', 'warning');
+                    }
+                    
+                    throw createError;
+                }
+            } catch (error) {
+                log('❌ 创建失败: ' + error.message, 'error');
+                
+                // 显示友好的错误提示
+                alert('创建市场失败！\n\n请查看控制台日志获取详细信息。\n\n常见问题：\n1. 没有测试代币\n2. 网络不正确\n3. 取消了交易');
+            }
+        });
+
+        // 押注 YES
+        document.getElementById('betYesBtn').addEventListener('click', async () => {
+            try {
+                const questionId = document.getElementById('betQuestionId').value;
+                if (!questionId) {
+                    log('⚠️ 请输入 QuestionID', 'warning');
+                    return;
+                }
+                
+                log('💰 正在押注 YES...', 'info');
+                
+                // 获取市场信息
+                const market = await lumi.getMarket(questionId);
+                
+                // 创建订单
+                const { order, signature } = await lumi.createOrder(
+                    market.conditionId + '1', // YES token
+                    10, // 10 USDC
+                    0.6, // 60% 价格
+                    'BUY'
+                );
+                
+                // 执行交易
+                const result = await lumi.fillOrder(order, signature);
+                
+                document.getElementById('betTxLink').href = result.explorerUrl;
+                document.getElementById('betResult').classList.remove('hidden');
+                
+                log('✅ 押注成功！', 'success');
+                log('🔗 交易: ' + result.transactionHash, 'success');
+            } catch (error) {
+                log('❌ 押注失败: ' + error.message, 'error');
+            }
+        });
+
+        // 押注 NO
+        document.getElementById('betNoBtn').addEventListener('click', async () => {
+            try {
+                const questionId = document.getElementById('betQuestionId').value;
+                if (!questionId) {
+                    log('⚠️ 请输入 QuestionID', 'warning');
+                    return;
+                }
+                
+                log('💰 正在押注 NO...', 'info');
+                
+                const market = await lumi.getMarket(questionId);
+                
+                const { order, signature } = await lumi.createOrder(
+                    market.conditionId + '2', // NO token
+                    10,
+                    0.4,
+                    'BUY'
+                );
+                
+                const result = await lumi.fillOrder(order, signature);
+                
+                document.getElementById('betTxLink').href = result.explorerUrl;
+                document.getElementById('betResult').classList.remove('hidden');
+                
+                log('✅ 押注成功！', 'success');
+                log('🔗 交易: ' + result.transactionHash, 'success');
+            } catch (error) {
+                log('❌ 押注失败: ' + error.message, 'error');
+            }
+        });
+
+        // 请求结算
+        document.getElementById('requestSettleBtn').addEventListener('click', async () => {
+            try {
+                const questionId = document.getElementById('settleQuestionId').value;
+                if (!questionId) {
+                    log('⚠️ 请输入 QuestionID', 'warning');
+                    return;
+                }
+                
+                log('🔮 正在请求 UMA 预言机结算...', 'info');
+                const result = await lumi.requestSettlement(questionId);
+                
+                document.getElementById('settleTxLink').href = result.explorerUrl;
+                document.getElementById('settleResult').classList.remove('hidden');
+                
+                log('✅ 结算请求已提交！', 'success');
+                log('⏳ 等待挑战期结束（约2小时）', 'warning');
+                log('🔗 交易: ' + result.transactionHash, 'success');
+            } catch (error) {
+                log('❌ 请求失败: ' + error.message, 'error');
+            }
+        });
+
+        // 最终结算
+        document.getElementById('resolveBtn').addEventListener('click', async () => {
+            try {
+                const questionId = document.getElementById('settleQuestionId').value;
+                if (!questionId) {
+                    log('⚠️ 请输入 QuestionID', 'warning');
+                    return;
+                }
+                
+                log('✅ 正在最终结算市场...', 'info');
+                const result = await lumi.resolveMarket(questionId);
+                
+                log('✅ 市场已结算！', 'success');
+                log('🔗 交易: ' + result.transactionHash, 'success');
+            } catch (error) {
+                log('❌ 结算失败: ' + error.message, 'error');
+            }
+        });
+
+        // 初始化日志
+        log('🎯 LUMI Polymarket 集成库已加载', 'success');
+        log('三大官方组件已就绪:', 'info');
+        log('  1️⃣ UMA 官方预言机: ' + LUMI_CONFIG.contracts.umaOracle, 'info');
+        log('  2️⃣ Polymarket CTF Exchange: ' + LUMI_CONFIG.contracts.ctfExchange, 'info');
+        log('  3️⃣ Gnosis Conditional Tokens: ' + LUMI_CONFIG.contracts.conditionalTokens, 'info');
+    </script>
+</body>
+</html>
+

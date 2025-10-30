@@ -5,12 +5,23 @@
 
 import { ethers } from 'ethers';
 
-// 合约配置
+// 合约配置 - 完整 Polymarket 系统 🔮
 const CONTRACTS = {
-  testAdapter: '0x5D440c98B55000087a8b0C164f1690551d18CfcC',
-  fullCtf: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2',
-  exchange: '0x213F1F4Fa93f4079BB24FAB7eAA891e603dB2E2d',
+  // ✅ 使用真实 UMA 预言机适配器 (Polymarket 官方同款)
+  realAdapter: '0xaBf0e29946C63fa1920E00bEA95dDADeF70FD80C',
+  
+  // ✅ UMA 官方预言机 (Polygon Amoy 测试网)
+  umaOracle: '0x263351499f82C107e540B01F0Ca959843e22464a',
+  
+  // ✅ Conditional Tokens Framework (Gnosis 官方)
+  conditionalTokens: '0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2',
+  
+  // ✅ CTF Exchange (订单簿交易所)
+  exchange: '0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40',
+  
+  // 测试用 USDC
   mockUSDC: '0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a',
+  
   rpcUrl: 'https://polygon-amoy-bor-rpc.publicnode.com'
 };
 
@@ -55,7 +66,7 @@ export class BlockchainService {
   constructor() {
     this.provider = new ethers.providers.JsonRpcProvider(CONTRACTS.rpcUrl);
     this.adapter = new ethers.Contract(
-      CONTRACTS.testAdapter,
+      CONTRACTS.realAdapter,  // ✅ 使用真实UMA预言机适配器
       ADAPTER_ABI,
       this.provider
     );

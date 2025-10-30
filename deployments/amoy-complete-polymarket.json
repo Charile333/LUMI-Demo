@@ -1,0 +1,36 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "deployer": "0xaa22D02aA0C31cF4140d54284B249cDb651107aB",
+  "version": "uma-adapter-only",
+  "timestamp": "2025-10-29T21:38:57.958Z",
+  "balance": "0.1 POL",
+  "contracts": {
+    "conditionalTokens": {
+      "address": "0xb171BBc6b1476ee1b6aD4Ac2cA7ed4AfFdFa10a2",
+      "type": "Existing",
+      "note": "Reusing existing deployment"
+    },
+    "ctfExchange": {
+      "address": "0xdFE02Eb6733538f8Ea35D585af8DE5958AD99E40",
+      "type": "Polymarket Official",
+      "official": true,
+      "note": "Using Polymarket official deployment"
+    },
+    "realUmaCTFAdapter": {
+      "address": "0xaBf0e29946C63fa1920E00bEA95dDADeF70FD80C",
+      "deployTx": "0xbb52278bfd80aab902649f1438b59d15695e31bb825bc152ce16ee684896a375",
+      "type": "Newly Deployed",
+      "oracle": "0x263351499f82C107e540B01F0Ca959843e22464a"
+    },
+    "umaOptimisticOracle": {
+      "address": "0x263351499f82C107e540B01F0Ca959843e22464a",
+      "type": "UMA Official V2",
+      "official": true
+    },
+    "collateral": {
+      "address": "0x8d2dae90Dbc51dF7E18C1b857544AC979F87a77a",
+      "type": "Existing Mock USDC"
+    }
+  }
+}
