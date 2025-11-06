@@ -91,7 +91,7 @@ export default function LotteryPage() {
           
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-3">
-                <Link href="/markets" className="flex items-center space-x-2 bg-[#1a1a1a] border border-gray-700 rounded-md px-3 py-1.5 text-sm hover:border-[#b8860b]/50 transition-colors">
+                <Link href="/markets/automotive" className="flex items-center space-x-2 bg-[#1a1a1a] border border-gray-700 rounded-md px-3 py-1.5 text-sm hover:border-[#b8860b]/50 transition-colors">
                   <i className="fa fa-arrow-left text-[#b8860b]"></i>
                   <span>{t('lottery.backToMarket')}</span>
                 </Link>

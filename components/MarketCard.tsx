@@ -4,10 +4,9 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MarketActivationStatus } from './MarketActivationStatus';
-import { TradeButton } from './TradeButton';
-import { InterestedButton } from './InterestedButton';
+import { useRouter } from 'next/navigation';
 import { useMarketPrice } from '@/hooks/useMarketPrice';
+import { useMarketParticipants } from '@/hooks/useMarketParticipants';
 
 interface MarketCardProps {
   market: {
@@ -21,37 +20,44 @@ interface MarketCardProps {
     condition_id?: string;
     main_category?: string;
     priority_level?: string;
+    trading_volume?: number; // 交易量
   };
   showPrice?: boolean; // 是否显示价格（默认 true）
 }
 
 export function MarketCard({ market: initialMarket, showPrice = true }: MarketCardProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [market, setMarket] = useState(initialMarket);
+  const [priceChange24h, setPriceChange24h] = useState(0);
   
-  // 🔥 获取实时价格（仅在已激活的市场获取）
+  // 🔥 获取实时价格（所有市场都获取）
   const price = useMarketPrice(
     market.id, 
-    showPrice && market.blockchain_status === 'created'
+    showPrice
   );
 
-  // 处理感兴趣更新
-  const handleInterestedUpdate = (newCount: number) => {
-    setMarket({
-      ...market,
-      interested_users: newCount
-    });
+  // 🔥 获取实际参与人数（交易过的用户数）
+  const { participants, loading: participantsLoading } = useMarketParticipants(
+    market.id,
+    true
+  );
+
+  // 🔥 计算24小时价格变化（模拟，实际应该从历史数据获取）
+  // TODO: 从数据库获取历史价格数据进行计算
+  const calculatePriceChange = () => {
+    if (!price.loading && price.probability > 0) {
+      // 这里是模拟数据，实际应该从历史表中获取24h前的价格
+      const change = Math.random() * 10 - 5; // -5% 到 +5% 的随机变化
+      setPriceChange24h(Number(change.toFixed(1)));
+    }
   };
 
-  // 处理激活成功
-  const handleActivated = (conditionId: string) => {
-    setMarket({
-      ...market,
-      blockchain_status: 'created',
-      condition_id: conditionId
-    });
-  };
-
+  // 当价格加载完成后计算变化
+  if (!price.loading && priceChange24h === 0 && price.probability > 0) {
+    calculatePriceChange();
+  }
+  
   // 类别徽章颜色
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -74,159 +80,123 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+    <div className="bg-black rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-zinc-800">
       {/* 卡片头部 */}
-      <div className="p-6">
-        {/* 标题和徽章 */}
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <h3 className="text-lg font-bold text-gray-900 flex-1">
+      <div className="p-5">
+        {/* 标题和涨跌 */}
+        <div className="flex items-start justify-between mb-3">
+          <h3 
+            className="text-base font-semibold text-white leading-tight flex-1 pr-2 cursor-pointer hover:text-orange-400 transition-colors duration-200"
+            onClick={() => router.push(`/market/${market.id}`)}
+          >
             {market.title}
           </h3>
-          
-          {/* 状态徽章 */}
-          <div className="flex flex-col gap-1">
-            {market.blockchain_status === 'created' && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap">
-                ✓ {t('market.activated')}
-              </span>
-            )}
-            {market.priority_level === 'hot' && (
-              <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full whitespace-nowrap">
-                🔥 {t('market.hot')}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* 描述 */}
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-          {market.description}
-        </p>
-
-        {/* 统计信息 */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-          <span className="flex items-center gap-1">
-            <span>👁️</span>
-            <span>{market.views || 0} {t('market.views')}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span>⭐</span>
-            <span>{market.interested_users || 0} {t('market.interestedCount')}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span>📊</span>
-            <span>{t('market.activityScore')} {Math.round(market.activity_score || 0)}</span>
-          </span>
-        </div>
-
-        {/* 分类 */}
-        {market.main_category && (
-          <div className="mb-4">
-            <span className={`text-xs px-2 py-1 rounded ${getCategoryColor(market.main_category)}`}>
-              {t(`categories.${market.main_category.replace('-', '')}`) || market.main_category}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 价格显示区域 - 仅在已激活的市场显示 */}
-      {showPrice && market.blockchain_status === 'created' && !price.loading && (
-        <div className="px-6 pb-4">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100">
-            {/* YES/NO 概率 */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-sm font-medium text-gray-600">YES</span>
-                <span className="text-2xl font-bold text-green-600">
-                  {price.probability.toFixed(1)}%
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                <span className="text-sm font-medium text-gray-600">NO</span>
-                <span className="text-2xl font-bold text-red-600">
-                  {(100 - price.probability).toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            
-            {/* 价格详情 */}
-            <div className="flex items-center justify-between text-xs text-gray-600 pt-2 border-t border-blue-200">
-              <div>
-                <span className="text-gray-500">买价:</span>
-                <span className="ml-1 font-semibold text-green-600">${price.bestBid.toFixed(2)}</span>
-              </div>
-              <div>
-                <span className="text-gray-500">卖价:</span>
-                <span className="ml-1 font-semibold text-red-600">${price.bestAsk.toFixed(2)}</span>
-              </div>
-              <div className={getLiquidityIndicator(price.spread).color}>
-                <span>{getLiquidityIndicator(price.spread).icon}</span>
-                <span className="ml-1 font-semibold">
-                  {(price.spread * 100).toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            
-            {/* 交易量和连接状态 */}
-            <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-              <div className="flex items-center gap-1">
-                <span>📊</span>
-                <span>24h: ${price.volume24h.toFixed(0)}</span>
-              </div>
-              {price.connected && (
-                <div className="flex items-center gap-1 text-green-600">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-xs">实时</span>
-                </div>
-              )}
-            </div>
-            
-            {/* 价差警告 */}
-            {price.spread >= 0.10 && (
-              <div className="mt-2 text-xs text-amber-600 flex items-center gap-1">
-                <span>⚠️</span>
-                <span>价差较大，交易成本较高</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 激活状态 */}
-      <div className="px-6 pb-4">
-        <MarketActivationStatus 
-          market={market} 
-          onActivated={handleActivated}
-        />
-      </div>
-
-      {/* 操作按钮 */}
-      <div className="px-6 pb-6 space-y-3">
-        {/* 感兴趣按钮（未激活时显示） */}
-        {market.blockchain_status === 'not_created' && (
-          <InterestedButton 
-            market={market}
-            onUpdate={handleInterestedUpdate}
-          />
-        )}
-
-        {/* 交易按钮 */}
-        <TradeButton market={market} />
-      </div>
-
-      {/* 底部信息 */}
-      <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>{t('market.marketId')}: {market.id}</span>
-          {market.condition_id && (
-            <span className="font-mono">
-              {market.condition_id.substring(0, 8)}...
+          {!price.loading && (
+            <span className={`flex items-center gap-0.5 text-xs whitespace-nowrap ${
+              priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
+            }`}>
+              <span>{priceChange24h >= 0 ? '↑' : '↓'}</span>
+              <span>{Math.abs(priceChange24h)}%</span>
             </span>
           )}
         </div>
+
+        {/* 标签区 */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {/* 推荐标签 */}
+          <span className="flex items-center gap-1 text-xs bg-orange-500/15 text-orange-400 px-2.5 py-1 rounded border border-orange-500/30">
+            <span>🔥</span>
+            <span>{t('market.recommended')}</span>
+          </span>
+          
+          {/* 自定义标签 */}
+          <span className="flex items-center gap-1 text-xs bg-green-500/15 text-green-400 px-2.5 py-1 rounded border border-green-500/30">
+            <span>📊</span>
+            <span>{t('market.custom')}</span>
+          </span>
+          
+          {/* 分类标签 */}
+          {market.main_category && (
+            <span className="text-xs bg-zinc-800 text-gray-400 px-2.5 py-1 rounded">
+              {t(`categories.${market.main_category.replace('-', '')}`) || market.main_category}
+            </span>
+          )}
+        </div>
+
+        {/* 当前概率和截止日期 */}
+        <div className="mb-5">
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="text-xs text-gray-500 mb-1">{t('market.currentProbability')}</div>
+              {price.loading ? (
+                <div className="text-5xl font-bold text-orange-500 leading-none animate-pulse">
+                  ---%
+                </div>
+              ) : (
+                <div className="text-5xl font-bold text-orange-500 leading-none">
+                  {price.probability.toFixed(0)}%
+                </div>
+              )}
+            </div>
+            <div className="text-right pb-1">
+              <div className="text-xs text-gray-500 mb-1">{t('market.deadline')}</div>
+              <div className="text-sm text-gray-400">2025/12/31</div>
+            </div>
+          </div>
+        </div>
+
+        {/* YES/NO 按钮 */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* YES 按钮 */}
+          <button className="bg-green-700/30 hover:bg-green-700/40 border border-green-600/50 rounded-lg py-4 px-3 transition-all duration-200">
+            <div className="text-green-400 font-bold text-base tracking-wide">{t('market.yes').toUpperCase()}</div>
+            {price.loading ? (
+              <div className="text-green-400 text-lg font-semibold mt-0.5 animate-pulse">
+                --¢
+              </div>
+            ) : (
+              <div className="text-green-400 text-lg font-semibold mt-0.5">
+                {(price.bestBid * 100).toFixed(0)}¢
+              </div>
+            )}
+          </button>
+          
+          {/* NO 按钮 */}
+          <button className="bg-red-700/30 hover:bg-red-700/40 border border-red-600/50 rounded-lg py-4 px-3 transition-all duration-200">
+            <div className="text-red-400 font-bold text-base tracking-wide">{t('market.no').toUpperCase()}</div>
+            {price.loading ? (
+              <div className="text-red-400 text-lg font-semibold mt-0.5 animate-pulse">
+                --¢
+              </div>
+            ) : (
+              <div className="text-red-400 text-lg font-semibold mt-0.5">
+                {(price.bestAsk * 100).toFixed(0)}¢
+              </div>
+            )}
+          </button>
+        </div>
+
+        {/* 底部信息栏 */}
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t border-zinc-800/50">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">💰</span>
+            {price.loading ? (
+              <span className="animate-pulse">--</span>
+            ) : (
+              <span>${price.volume24h.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">👥</span>
+            {participantsLoading ? (
+              <span className="animate-pulse">--{t('market.participants')}</span>
+            ) : (
+              <span>{participants}{t('market.participants')}</span>
+            )}
+          </div>
+        </div>
       </div>
+
     </div>
   );
 }

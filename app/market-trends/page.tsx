@@ -25,7 +25,7 @@ export default function MarketTrendsPage() {
 
       {/* 返回按钮 - 左上角 */}
       <a
-        href="/markets"
+        href="/markets/automotive"
         className="fixed top-8 left-8 z-20 flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium transition-all group backdrop-blur-sm bg-emerald-950/30 px-4 py-2 rounded-lg border border-emerald-500/30 hover:border-emerald-400/50"
       >
         <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>

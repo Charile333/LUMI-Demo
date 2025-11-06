@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import QuickTradeModal from '@/components/trading/QuickTradeModal';
 import { useMarketsByCategory } from '@/lib/hooks/useMarketsByCategory';
 import { useMarketListWebSocket } from '@/hooks/useWebSocket';
+import { MarketCard } from '@/components/MarketCard';
 import { 
   faCar, 
   faBolt, 
@@ -283,19 +284,36 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
   // 最后应用时间筛选
   filteredMarkets = filterByTimeRange(filteredMarkets);
 
-  // 🔥 合并 WebSocket 实时价格到市场数据
+  // 🔥 合并 WebSocket 实时价格到市场数据，并转换为MarketCard格式
   const marketsWithRealtimePrices = filteredMarkets.map(market => {
     const wsPrice = pricesMap.get(market.id);
+    let probability = market.probability || 50; // 默认50%
+    
     if (wsPrice) {
       const midPrice = (wsPrice.bestBid + wsPrice.bestAsk) / 2;
-      return {
-        ...market,
-        probability: Math.round(midPrice * 100),
-        trend: midPrice > 0.5 ? 'up' as const : 'down' as const,
-        change: `${midPrice > 0.5 ? '+' : ''}${((midPrice - 0.5) * 200).toFixed(1)}%`
-      };
+      probability = Math.round(midPrice * 100);
     }
-    return market;
+    
+    // 转换为MarketCard组件需要的格式
+    return {
+      id: market.id,
+      title: market.title,
+      description: market.description || '暂无描述',
+      blockchain_status: market.blockchain_status || 'not_created', // 从数据库获取状态
+      interested_users: market.interested_users || 0,
+      views: market.views || 0,
+      activity_score: market.activity_score || 0,
+      condition_id: market.condition_id,
+      main_category: market.main_category || category,
+      priority_level: market.priorityLevel || market.priority_level,
+      // 保留原始数据用于其他用途
+      _original: {
+        ...market,
+        probability,
+        trend: probability > 50 ? 'up' as const : 'down' as const,
+        change: `${probability > 50 ? '+' : ''}${((probability - 50) * 2).toFixed(1)}%`
+      }
+    };
   });
 
   return (
@@ -358,134 +376,11 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
         {!loading && !error && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {marketsWithRealtimePrices.map((market) => (
-            <div
+            <MarketCard
               key={market.id}
-              className="bg-zinc-900 rounded-xl border border-white/10 hover:border-amber-400/50 transition-all duration-300 group overflow-hidden flex flex-col"
-            >
-              {/* Card Header - Title with Trend */}
-              <Link href={`/market/${market.id}`} className="block p-5 pb-3">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-white group-hover:text-amber-400 transition-colors flex-1">
-                    {market.title}
-                  </h3>
-                  <div className={`flex items-center text-sm font-medium whitespace-nowrap ${
-                    market.trend === 'up' ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    <FontAwesomeIcon 
-                      icon={faArrowUp} 
-                      className={`mr-1 text-xs ${market.trend === 'down' ? 'rotate-180' : ''}`} 
-                    />
-                    {market.change}
-                  </div>
-                </div>
-                
-                {/* 标签区域：优先级 + 数据来源 + 分类 */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  {/* 优先级标签 */}
-                  {market.priorityLevel === 'pinned' && (
-                    <span className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400 font-medium border border-red-500/30">
-                      📌 置顶
-                    </span>
-                  )}
-                  {market.priorityLevel === 'featured' && (
-                    <span className="px-2 py-1 text-xs rounded bg-amber-400/10 text-amber-400 font-medium border border-amber-400/30">
-                      ⭐ 精选
-                    </span>
-                  )}
-                  {market.priorityLevel === 'recommended' && (
-                    <span className="px-2 py-1 text-xs rounded bg-orange-500/20 text-orange-400 font-medium border border-orange-500/30">
-                      🔥 推荐
-                    </span>
-                  )}
-                  
-                  {/* 数据来源标签 */}
-                  {market.source === 'polymarket' && (
-                    <span className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                      🔴 Polymarket
-                    </span>
-                  )}
-                  {market.source === 'custom' && (
-                    <span className="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400 border border-green-500/30">
-                      📝 自定义
-                    </span>
-                  )}
-                  
-                  {/* 分类标签 */}
-                  <span className="px-2 py-1 text-xs rounded bg-white/5 text-gray-400 border border-white/10">
-                    {market.category}
-                  </span>
-                </div>
-              </Link>
-
-              {/* Card Body */}
-              <div className="px-5 pb-5">
-                {/* Probability and Stats */}
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">当前概率</div>
-                    <div className="text-3xl font-bold text-amber-400">{market.probability}%</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-400 mb-1">截止日期</div>
-                    <div className="text-sm text-white">{market.endDate}</div>
-                  </div>
-                </div>
-
-                {/* YES/NO Buttons - 快速交易 */}
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setQuickTradeModal({
-                        isOpen: true,
-                        market: {
-                          id: market.id,
-                          title: market.title,
-                          questionId: market.questionId || 'unknown'
-                        },
-                        side: 'YES'
-                      });
-                    }}
-                    className="bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 hover:border-green-500/50 rounded-lg py-2.5 px-4 transition-all group/btn"
-                  >
-                    <div className="text-green-400 font-bold text-lg mb-0.5">YES</div>
-                    <div className="text-green-400/70 text-xs">{market.probability}¢</div>
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setQuickTradeModal({
-                        isOpen: true,
-                        market: {
-                          id: market.id,
-                          title: market.title,
-                          questionId: market.questionId || 'unknown'
-                        },
-                        side: 'NO'
-                      });
-                    }}
-                    className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg py-2.5 px-4 transition-all group/btn"
-                  >
-                    <div className="text-red-400 font-bold text-lg mb-0.5">NO</div>
-                    <div className="text-red-400/70 text-xs">{100 - market.probability}¢</div>
-                  </button>
-                </div>
-
-                {/* Market Info */}
-                <div className="flex items-center justify-between text-xs text-gray-500 pt-2.5 border-t border-white/5">
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faChartLine} className="mr-1.5 text-amber-400" />
-                    <span>{market.volume}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faCalendar} className="mr-1.5" />
-                    <span>{market.participants}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              market={market}
+              showPrice={true}
+            />
           ))}
           
           {/* Empty State - 只在无筛选结果时显示 */}

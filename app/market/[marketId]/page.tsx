@@ -107,7 +107,7 @@ export default function MarketDetailPage() {
         .single();
 
       if (error) {
-        console.error('查询市场失败:', error);
+        console.error(t('common.loadFailed'), error);
         return;
       }
 
@@ -115,7 +115,7 @@ export default function MarketDetailPage() {
         setMarket(data);
       }
     } catch (err) {
-      console.error('加载市场失败:', err);
+      console.error(t('common.loadFailed'), err);
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,7 @@ export default function MarketDetailPage() {
           bestAsk
         });
         
-        console.log('📊 价格已更新（HTTP）:', { 
+        console.log('📊 Price updated (HTTP):', { 
           marketId, 
           bestBid, 
           bestAsk, 
@@ -179,7 +179,7 @@ export default function MarketDetailPage() {
         });
       }
     } catch (err) {
-      console.error('获取价格失败:', err);
+      console.error(t('common.loadFailed'), err);
     }
   };
 
@@ -223,7 +223,7 @@ export default function MarketDetailPage() {
         bestAsk
       });
 
-      console.log('🔥 实时价格更新:', { bestBid, bestAsk, midPrice, probability: (midPrice * 100).toFixed(1) + '%' });
+      console.log('🔥 Real-time price update:', { bestBid, bestAsk, midPrice, probability: (midPrice * 100).toFixed(1) + '%' });
     }
   }, [wsOrderBook]);
 
@@ -295,7 +295,7 @@ export default function MarketDetailPage() {
     if (prices.probability) {
       const newChartData = generateChartData(prices.probability);
       setChartData(newChartData);
-      console.log('📊 图表已更新，当前概率:', prices.probability.toFixed(1) + '%');
+      console.log('📊 Chart updated, current probability:', prices.probability.toFixed(1) + '%');
     }
   }, [prices.probability]);
 
@@ -304,16 +304,16 @@ export default function MarketDetailPage() {
     if (refreshing) return; // 防止重复点击
     
     setRefreshing(true);
-    console.log('🔄 手动刷新数据...');
+    console.log('🔄 Manually refreshing data...');
     
     try {
       await Promise.all([
         fetchMarket(),
         fetchPrices()
       ]);
-      console.log('✅ 数据刷新完成');
+      console.log('✅ Data refresh complete');
     } catch (error) {
-      console.error('❌ 刷新失败:', error);
+      console.error('❌ Refresh failed:', error);
     } finally {
       setTimeout(() => {
         setRefreshing(false);
@@ -480,17 +480,17 @@ export default function MarketDetailPage() {
                 onClick={handleRefresh}
                 disabled={refreshing}
                 className={`flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg hover:border-amber-400/50 transition-colors bg-white/5 hover:bg-white/10 ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                title="刷新数据（不刷新页面）"
+                title={t('marketDetail.refreshData')}
               >
                 <svg className={`w-4 h-4 text-gray-400 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <span className="text-sm text-gray-300">{refreshing ? '刷新中...' : '刷新'}</span>
+                <span className="text-sm text-gray-300">{refreshing ? t('marketDetail.refreshing') : t('marketDetail.refresh')}</span>
               </button>
               {/* Realtime连接状态 */}
               <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
                 <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-xs text-gray-400">{wsConnected ? '实时' : '离线'}</span>
+                <span className="text-xs text-gray-400">{wsConnected ? t('marketDetail.realtime') : t('marketDetail.offline')}</span>
               </div>
               <button className="flex items-center gap-2 px-4 py-2 border border-white/10 rounded-lg hover:border-amber-400/50 transition-colors bg-white/5">
                 <FontAwesomeIcon icon={faShareAlt} className="text-gray-400" />
@@ -545,11 +545,11 @@ export default function MarketDetailPage() {
             {/* 价格详情 - 买价/卖价/价差 */}
             <div className="flex flex-wrap gap-2 items-center text-xs">
               <div className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
-                <span className="text-gray-400 mr-2">买价:</span>
+                <span className="text-gray-400 mr-2">{t('marketDetail.bidPrice')}:</span>
                 <span className="text-green-400 font-semibold">${prices?.bestBid?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
-                <span className="text-gray-400 mr-2">卖价:</span>
+                <span className="text-gray-400 mr-2">{t('marketDetail.askPrice')}:</span>
                 <span className="text-red-400 font-semibold">${prices?.bestAsk?.toFixed(2) || '0.00'}</span>
               </div>
               {prices?.bestBid && prices?.bestAsk && (
@@ -560,7 +560,7 @@ export default function MarketDetailPage() {
                     ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400'
                     : 'bg-red-500/10 border-red-500/30 text-red-400'
                 }`}>
-                  <span className="text-gray-400 mr-2">价差:</span>
+                  <span className="text-gray-400 mr-2">{t('marketDetail.spread')}:</span>
                   <span className="font-semibold">
                     ${(prices.bestAsk - prices.bestBid).toFixed(3)} ({((prices.bestAsk - prices.bestBid) * 100).toFixed(1)}%)
                   </span>
@@ -576,10 +576,13 @@ export default function MarketDetailPage() {
               <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2">
                 <span className="text-amber-400 text-sm">⚠️</span>
                 <div className="flex-1">
-                  <div className="text-sm text-amber-400 font-medium">价差较大</div>
+                  <div className="text-sm text-amber-400 font-medium">{t('marketDetail.largeSpread')}</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    当前价差为 {((prices.bestAsk - prices.bestBid) * 100).toFixed(1)}%，交易成本较高。
-                    买入价: ${prices.bestAsk.toFixed(2)} | 卖出价: ${prices.bestBid.toFixed(2)}
+                    {t('marketDetail.largeSpreadWarning', {
+                      spread: ((prices.bestAsk - prices.bestBid) * 100).toFixed(1),
+                      askPrice: prices.bestAsk.toFixed(2),
+                      bidPrice: prices.bestBid.toFixed(2)
+                    })}
                   </div>
                 </div>
               </div>
@@ -616,7 +619,7 @@ export default function MarketDetailPage() {
                   <Line data={chartData} options={chartOptions} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500">
-                    加载图表中...
+                    {t('marketDetail.loadingChart')}
                   </div>
                 )}
               </div>
@@ -659,7 +662,7 @@ export default function MarketDetailPage() {
                   // 订单成功后立即刷新市场数据和价格
                   await fetchMarket();
                   await fetchPrices();
-                  console.log('✅ 订单成功，已刷新市场数据和价格');
+                  console.log('✅ Order success, refreshed market data and prices');
                 }}
               />
             </div>

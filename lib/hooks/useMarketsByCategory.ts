@@ -19,6 +19,13 @@ export interface Market {
   relatedMarkets?: any[];
   priorityLevel?: 'normal' | 'recommended' | 'featured' | 'pinned';
   source?: 'custom' | 'polymarket' | 'kalshi' | 'metaculus' | 'other';
+  // MarketCard需要的字段
+  blockchain_status?: string;
+  interested_users?: number;
+  views?: number;
+  activity_score?: number;
+  condition_id?: string;
+  main_category?: string;
 }
 
 export function useMarketsByCategory(category: string) {
@@ -70,7 +77,14 @@ export function useMarketsByCategory(category: string) {
           resolutionCriteria: market.description,
           relatedMarkets: [],
           priorityLevel: market.priority_level || 'normal',
-          source: market.source || 'custom'
+          source: market.source || 'custom',
+          // MarketCard需要的字段
+          blockchain_status: market.blockchain_status || 'not_created',
+          interested_users: market.interested_users || 0,
+          views: market.views || 0,
+          activity_score: market.activity_score || 0,
+          condition_id: market.condition_id,
+          main_category: market.main_category
         }));
 
         setMarkets(formattedMarkets);

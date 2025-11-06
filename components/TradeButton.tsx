@@ -112,6 +112,39 @@ export function TradeButton({ market, className = '' }: TradeButtonProps) {
     }
   };
 
+  // 检查是否需要自动激活（当交易量达到阈值时）
+  const checkAutoActivation = async () => {
+    if (market.blockchain_status !== 'not_created') {
+      return; // 已激活或正在激活中
+    }
+
+    try {
+      const response = await fetch(`/api/markets/${market.id}/check-activation`, {
+        method: 'POST'
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.activated) {
+        console.log('✅ 市场已自动激活！', data.conditionId);
+        
+        // 更新本地状态
+        market.blockchain_status = 'created';
+        market.condition_id = data.conditionId;
+        
+        // 显示通知
+        alert(
+          `🎉 市场已自动激活！\n\n` +
+          `交易量达到 $${data.tradingVolume.toFixed(2)}，已达到激活条件。\n` +
+          `Condition ID: ${data.conditionId.substring(0, 10)}...`
+        );
+      }
+    } catch (error) {
+      console.error('检查自动激活失败:', error);
+      // 静默失败，不影响用户体验
+    }
+  };
+
   return (
     <div className="space-y-2">
       <button
@@ -150,13 +183,13 @@ export function TradeButton({ market, className = '' }: TradeButtonProps) {
 
       {/* 状态提示 */}
       {market.blockchain_status === 'not_created' && !isActivating && (
-        <p className="text-xs text-gray-500 text-center">
+        <p className="text-xs text-gray-400 text-center">
           💡 首次交易需要激活市场（约 30 秒）
         </p>
       )}
 
       {error && (
-        <p className="text-xs text-red-500 text-center">
+        <p className="text-xs text-red-400 text-center">
           ❌ {error}
         </p>
       )}

@@ -428,7 +428,7 @@ export default function LumiSoonPage() {
         {/* 进入市场按钮 - 虫洞科技风格 */}
         <div className="relative z-20 flex justify-center py-8 mt-8">
           <Link 
-            href="/markets"
+            href="/markets/automotive"
             className="group relative inline-block"
           >
             {/* 外层能量环 - 静态 */}
@@ -718,7 +718,7 @@ export default function LumiSoonPage() {
                     
                     {/* CTA按钮 */}
                     <Link
-                      href="/markets"
+                      href="/markets/automotive"
                       className="group/btn relative block w-full overflow-hidden rounded-xl border-2 border-yellow-500/50 hover:border-yellow-400 transition-all duration-300"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-amber-600 group-hover/btn:from-yellow-400 group-hover/btn:to-amber-500 transition-all duration-300"></div>

@@ -8,15 +8,10 @@ const fs = require('fs');
 const path = require('path');
 
 // HTML页面列表
+// 注意：这些HTML文件已被Next.js页面替代（app目录下），此脚本已过时
+// 如需使用，请参考对应的Next.js页面实现
 const HTML_PAGES = [
-  'blockchain-gambling.html',
-  'blockchain-lottery (1).html',
-  'live-casino.html',
-  'tournaments.html',
-  'promotions.html',
-  '个人主页.html',
-  '右上角的福利中心.html',
-  // sports-betting.html 已经手动更新过了
+  // 所有HTML文件已迁移到Next.js页面，此脚本不再需要
 ];
 
 // 需要添加的脚本引用
