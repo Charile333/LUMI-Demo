@@ -67,7 +67,7 @@ export default function TournamentsPage() {
           <div className="flex items-center space-x-2">
             <div className="flex items-center h-6">
               <Image 
-                src="/image/LUMI-golden.png" 
+                src="/image/LUMI-logo.png" 
                 alt="LUMI" 
                 width={180} 
                 height={30}

@@ -1,6 +1,9 @@
 // 🎯 带实时价格的市场数据 Hook
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabase } from '@/lib/supabase-client';
+
+// #vercel环境禁用 - 使用单例 Supabase 客户端，避免多实例警告
+const supabase = getSupabase();
 
 export interface Market {
   id: number;
@@ -32,18 +35,13 @@ export function useMarketsWithRealTimePrices(category: string) {
         setLoading(true);
         setError(null);
 
-        // 1. 从 Supabase 加载市场数据
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
-
+        // #vercel环境禁用 - 从 Supabase 加载市场数据（使用单例客户端）
         const { data: marketsData, error: queryError } = await supabase
           .from('markets')
           .select('*')
           .eq('main_category', category)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false });
+          .neq('status', 'cancelled') // 排除已取消的市场，其他都显示
+          .order('id', { ascending: false }); // 使用 id 排序，避免字段名问题
 
         if (queryError) {
           console.error(`[${category}] 查询失败:`, queryError);

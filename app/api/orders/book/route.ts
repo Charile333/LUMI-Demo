@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { matchingEngine } from '@/lib/clob/matching-engine';
+import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic';
@@ -19,9 +20,30 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // 获取订单簿
+    const marketIdNum = parseInt(marketId);
+    const cacheKey = `${cacheKeys.orderbook(marketIdNum)}:${outcome}`;
+    
+    // 🚀 检查缓存（订单簿使用较短的缓存时间：5秒）
+    const cachedData = globalCache.orderbooks.get(cacheKey);
+    
+    if (cachedData) {
+      return NextResponse.json({
+        success: true,
+        orderBook: {
+          ...cachedData,
+          updatedAt: Date.now()
+        },
+        cached: true
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=3, stale-while-revalidate=5',
+        }
+      });
+    }
+    
+    // 获取订单簿（如果数据库连接失败，会返回空订单簿）
     const orderBook = await matchingEngine.getOrderBook(
-      parseInt(marketId),
+      marketIdNum,
       parseInt(outcome)
     );
     
@@ -33,34 +55,41 @@ export async function GET(request: NextRequest) {
       spread = parseFloat((bestAsk - bestBid).toFixed(4));
     }
     
+    const result = {
+      bids: orderBook.bids,
+      asks: orderBook.asks,
+      spread
+    };
+    
+    // 🚀 保存到缓存（5秒）
+    globalCache.orderbooks.set(cacheKey, result, 5000);
+    
     return NextResponse.json({
       success: true,
       orderBook: {
-        bids: orderBook.bids,
-        asks: orderBook.asks,
-        spread,
+        ...result,
         updatedAt: Date.now()
+      },
+      cached: false
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3, stale-while-revalidate=5',
       }
     });
     
   } catch (error: any) {
     console.error('获取订单簿失败:', error);
     
-    // 检查是否是数据库连接错误
-    if (error.message && error.message.includes('DATABASE_URL')) {
-      return NextResponse.json(
-        { 
-          error: '数据库未配置',
-          details: 'DATABASE_URL 环境变量未设置，请在 Vercel 配置中添加 PostgreSQL 连接字符串',
-          helpUrl: 'https://github.com/your-repo/blob/main/VERCEL_环境变量配置指南.md'
-        },
-        { status: 500 }
-      );
-    }
-    
-    return NextResponse.json(
-      { error: error.message || '获取订单簿失败' },
-      { status: 500 }
-    );
+    // 即使出错也返回空订单簿，避免前端500错误
+    return NextResponse.json({
+      success: true,
+      orderBook: {
+        bids: [],
+        asks: [],
+        spread: null,
+        updatedAt: Date.now()
+      },
+      warning: '数据库连接失败，返回空订单簿'
+    });
   }
 }

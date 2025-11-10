@@ -1,13 +1,11 @@
 // 🔍 检查市场交易量并自动激活
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
 import { ethers } from 'ethers';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// #vercel环境禁用 - 使用单例 Supabase Admin 客户端，避免多实例警告
+const supabase = getSupabaseAdmin();
 
 const ACTIVATION_THRESHOLD = 100; // $100 交易量阈值
 

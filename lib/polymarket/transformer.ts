@@ -69,25 +69,49 @@ export function transformPolymarketToMarket(
     : `-${(Math.random() * 5).toFixed(1)}%`;
   
   const trend = probability > 50 ? 'up' : 'down';
+  const mappedCategory = mapCategory(polymarket.category, polymarket.tags);
   
   return {
+    // 基础字段
     id: polymarket.condition_id || `polymarket-${index}`,
     title: polymarket.question || 'Untitled Market',
+    description: polymarket.description || polymarket.question || '',
+    
+    // 旧架构字段（向后兼容）
     category: polymarket.category || 'General',
-    categoryType: mapCategory(polymarket.category, polymarket.tags),
+    categoryType: mappedCategory,
     probability,
     volume: formatVolume(polymarket.volume_num || polymarket.volume),
+    volumeNum: polymarket.volume_num || 0,
     participants: Math.floor(Math.random() * 1000) + 100, // 模拟参与人数
     endDate: formatEndDate(polymarket.end_date_iso || polymarket.end_date),
     trend,
     change,
-    description: polymarket.description || polymarket.question || '',
     resolutionCriteria: [
       'Based on official sources and market resolution',
       'Market will resolve according to outcome criteria'
     ],
     relatedMarkets: [],
     isActive: polymarket.active !== false,
+    createdAt: new Date().toISOString(),
+    priorityLevel: 'normal',
+    
+    // 新架构字段
+    question_id: polymarket.question_id,
+    condition_id: polymarket.condition_id,
+    main_category: mappedCategory,
+    sub_category: polymarket.category || 'General',
+    tags: polymarket.tags || [],
+    end_time: polymarket.end_date_iso || polymarket.end_date,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    status: polymarket.active !== false ? 'active' : 'resolved',
+    blockchain_status: 'created', // Polymarket的市场都已在链上
+    resolved: polymarket.active === false,
+    image_url: polymarket.image || polymarket.icon,
+    priority_level: 'normal',
+    source: 'polymarket',
+    
     // 额外的 Polymarket 信息
     polymarketData: {
       marketSlug: polymarket.market_slug,

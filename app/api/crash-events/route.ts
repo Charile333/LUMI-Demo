@@ -4,14 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabase } from '@/lib/supabase-client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// #vercel环境禁用 - 使用单例 Supabase 客户端，避免多实例警告
+const supabase = getSupabase();
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'verified'; // 默认只返回verified的事件
@@ -94,7 +93,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // #vercel环境禁用 - 使用顶层的单例 supabase 客户端
     const body = await request.json();
     
     const { data, error } = await supabase

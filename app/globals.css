@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RainbowKit 样式 */
+@import '@rainbow-me/rainbowkit/styles.css';
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;

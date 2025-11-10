@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import WalletConnect from './WalletConnect'
 import LanguageSwitcher from './LanguageSwitcher'
+import SmartSearchBar from './SmartSearchBar'
 
 // Navigation Link Component - 修改为按钮式点击
 const NavLink = ({ 
@@ -50,6 +51,7 @@ interface NavbarProps {
   onTimeRangeChange?: (range: string) => void;
   // 显示控制
   showProductBanner?: boolean;
+  showSmartSearch?: boolean; // 是否显示智能搜索（在顶部）
 }
 
 const Navbar = ({ 
@@ -63,7 +65,8 @@ const Navbar = ({
   onSearchChange,
   selectedTimeRange = 'ALL',
   onTimeRangeChange,
-  showProductBanner = true
+  showProductBanner = true,
+  showSmartSearch = false
 }: NavbarProps) => {
   const { t } = useTranslation()
   const router = useRouter()
@@ -138,7 +141,7 @@ const Navbar = ({
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 <Image 
-                  src="/image/LUMI-golden.png" 
+                  src="/image/LUMI-logo.png" 
                   alt="LUMI Logo" 
                   width={250} 
                   height={70}
@@ -147,6 +150,13 @@ const Navbar = ({
               </div>
             </button>
           </div>
+          
+          {/* 中间: 智能搜索栏 */}
+          {showSmartSearch && (
+            <div className="flex-1 max-w-2xl mx-4">
+              <SmartSearchBar />
+            </div>
+          )}
           
           {/* Right Side: Action Buttons */}
           <div className="flex items-center space-x-3">
@@ -199,7 +209,7 @@ const Navbar = ({
             >
               <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                 <Image 
-                  src="/image/LUMI-golden-sm.png" 
+                  src="/image/LUMI-logo.png" 
                   alt="LUMI" 
                   width={40} 
                   height={40}
@@ -335,23 +345,29 @@ const Navbar = ({
         {showFilters && (
           <div className="py-3.5 border-t border-white/5">
             <div className="flex gap-3 items-center flex-nowrap">
-              {/* Search Box */}
-              <div className="relative w-72 flex-shrink-0">
-                <input
-                  type="text"
-                  placeholder={t('common.searchMarkets')}
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange?.(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 pl-10 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 transition-colors"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-amber-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+              {/* Search Box - 使用智能搜索或简单搜索 */}
+              <div className="w-72 flex-shrink-0">
+                {showSmartSearch ? (
+                  <SmartSearchBar className="w-full" />
+                ) : (
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder={t('common.searchMarkets')}
+                      value={searchQuery}
+                      onChange={(e) => onSearchChange?.(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 pl-10 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 transition-colors"
+                    />
+                    <svg
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-amber-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                )}
               </div>
 
               {/* Sub-Categories with Scroll Arrows */}

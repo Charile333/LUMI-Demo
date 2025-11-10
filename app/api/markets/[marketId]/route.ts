@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
 import { UpdateMarketRequest } from '@/lib/types/market';
+import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 
 // GET - 获取单个市场
 export async function GET(
@@ -8,6 +9,25 @@ export async function GET(
   { params }: { params: { marketId: string } }
 ) {
   try {
+    const marketId = parseInt(params.marketId);
+    
+    // 🚀 检查缓存
+    const cacheKey = cacheKeys.market(marketId);
+    const cachedData = globalCache.markets.get(cacheKey);
+    
+    if (cachedData) {
+      console.log(`✅ 从缓存返回市场 ${marketId} 数据`);
+      return NextResponse.json({
+        success: true,
+        data: cachedData,
+        cached: true
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        }
+      });
+    }
+    
     const { data, error } = await supabaseAdmin
       .from('markets')
       .select('*')
@@ -21,9 +41,17 @@ export async function GET(
       );
     }
     
+    // 🚀 保存到缓存（30秒）
+    globalCache.markets.set(cacheKey, data, 30000);
+    
     return NextResponse.json({
       success: true,
       data: data,
+      cached: false
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+      }
     });
   } catch (error) {
     return NextResponse.json(
@@ -40,6 +68,7 @@ export async function PUT(
 ) {
   try {
     const body: UpdateMarketRequest = await request.json();
+    const marketId = parseInt(params.marketId);
     
     const updateData = {
       ...body,
@@ -63,6 +92,11 @@ export async function PUT(
       );
     }
     
+    // 🚀 更新后清除相关缓存
+    globalCache.markets.delete(cacheKeys.market(marketId));
+    globalCache.stats.deleteByPrefix('batch-stats:');
+    console.log(`🧹 已清除市场 ${marketId} 的缓存`);
+    
     return NextResponse.json({
       success: true,
       data: data,
@@ -82,6 +116,8 @@ export async function DELETE(
   { params }: { params: { marketId: string } }
 ) {
   try {
+    const marketId = parseInt(params.marketId);
+    
     const { error } = await supabaseAdmin
       .from('markets')
       .delete()
@@ -93,6 +129,12 @@ export async function DELETE(
         { status: 500 }
       );
     }
+    
+    // 🚀 删除后清除相关缓存
+    globalCache.markets.delete(cacheKeys.market(marketId));
+    globalCache.orderbooks.delete(cacheKeys.orderbook(marketId));
+    globalCache.stats.deleteByPrefix('batch-stats:');
+    console.log(`🧹 已清除市场 ${marketId} 的所有缓存`);
     
     return NextResponse.json({
       success: true,

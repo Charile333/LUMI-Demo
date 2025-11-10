@@ -97,6 +97,13 @@
     "hot": "Hot",
     "pending": "Pending",
     "failed": "Failed",
+    "orderId": "Order ID",
+    "status": {
+      "active": "Trading",
+      "pending": "Pending Settlement",
+      "resolved": "Resolved",
+      "preparing": "Preparing"
+    },
     "interestedButton": {
       "installWallet": "Please install MetaMask or other Web3 wallet first",
       "processing": "Processing...",
@@ -113,6 +120,7 @@
     "no": "NO",
     "buy": "Buy",
     "sell": "Sell",
+    "trade": "Trade",
     "price": "Price",
     "quantity": "Quantity",
     "total": "Total",
@@ -224,6 +232,10 @@
     "bid": "BID",
     "ask": "ASK",
     "lastUpdate": "Last update"
+  },
+  "filters": {
+    "status": "Status",
+    "all": "All"
   },
   "categories": {
     "automotive": "Automotive",
@@ -1354,7 +1366,8 @@
     "quickTradeNote": "Quick trade: This will create a market order at the best available price. For advanced options, visit the market page.",
     "processing": "Processing...",
     "buyFor": "Buy",
-    "for": "for"
+    "for": "for",
+    "perShare": "per share"
   },
   "orderForm": {
     "buy": "Buy",
@@ -1383,7 +1396,11 @@
     "orderSuccessDetail": "Order has been submitted to the order book",
     "orderFailed": "❌ Order failed",
     "userCancelled": "❌ User cancelled signature",
-    "userRejected": "❌ User rejected transaction"
+    "userRejected": "❌ User rejected transaction",
+    "tradeSuccess": "🎉 Trade Successful!",
+    "usingPolymarket": "Using Polymarket Official CTF Exchange",
+    "txHash": "Transaction Hash",
+    "viewOnExplorer": "View on Block Explorer"
   },
   "marketDetail": {
     "loading": "Loading market data...",
@@ -1415,6 +1432,7 @@
     "refreshing": "Refreshing...",
     "refresh": "Refresh",
     "refreshData": "Refresh data (without page reload)",
+    "syncing": "Syncing...",
     "realtime": "Realtime",
     "offline": "Offline",
     "bidPrice": "Bid",

@@ -33,10 +33,11 @@ export async function activateMarketOnChain(marketId: number): Promise<{
   console.log(`\n🚀 开始激活市场 ${marketId}...`);
   
   try {
-    // 1. 获取市场数据
+    // 1. 获取市场数据（增加重试次数）
     const marketResult = await db.query(
       `SELECT * FROM markets WHERE id = $1`,
-      [marketId]
+      [marketId],
+      2 // 重试2次
     );
     
     if (marketResult.rows.length === 0) {
@@ -62,10 +63,11 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       感兴趣: ${market.interested_users}
     `);
     
-    // 2. 更新状态为 creating
+    // 2. 更新状态为 creating（增加重试）
     await db.query(
       `UPDATE markets SET blockchain_status = $1 WHERE id = $2`,
-      ['creating', marketId]
+      ['creating', marketId],
+      2 // 重试2次
     );
     
     // 2.5. 广播激活中事件（WebSocket）
@@ -87,9 +89,106 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       throw new Error('PLATFORM_WALLET_PRIVATE_KEY 未配置');
     }
     
-    const provider = new ethers.providers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL || 'https://polygon-amoy-bor-rpc.publicnode.com'
-    );
+    // 🚀 支持多个 RPC 端点作为 fallback（已优化：添加更多端点和缓存）
+    const rpcUrls = [
+      process.env.NEXT_PUBLIC_RPC_URL,
+      'https://rpc-amoy.polygon.technology',
+      'https://polygon-amoy.g.alchemy.com/v2/demo',
+      'https://polygon-amoy.drpc.org',
+      'https://polygon-amoy-bor-rpc.publicnode.com',
+      'https://rpc.ankr.com/polygon_amoy',
+      'https://polygon-amoy.public.blastapi.io'
+    ].filter(Boolean) as string[];
+    
+    // 🚀 导入 RPC 缓存
+    const { rpcCache } = await import('@/lib/cache/rpc-cache');
+    
+    // 获取可尝试的 RPC 端点（排除已知失败的）
+    const triableRPCs = rpcCache.getTriableRPCs(rpcUrls);
+    
+    if (triableRPCs.length === 0) {
+      console.warn('⚠️ 所有 RPC 端点都暂时不可用，尝试全部端点');
+      triableRPCs.push(...rpcUrls);
+    }
+    
+    console.log(`🌐 将尝试 ${triableRPCs.length} 个 RPC 端点...`);
+    
+    let provider: ethers.providers.Provider | null = null;
+    let rpcUrl = '';
+    let lastError: Error | null = null;
+    
+    // 🔄 尝试连接每个 RPC 端点（带超时和重试）
+    for (const url of triableRPCs) {
+      try {
+        console.log(`🌐 尝试连接 RPC: ${url}`);
+        const startTime = Date.now();
+        
+        // 🚀 创建带超时的 Provider
+        const testProvider = new ethers.providers.StaticJsonRpcProvider(
+          {
+            url,
+            timeout: 10000 // 10秒超时
+          },
+          {
+            name: 'polygon-amoy',
+            chainId: 80002
+          }
+        );
+        
+        // 🔄 测试连接（带超时保护）
+        const blockNumberPromise = testProvider.getBlockNumber();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout after 10s')), 10000)
+        );
+        
+        await Promise.race([blockNumberPromise, timeoutPromise]);
+        
+        const latency = Date.now() - startTime;
+        
+        // ✅ 连接成功
+        provider = testProvider;
+        rpcUrl = url;
+        rpcCache.markAvailable(url, latency);
+        
+        console.log(`✅ RPC 连接成功: ${url} (延迟: ${latency}ms)`);
+        break;
+        
+      } catch (error: any) {
+        const errorMsg = error.message || error.reason || '未知错误';
+        console.warn(`⚠️ RPC ${url} 连接失败: ${errorMsg}`);
+        
+        // 标记为不可用
+        rpcCache.markUnavailable(url);
+        lastError = error;
+        
+        // 短暂延迟再试下一个（避免过快连续请求）
+        await new Promise(resolve => setTimeout(resolve, 500));
+        continue;
+      }
+    }
+    
+    if (!provider) {
+      // 显示 RPC 缓存统计
+      const stats = rpcCache.getStats();
+      console.error('📊 RPC 状态统计:', {
+        total: stats.total,
+        available: stats.available,
+        unavailable: stats.unavailable
+      });
+      
+      throw new Error(
+        `所有 RPC 端点连接失败。\n` +
+        `  尝试的端点: ${triableRPCs.join(', ')}\n` +
+        `  最后错误: ${lastError?.message || '未知错误'}\n` +
+        `  建议: \n` +
+        `    1. 检查网络连接（国内可能需要代理）\n` +
+        `    2. 检查防火墙设置\n` +
+        `    3. 稍后再试（RPC 服务可能暂时不可用）\n` +
+        `    4. 使用自己的 RPC 端点（Alchemy/Infura）`
+      );
+    }
+    
+    console.log(`✅ Provider 已创建 (chainId: 80002, RPC: ${rpcUrl})`);
     
     const platformWallet = new ethers.Wallet(privateKey, provider);
     console.log(`💰 平台账户: ${platformWallet.address}`);
@@ -101,7 +200,57 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       platformWallet
     );
     
-    const balance = await usdc.balanceOf(platformWallet.address);
+    // 先检查合约是否存在
+    let code;
+    try {
+      code = await provider.getCode(CONTRACTS.mockUSDC);
+    } catch (codeError: any) {
+      throw new Error(`无法检查 USDC 合约代码: ${codeError.message || codeError.reason}. RPC URL: ${rpcUrl}`);
+    }
+    
+    if (code === '0x' || code === '0x0') {
+      throw new Error(`USDC 合约不存在于地址 ${CONTRACTS.mockUSDC}. 请确认合约已部署到 Polygon Amoy 测试网.`);
+    }
+    console.log(`✅ USDC 合约已验证存在 (代码长度: ${code.length} 字符)`);
+    
+    // 使用 try-catch 处理 balanceOf 调用
+    let balance;
+    try {
+      // 尝试直接调用
+      balance = await usdc.balanceOf(platformWallet.address);
+      console.log(`✅ 成功获取余额 (方法: balanceOf)`);
+    } catch (error: any) {
+      console.warn(`⚠️ balanceOf 调用失败，尝试替代方法...`, error.message || error.reason);
+      
+      // 如果 balanceOf 失败，尝试使用 callStatic
+      try {
+        balance = await usdc.callStatic.balanceOf(platformWallet.address);
+        console.log(`✅ 成功获取余额 (方法: callStatic)`);
+      } catch (staticError: any) {
+        // 最后尝试使用 provider.call
+        try {
+          const iface = new ethers.utils.Interface(USDC_ABI);
+          const data = iface.encodeFunctionData('balanceOf', [platformWallet.address]);
+          const result = await provider.call({
+            to: CONTRACTS.mockUSDC,
+            data: data
+          });
+          balance = iface.decodeFunctionResult('balanceOf', result)[0];
+          console.log(`✅ 成功获取余额 (方法: provider.call)`);
+        } catch (callError: any) {
+          const errorMsg = error.message || error.reason || staticError.message || staticError.reason || callError.message || '未知错误';
+          throw new Error(
+            `无法获取 USDC 余额。\n` +
+            `  合约地址: ${CONTRACTS.mockUSDC}\n` +
+            `  账户地址: ${platformWallet.address}\n` +
+            `  RPC URL: ${rpcUrl}\n` +
+            `  错误: ${errorMsg}\n` +
+            `  建议: 1) 检查 RPC 节点是否正常 2) 确认合约地址正确 3) 尝试使用其他 RPC 端点`
+          );
+        }
+      }
+    }
+    
     const rewardAmount = ethers.utils.parseUnits(market.reward_amount?.toString() || '10', 6);
     
     console.log(`💵 USDC 余额: ${ethers.utils.formatUnits(balance, 6)}`);
@@ -171,7 +320,7 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     
     console.log(`📊 Condition ID: ${conditionId}`);
     
-    // 8. 更新数据库
+    // 8. 更新数据库（增加重试）
     await db.query(
       `UPDATE markets 
        SET blockchain_status = $1,
@@ -181,7 +330,8 @@ export async function activateMarketOnChain(marketId: number): Promise<{
            adapter_address = $4,
            ctf_address = $5
        WHERE id = $6`,
-      ['created', 'active', conditionId, CONTRACTS.adapter, CONTRACTS.ctf, marketId]
+      ['created', 'active', conditionId, CONTRACTS.adapter, CONTRACTS.conditionalTokens, marketId],
+      2 // 重试2次
     );
     
     console.log('✅ 市场激活成功！');
@@ -210,11 +360,16 @@ export async function activateMarketOnChain(marketId: number): Promise<{
   } catch (error: any) {
     console.error(`❌ 激活失败:`, error.message);
     
-    // 更新状态为 failed
-    await db.query(
-      `UPDATE markets SET blockchain_status = $1 WHERE id = $2`,
-      ['failed', marketId]
-    );
+    // 更新状态为 failed（增加重试，确保状态更新成功）
+    try {
+      await db.query(
+        `UPDATE markets SET blockchain_status = $1 WHERE id = $2`,
+        ['failed', marketId],
+        2 // 重试2次
+      );
+    } catch (updateError) {
+      console.error('❌ 更新失败状态也失败了:', updateError);
+    }
     
     // 广播激活失败事件（WebSocket）
     try {
@@ -282,7 +437,8 @@ async function notifyInterestedUsers(marketId: number) {
   try {
     const result = await db.query(
       `SELECT user_address FROM user_interests WHERE market_id = $1`,
-      [marketId]
+      [marketId],
+      2 // 重试2次
     );
     
     console.log(`📧 通知 ${result.rows.length} 个用户市场已激活`);
@@ -290,16 +446,21 @@ async function notifyInterestedUsers(marketId: number) {
     // TODO: 实现实际的通知逻辑（邮件/推送）
     // 这里只是记录日志
     for (const row of result.rows) {
-      await db.query(
-        `INSERT INTO activity_logs (user_address, action_type, market_id, details)
-         VALUES ($1, $2, $3, $4)`,
-        [
-          row.user_address,
-          'market_activated',
-          marketId,
-          JSON.stringify({ notified: true })
-        ]
-      );
+      try {
+        await db.query(
+          `INSERT INTO activity_logs (user_address, action_type, market_id, details)
+           VALUES ($1, $2, $3, $4)`,
+          [
+            row.user_address,
+            'market_activated',
+            marketId,
+            JSON.stringify({ notified: true })
+          ],
+          1 // 重试1次（日志不是关键操作）
+        );
+      } catch (logError) {
+        console.warn('记录活动日志失败:', logError);
+      }
     }
     
   } catch (error) {

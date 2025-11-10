@@ -1,7 +1,10 @@
 // 📝 创建订单 API - 使用Supabase（Vercel兼容）
+// 🚀 已优化：订单变更时清除相关缓存
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
+import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
+import { tradingCache } from '@/lib/cache/trading-cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -256,6 +259,20 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error('⚠️ 更新市场数据失败（非致命错误）:', error);
     }
+
+    // 🚀 清除相关缓存（订单创建会影响订单簿和市场统计）
+    globalCache.orderbooks.deleteByPrefix(cacheKeys.orderbook(marketId));
+    globalCache.markets.delete(cacheKeys.market(marketId));
+    globalCache.stats.deleteByPrefix('batch-stats:');
+    
+    // 🔄 清除交易相关缓存
+    await tradingCache.onOrderChange({
+      marketId,
+      userAddress,
+      outcome: body.outcome
+    });
+    
+    console.log(`🧹 已清除市场 ${marketId} 和用户 ${userAddress.slice(0, 10)}... 的相关缓存`);
 
     // 返回兼容旧格式的结果
     return NextResponse.json({

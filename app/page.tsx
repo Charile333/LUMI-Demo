@@ -352,7 +352,7 @@ export default function LumiSoonPage() {
       {/* 左上角Logo - 固定在顶部，与语言切换器垂直居中对齐 */}
       <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)' }}>
         <Image 
-          src="/image/LUMI-golden.png" 
+          src="/image/LUMI-logo.png" 
           alt="LUMI Logo" 
           width={600} 
           height={200}

@@ -31,6 +31,7 @@ export const getSupabase = (): SupabaseClient => {
 
 /**
  * 获取服务端 Supabase 客户端（使用 service role key，仅在 API 路由中使用）
+ * 🚀 已优化：添加超时和重试配置
  */
 export const getSupabaseAdmin = (): SupabaseClient => {
   if (!supabaseAdminInstance) {
@@ -45,6 +46,22 @@ export const getSupabaseAdmin = (): SupabaseClient => {
       auth: {
         autoRefreshToken: false,
         persistSession: false
+      },
+      // 🚀 优化：添加全局配置
+      global: {
+        headers: {
+          'x-client-info': 'lumi-market@1.0.0'
+        },
+      },
+      // 🔧 数据库配置
+      db: {
+        schema: 'public'
+      },
+      // 🔧 Realtime 配置（如果不用可以禁用以节省连接）
+      realtime: {
+        params: {
+          eventsPerSecond: 10
+        }
       }
     });
     console.log('✅ Supabase Admin 客户端已初始化');

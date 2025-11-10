@@ -1,7 +1,10 @@
 /**
  * Polymarket API 集成
  * 获取真实的预测市场数据
+ * 🚀 已优化：添加智能缓存层
  */
+
+import { productCache } from '@/lib/cache/product-cache';
 
 export interface PolymarketMarket {
   condition_id: string;
@@ -41,42 +44,70 @@ export interface PolymarketMarket {
 }
 
 /**
- * 获取 Polymarket 市场数据
+ * 获取 Polymarket 市场数据（带缓存）
+ * 🚀 性能优化：默认缓存5分钟，减少API调用
  */
 export async function fetchPolymarketMarkets(options?: {
   limit?: number;
   active?: boolean;
   category?: string;
+  skipCache?: boolean; // 是否跳过缓存
 }): Promise<PolymarketMarket[]> {
   try {
-    const { limit = 20, active = true } = options || {};
+    const { limit = 20, active = true, category, skipCache = false } = options || {};
     
-    const params = new URLSearchParams();
-    params.append('limit', limit.toString());
-    params.append('active', active.toString());
+    // 生成缓存键
+    const cacheKey = `markets:${limit}:${active}:${category || 'all'}`;
     
-    const url = `https://gamma-api.polymarket.com/markets?${params.toString()}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store', // 不缓存，获取最新数据
-      next: { revalidate: 300 } // 5分钟后重新验证
-    });
-
-    if (!response.ok) {
-      throw new Error(`Polymarket API 返回错误: ${response.status}`);
+    // 🚀 如果不跳过缓存，先尝试从缓存获取
+    if (!skipCache) {
+      return await productCache.getPolymarketData(
+        cacheKey,
+        async () => {
+          console.log('📡 从 Polymarket API 获取数据...');
+          return await fetchFromPolymarketAPI(limit, active);
+        }
+      );
     }
-
-    const data = await response.json();
     
-    return Array.isArray(data) ? data : [];
+    // 跳过缓存，直接获取
+    console.log('⚠️ 跳过缓存，直接从 API 获取');
+    return await fetchFromPolymarketAPI(limit, active);
+    
   } catch (error) {
     console.error('获取 Polymarket 数据失败:', error);
     return [];
   }
+}
+
+/**
+ * 实际的 API 调用函数
+ */
+async function fetchFromPolymarketAPI(
+  limit: number,
+  active: boolean
+): Promise<PolymarketMarket[]> {
+  const params = new URLSearchParams();
+  params.append('limit', limit.toString());
+  params.append('active', active.toString());
+  
+  const url = `https://gamma-api.polymarket.com/markets?${params.toString()}`;
+  
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store', // 不使用浏览器缓存
+  });
+
+  if (!response.ok) {
+    throw new Error(`Polymarket API 返回错误: ${response.status}`);
+  }
+
+  const data = await response.json();
+  
+  return Array.isArray(data) ? data : [];
 }
 
 /**

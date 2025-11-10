@@ -97,6 +97,13 @@
     "hot": "热门",
     "pending": "待定",
     "failed": "失败",
+    "orderId": "订单ID",
+    "status": {
+      "active": "交易中",
+      "pending": "待结算",
+      "resolved": "已结算",
+      "preparing": "准备中"
+    },
     "interestedButton": {
       "installWallet": "请先安装 MetaMask 或其他 Web3 钱包",
       "processing": "处理中...",
@@ -113,6 +120,7 @@
     "no": "否",
     "buy": "买入",
     "sell": "卖出",
+    "trade": "交易",
     "price": "价格",
     "quantity": "数量",
     "total": "总计",
@@ -224,6 +232,10 @@
     "bid": "买盘",
     "ask": "卖盘",
     "lastUpdate": "最后更新"
+  },
+  "filters": {
+    "status": "状态",
+    "all": "全部"
   },
   "categories": {
     "automotive": "汽车",
@@ -1313,7 +1325,8 @@
     "quickTradeNote": "快速交易：这将以最优价格创建市价订单。如需高级选项，请访问市场页面。",
     "processing": "处理中...",
     "buyFor": "买入",
-    "for": "价格"
+    "for": "价格",
+    "perShare": "每份"
   },
   "orderForm": {
     "buy": "买入",
@@ -1342,7 +1355,11 @@
     "orderSuccessDetail": "订单已提交到订单簿",
     "orderFailed": "❌ 下单失败",
     "userCancelled": "❌ 用户取消了签名",
-    "userRejected": "❌ 用户拒绝了交易"
+    "userRejected": "❌ 用户拒绝了交易",
+    "tradeSuccess": "🎉 交易成功！",
+    "usingPolymarket": "使用 Polymarket 官方 CTF Exchange",
+    "txHash": "交易哈希",
+    "viewOnExplorer": "在区块浏览器查看"
   },
   "marketDetail": {
     "loading": "加载市场数据中...",
@@ -1374,6 +1391,7 @@
     "refreshing": "刷新中...",
     "refresh": "刷新",
     "refreshData": "刷新数据（不刷新页面）",
+    "syncing": "同步中...",
     "realtime": "实时",
     "offline": "离线",
     "bidPrice": "买价",

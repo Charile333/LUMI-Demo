@@ -80,8 +80,12 @@ export class PolymarketProvider implements IDataProvider {
     const probability = yesToken ? calculateProbability(yesToken.price) : 50;
     
     return {
+      // 基础字段
       id: pm.condition_id || `poly-${index}`,
       title: pm.question || 'Untitled',
+      description: pm.description || pm.question || '',
+      
+      // 旧架构字段（向后兼容）
       category: pm.category || 'General',
       categoryType: undefined, // 将由聚合器设置
       probability,
@@ -91,21 +95,33 @@ export class PolymarketProvider implements IDataProvider {
       endDate: formatEndDate(pm.end_date_iso || pm.end_date),
       trend: probability > 50 ? 'up' : 'down',
       change: `${probability > 50 ? '+' : '-'}${(Math.random() * 10).toFixed(1)}%`,
-      description: pm.description || pm.question || '',
       resolutionCriteria: ['Based on official sources and market resolution'],
       relatedMarkets: [],
       isActive: pm.active !== false,
       createdAt: pm.end_date_iso || new Date().toISOString(),
-      
-      // 数据源标识
-      source: 'polymarket',
-      
-      // 默认优先级（普通）
       priorityLevel: 'normal',
       customWeight: 50,
       isHomepage: false,
       isHot: false,
       isTrending: false,
+      
+      // 新架构字段
+      question_id: pm.question_id,
+      condition_id: pm.condition_id,
+      main_category: undefined, // 将由聚合器设置
+      sub_category: pm.category || 'General',
+      tags: pm.tags || [],
+      end_time: pm.end_date_iso || pm.end_date,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      status: pm.active !== false ? 'active' : 'resolved',
+      blockchain_status: 'created', // Polymarket的市场都已在链上
+      resolved: pm.active === false,
+      image_url: pm.image || pm.icon,
+      priority_level: 'normal',
+      
+      // 数据源标识
+      source: 'polymarket',
       
       // Polymarket 原始数据
       polymarketData: {

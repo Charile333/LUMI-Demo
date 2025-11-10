@@ -1,6 +1,7 @@
 // 🎯 订单匹配引擎
 
 import { db } from '../db';
+import { supabaseAdmin } from '../supabase-client';
 import { Order, verifyOrderSignature, isOrderExpired, getOrderHash } from './signing';
 
 export interface MatchResult {
@@ -9,6 +10,14 @@ export interface MatchResult {
   remainingAmount: string;
   fullyFilled: boolean;
 }
+
+// 简单的内存缓存
+const orderbookCache = new Map<string, {
+  data: any;
+  timestamp: number;
+}>();
+
+const CACHE_TTL = 5000; // 5秒缓存
 
 export class MatchingEngine {
   /**
@@ -287,55 +296,129 @@ export class MatchingEngine {
   
   /**
    * 获取订单簿
+   * 如果数据库连接失败，返回空订单簿而不是抛出错误
    */
   async getOrderBook(marketId: number, outcome: number): Promise<{
     bids: Array<{ price: string; total_amount: string; order_count: number }>;
     asks: Array<{ price: string; total_amount: string; order_count: number }>;
   }> {
-    // 买单（bids）
-    const bidsResult = await db.query(
-      `SELECT price, 
-              SUM(quantity - filled_quantity) as total_amount,
-              COUNT(*) as order_count
-       FROM orders
-       WHERE market_id = $1
-         AND side = 'buy'
-         AND status IN ('open', 'partial')
-         AND (quantity - filled_quantity) > 0
-       GROUP BY price
-       ORDER BY price DESC
-       LIMIT 20`,
-      [marketId]
-    );
+    // 检查缓存
+    const cacheKey = `${marketId}-${outcome}`;
+    const cached = orderbookCache.get(cacheKey);
     
-    // 卖单（asks）
-    const asksResult = await db.query(
-      `SELECT price, 
-              SUM(quantity - filled_quantity) as total_amount,
-              COUNT(*) as order_count
-       FROM orders
-       WHERE market_id = $1
-         AND side = 'sell'
-         AND status IN ('open', 'partial')
-         AND (quantity - filled_quantity) > 0
-       GROUP BY price
-       ORDER BY price ASC
-       LIMIT 20`,
-      [marketId]
-    );
+    if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+      console.log(`✅ 使用缓存的订单簿数据 (${marketId})`);
+      return cached.data;
+    }
     
-    return {
-      bids: bidsResult.rows.map(r => ({
-        price: r.price,
-        total_amount: r.total_amount,
-        order_count: parseInt(r.order_count)
-      })),
-      asks: asksResult.rows.map(r => ({
-        price: r.price,
-        total_amount: r.total_amount,
-        order_count: parseInt(r.order_count)
-      }))
-    };
+    try {
+      // ✅ 使用 Supabase REST API 查询买单
+      const { data: bidsData, error: bidsError } = await supabaseAdmin
+        .from('orders')
+        .select('price, quantity, filled_quantity')
+        .eq('market_id', marketId)
+        .eq('side', 'buy')
+        .in('status', ['open', 'partial']);
+      
+      if (bidsError) {
+        console.warn('⚠️ 查询买单失败:', bidsError);
+      }
+      
+      // ✅ 使用 Supabase REST API 查询卖单
+      const { data: asksData, error: asksError } = await supabaseAdmin
+        .from('orders')
+        .select('price, quantity, filled_quantity')
+        .eq('market_id', marketId)
+        .eq('side', 'sell')
+        .in('status', ['open', 'partial']);
+      
+      if (asksError) {
+        console.warn('⚠️ 查询卖单失败:', asksError);
+      }
+      
+      // 聚合买单数据（按价格分组）
+      const bidsMap = new Map<string, { total: number; count: number }>();
+      bidsData?.forEach(order => {
+        const remaining = parseFloat(order.quantity || 0) - parseFloat(order.filled_quantity || 0);
+        if (remaining > 0) {
+          const price = order.price?.toString() || '0';
+          const existing = bidsMap.get(price) || { total: 0, count: 0 };
+          bidsMap.set(price, {
+            total: existing.total + remaining,
+            count: existing.count + 1
+          });
+        }
+      });
+      
+      // 聚合卖单数据（按价格分组）
+      const asksMap = new Map<string, { total: number; count: number }>();
+      asksData?.forEach(order => {
+        const remaining = parseFloat(order.quantity || 0) - parseFloat(order.filled_quantity || 0);
+        if (remaining > 0) {
+          const price = order.price?.toString() || '0';
+          const existing = asksMap.get(price) || { total: 0, count: 0 };
+          asksMap.set(price, {
+            total: existing.total + remaining,
+            count: existing.count + 1
+          });
+        }
+      });
+      
+      // 转换为返回格式
+      const bids = Array.from(bidsMap.entries())
+        .map(([price, data]) => ({
+          price,
+          total_amount: data.total.toFixed(8),
+          order_count: data.count
+        }))
+        .sort((a, b) => parseFloat(b.price) - parseFloat(a.price))
+        .slice(0, 20);
+      
+      const asks = Array.from(asksMap.entries())
+        .map(([price, data]) => ({
+          price,
+          total_amount: data.total.toFixed(8),
+          order_count: data.count
+        }))
+        .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+        .slice(0, 20);
+    
+      const result = { bids, asks };
+      
+      // 存入缓存
+      orderbookCache.set(cacheKey, {
+        data: result,
+        timestamp: Date.now()
+      });
+      
+      return result;
+    } catch (error: any) {
+      // 数据库连接失败时返回空订单簿，而不是抛出错误
+      const isConnectionError = error.code === 'ENOTFOUND' || error.message?.includes('getaddrinfo');
+      const isTimeout = error.message?.includes('timeout');
+      
+      if (isConnectionError) {
+        console.warn(`⚠️ 订单簿获取失败（数据库连接不可用），返回空订单簿`);
+      } else if (isTimeout) {
+        console.warn(`⚠️ 订单簿查询超时 (${marketId})，返回空订单簿`);
+      } else {
+        console.warn('⚠️ 获取订单簿失败，返回空订单簿:', error.message);
+      }
+      
+      // 返回空订单簿
+      const emptyResult = {
+        bids: [],
+        asks: []
+      };
+      
+      // 缓存空结果（避免频繁重试）
+      orderbookCache.set(cacheKey, {
+        data: emptyResult,
+        timestamp: Date.now()
+      });
+      
+      return emptyResult;
+    }
   }
 }
 

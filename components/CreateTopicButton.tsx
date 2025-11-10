@@ -122,7 +122,7 @@ export function CreateTopicButton() {
           title={t('topic.create')}
         >
           <Image
-            src="/image/LUMI-golden-sm.png"
+            src="/image/LUMI-logo.png"
             alt={t('topic.createButton')}
             width={64}
             height={64}

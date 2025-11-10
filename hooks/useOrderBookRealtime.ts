@@ -4,7 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase-client';
+import { getSupabase } from '@/lib/supabase-client';
+
+// 获取单例 Supabase 客户端
+const supabase = getSupabase();
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface OrderBookData {

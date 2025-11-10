@@ -2,11 +2,14 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useMarketPrice } from '@/hooks/useMarketPrice';
 import { useMarketParticipants } from '@/hooks/useMarketParticipants';
+import { usePriceChange24h } from '@/hooks/usePriceChange24h';
+import { supabase } from '@/lib/supabase-client';
+import CompactTradeModal from './trading/CompactTradeModal';
 
 interface MarketCardProps {
   market: {
@@ -21,6 +24,7 @@ interface MarketCardProps {
     main_category?: string;
     priority_level?: string;
     trading_volume?: number; // 交易量
+    question_id?: string; // 添加 question_id
   };
   showPrice?: boolean; // 是否显示价格（默认 true）
 }
@@ -29,7 +33,11 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
   const { t } = useTranslation();
   const router = useRouter();
   const [market, setMarket] = useState(initialMarket);
-  const [priceChange24h, setPriceChange24h] = useState(0);
+  const [tradingVolume, setTradingVolume] = useState(initialMarket.trading_volume || 0);
+  
+  // 🎯 快速交易弹窗状态
+  const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+  const [initialOutcome, setInitialOutcome] = useState<'yes' | 'no'>('yes');
   
   // 🔥 获取实时价格（所有市场都获取）
   const price = useMarketPrice(
@@ -43,20 +51,52 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
     true
   );
 
-  // 🔥 计算24小时价格变化（模拟，实际应该从历史数据获取）
-  // TODO: 从数据库获取历史价格数据进行计算
-  const calculatePriceChange = () => {
-    if (!price.loading && price.probability > 0) {
-      // 这里是模拟数据，实际应该从历史表中获取24h前的价格
-      const change = Math.random() * 10 - 5; // -5% 到 +5% 的随机变化
-      setPriceChange24h(Number(change.toFixed(1)));
-    }
-  };
+  // 🔥 获取24小时价格变化（真实数据，方案A）
+  const { change: priceChange24h, loading: priceChangeLoading } = usePriceChange24h(
+    market.id,
+    showPrice
+  );
 
-  // 当价格加载完成后计算变化
-  if (!price.loading && priceChange24h === 0 && price.probability > 0) {
-    calculatePriceChange();
-  }
+  // 🔥 订阅 markets 表的实时更新（交易量和参与人数）
+  useEffect(() => {
+    const channel = supabase
+      .channel(`market_card:${market.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'markets',
+          filter: `id=eq.${market.id}`
+        },
+        (payload) => {
+          // 实时更新交易量和其他统计数据
+          if (payload.new) {
+            const newData = payload.new as any;
+            if (newData.volume !== undefined) {
+              setTradingVolume(newData.volume || 0);
+            }
+            // 同时更新 market 状态
+            setMarket(prev => ({
+              ...prev,
+              trading_volume: newData.volume || prev.trading_volume,
+            }));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [market.id]);
+
+  // 🎯 处理快速交易按钮点击
+  const handleQuickTrade = (outcome: 'yes' | 'no', e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止冒泡，避免触发卡片点击
+    setInitialOutcome(outcome);
+    setIsTradeModalOpen(true);
+  };
   
   // 类别徽章颜色
   const getCategoryColor = (category: string) => {
@@ -91,14 +131,19 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
           >
             {market.title}
           </h3>
-          {!price.loading && (
-            <span className={`flex items-center gap-0.5 text-xs whitespace-nowrap ${
+          {/* 24小时价格变化（真实数据） */}
+          {priceChangeLoading ? (
+            <span className="flex items-center gap-0.5 text-xs text-gray-500 animate-pulse">
+              <span>--</span>
+            </span>
+          ) : priceChange24h !== 0 ? (
+            <span className={`flex items-center gap-0.5 text-xs font-semibold whitespace-nowrap ${
               priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'
             }`}>
               <span>{priceChange24h >= 0 ? '↑' : '↓'}</span>
-              <span>{Math.abs(priceChange24h)}%</span>
+              <span>{Math.abs(priceChange24h).toFixed(1)}%</span>
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* 标签区 */}
@@ -145,32 +190,42 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
           </div>
         </div>
 
-        {/* YES/NO 按钮 */}
+        {/* YES/NO 交易按钮 */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {/* YES 按钮 */}
-          <button className="bg-green-700/30 hover:bg-green-700/40 border border-green-600/50 rounded-lg py-4 px-3 transition-all duration-200">
-            <div className="text-green-400 font-bold text-base tracking-wide">{t('market.yes').toUpperCase()}</div>
+          <button 
+            onClick={(e) => handleQuickTrade('yes', e)}
+            className="bg-green-700/30 hover:bg-green-700/50 border border-green-600/50 hover:border-green-500 rounded-lg py-4 px-3 transition-all duration-200 hover:shadow-lg hover:shadow-green-500/20 group"
+          >
+            <div className="text-green-400 font-bold text-base tracking-wide group-hover:scale-105 transition-transform">
+              {t('market.yes').toUpperCase()}
+            </div>
             {price.loading ? (
               <div className="text-green-400 text-lg font-semibold mt-0.5 animate-pulse">
                 --¢
               </div>
             ) : (
-              <div className="text-green-400 text-lg font-semibold mt-0.5">
-                {(price.bestBid * 100).toFixed(0)}¢
+              <div className="text-green-400 text-lg font-semibold mt-0.5 group-hover:scale-110 transition-transform">
+                {(price.yes * 100).toFixed(0)}¢
               </div>
             )}
           </button>
           
           {/* NO 按钮 */}
-          <button className="bg-red-700/30 hover:bg-red-700/40 border border-red-600/50 rounded-lg py-4 px-3 transition-all duration-200">
-            <div className="text-red-400 font-bold text-base tracking-wide">{t('market.no').toUpperCase()}</div>
+          <button 
+            onClick={(e) => handleQuickTrade('no', e)}
+            className="bg-red-700/30 hover:bg-red-700/50 border border-red-600/50 hover:border-red-500 rounded-lg py-4 px-3 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/20 group"
+          >
+            <div className="text-red-400 font-bold text-base tracking-wide group-hover:scale-105 transition-transform">
+              {t('market.no').toUpperCase()}
+            </div>
             {price.loading ? (
               <div className="text-red-400 text-lg font-semibold mt-0.5 animate-pulse">
                 --¢
               </div>
             ) : (
-              <div className="text-red-400 text-lg font-semibold mt-0.5">
-                {(price.bestAsk * 100).toFixed(0)}¢
+              <div className="text-red-400 text-lg font-semibold mt-0.5 group-hover:scale-110 transition-transform">
+                {(price.no * 100).toFixed(0)}¢
               </div>
             )}
           </button>
@@ -180,11 +235,8 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
         <div className="flex items-center justify-between text-sm text-gray-500 pt-3 border-t border-zinc-800/50">
           <div className="flex items-center gap-1.5">
             <span className="text-base">💰</span>
-            {price.loading ? (
-              <span className="animate-pulse">--</span>
-            ) : (
-              <span>${price.volume24h.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-            )}
+            {/* 优先显示 markets 表的交易量（实时更新），如果没有则显示订单簿的 volume24h */}
+            <span>${(tradingVolume || price.volume24h || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-base">👥</span>
@@ -197,6 +249,17 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
         </div>
       </div>
 
+      {/* 🎯 紧凑交易弹窗 */}
+      <CompactTradeModal
+        isOpen={isTradeModalOpen}
+        onClose={() => setIsTradeModalOpen(false)}
+        market={{
+          id: market.id,
+          title: market.title,
+          questionId: market.question_id || `market-${market.id}`
+        }}
+        initialOutcome={initialOutcome}
+      />
     </div>
   );
 }

@@ -21,13 +21,13 @@ export class CustomProvider implements IDataProvider {
 
   async fetchMarkets(category: CategoryType, limit: number): Promise<Market[]> {
     try {
-      // 从 Supabase 查询
+      // 从 Supabase 查询（使用新架构字段）
       let query = supabaseAdmin
         .from('markets')
         .select('*')
-        .eq('categoryType', category)
-        .eq('isActive', true)
-        .order('createdAt', { ascending: false })
+        .eq('main_category', category) // 新架构：main_category
+        .eq('status', 'active') // 新架构：status = 'active'
+        .order('id', { ascending: false }) // 使用 id 排序
         .limit(limit * 2); // 多取一些，用于后续筛选
 
       const { data, error } = await query;
@@ -41,17 +41,36 @@ export class CustomProvider implements IDataProvider {
         return [];
       }
 
-      // 转换为标准格式
+      // 转换为标准格式（映射新架构到旧接口）
       return data.map(item => ({
-        ...item,
+        id: item.id,
+        title: item.title,
+        description: item.description || '',
+        category: item.sub_category || '', // sub_category -> category
+        categoryType: item.main_category, // main_category -> categoryType（保持兼容）
+        probability: 50, // 从实时数据获取
+        volume: `$${item.volume || 0}`, // 格式化显示
+        volumeNum: parseFloat(item.volume) || 0,
+        participants: item.participants || 0,
+        endDate: item.end_time ? new Date(item.end_time).toLocaleDateString('zh-CN') : '2025-12-31',
+        trend: 'up' as const,
+        change: '+0%',
+        resolutionCriteria: item.description ? [item.description] : [],
+        relatedMarkets: [],
+        isActive: true,
         source: 'custom' as const,
-        volumeNum: this.parseVolume(item.volume),
-        // 确保优先级字段存在
-        priorityLevel: item.priorityLevel || 'normal',
-        customWeight: item.customWeight || 50,
-        isHomepage: item.isHomepage || false,
-        isHot: item.isHot || false,
-        isTrending: item.isTrending || false
+        priorityLevel: item.priority_level || 'normal',
+        customWeight: 50,
+        isHomepage: false,
+        isHot: false,
+        isTrending: false,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
+        // 新架构字段
+        question_id: item.question_id,
+        condition_id: item.condition_id,
+        blockchain_status: item.blockchain_status,
+        image_url: item.image_url
       }));
 
     } catch (error) {

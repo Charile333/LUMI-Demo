@@ -1,4 +1,8 @@
 // WebSocket 服务器 - 实时价格推送 + 预警系统
+
+// 🔧 增加 EventEmitter 最大监听器数量（解决 WalletConnect 警告）
+require('events').EventEmitter.defaultMaxListeners = 20;
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');

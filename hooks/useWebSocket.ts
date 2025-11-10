@@ -3,6 +3,9 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+// #vercel环境禁用 - WebSocket 在 Vercel 上不可用，使用 Supabase Realtime 替代
+const ENABLE_WEBSOCKET = process.env.NODE_ENV === 'development' && !process.env.VERCEL;
+
 interface OrderBookUpdate {
   bestBid: number;
   bestAsk: number;
@@ -111,6 +114,11 @@ export function useOrderBookWebSocket(marketId: number | string) {
   }, [marketId]);
 
   useEffect(() => {
+    // #vercel环境禁用 - 跳过 WebSocket 连接
+    if (!ENABLE_WEBSOCKET) {
+      return;
+    }
+    
     connect();
 
     // 清理函数
@@ -138,6 +146,7 @@ export function useOrderBookWebSocket(marketId: number | string) {
 }
 
 // 🔥 批量市场价格 Hook（用于分类页面）
+// #vercel环境禁用 - 已改用 Supabase Realtime
 export function useMarketListWebSocket(marketIds: number[]) {
   const [pricesMap, setPricesMap] = useState<Map<number, OrderBookUpdate>>(new Map());
   const [connected, setConnected] = useState(false);
@@ -146,6 +155,12 @@ export function useMarketListWebSocket(marketIds: number[]) {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const connect = useCallback(() => {
+    // #vercel环境禁用 - 跳过 WebSocket 连接
+    if (!ENABLE_WEBSOCKET) {
+      console.log('📡 批量 WebSocket 已禁用 (Vercel 环境) - 使用 Supabase Realtime 替代');
+      return;
+    }
+    
     if (typeof window === 'undefined' || marketIds.length === 0) return;
 
     try {
@@ -223,6 +238,11 @@ export function useMarketListWebSocket(marketIds: number[]) {
   }, [marketIds]);
 
   useEffect(() => {
+    // #vercel环境禁用 - 跳过 WebSocket 连接
+    if (!ENABLE_WEBSOCKET) {
+      return;
+    }
+    
     connect();
 
     return () => {
@@ -246,4 +266,3 @@ export function useMarketListWebSocket(marketIds: number[]) {
     error
   };
 }
-

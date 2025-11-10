@@ -11,12 +11,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // 使用service key
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+// #vercel环境禁用 - 使用单例 Supabase Admin 客户端，避免多实例警告
+const supabase = getSupabaseAdmin();
 
 // 支持的资产列表
 const MONITORED_ASSETS = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT'];

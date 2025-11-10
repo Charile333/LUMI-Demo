@@ -17,6 +17,26 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
   
   useEffect(() => {
     loadAccount();
+    
+    // ✅ 监听账户变化
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (accounts.length > 0) {
+          console.log('[MyOrders] 账户已切换:', accounts[0]);
+          setAccount(accounts[0]);
+        } else {
+          console.log('[MyOrders] 钱包已断开');
+          setAccount(null);
+          setOrders([]);
+        }
+      };
+      
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      };
+    }
   }, []);
   
   useEffect(() => {
@@ -33,13 +53,30 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
     if (!window.ethereum) return;
     
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.listAccounts();
-      if (accounts.length > 0) {
+      // ✅ 修复：先请求账户访问权限，不要只使用 listAccounts
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      
+      if (accounts && accounts.length > 0) {
         setAccount(accounts[0]);
+        console.log('[MyOrders] 钱包已连接:', accounts[0]);
+      } else {
+        // 如果没有账户，尝试静默获取（钱包已授权的情况）
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const existingAccounts = await provider.listAccounts();
+        if (existingAccounts.length > 0) {
+          setAccount(existingAccounts[0]);
+          console.log('[MyOrders] 使用已授权账户:', existingAccounts[0]);
+        }
       }
-    } catch (error) {
-      console.error('获取账户失败:', error);
+    } catch (error: any) {
+      // 用户拒绝连接
+      if (error.code === 4001) {
+        console.warn('[MyOrders] 用户拒绝连接钱包');
+      } else {
+        console.error('[MyOrders] 获取账户失败:', error);
+      }
     }
   };
   
@@ -98,8 +135,19 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
   
   if (!account) {
     return (
-      <div className="text-center py-8 text-gray-400">
-        请先连接钱包查看订单
+      <div className="text-center py-8">
+        <div className="text-gray-400 mb-4">
+          请先连接钱包查看订单
+        </div>
+        <button
+          onClick={loadAccount}
+          className="px-6 py-2 bg-amber-400 hover:bg-amber-500 text-black font-semibold rounded-lg transition-colors"
+        >
+          连接钱包
+        </button>
+        <div className="text-xs text-gray-500 mt-2">
+          点击按钮将弹出 MetaMask 连接请求
+        </div>
       </div>
     );
   }

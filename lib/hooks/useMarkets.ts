@@ -19,8 +19,10 @@ export function useMarkets(options: UseMarketsOptions = {}) {
       setError(null);
 
       const params = new URLSearchParams();
-      if (categoryType) params.append('categoryType', categoryType);
-      if (isActive !== undefined) params.append('isActive', String(isActive));
+      // 新架构：使用 main_category 而不是 categoryType
+      if (categoryType) params.append('main_category', categoryType);
+      // 新架构：使用 status 而不是 isActive
+      if (isActive !== undefined) params.append('status', isActive ? 'active' : 'all');
 
       const response = await fetch(`/api/markets?${params.toString()}`);
       const result = await response.json();

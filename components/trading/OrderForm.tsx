@@ -4,10 +4,11 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { useWallet } from '@/app/provider';
+import { useWallet } from '@/app/provider-wagmi';
 import { signOrder, generateSalt, generateOrderId } from '@/lib/clob/signing';
 import { Order } from '@/lib/clob/types';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useToast } from '@/components/Toast';
 
 interface OrderFormProps {
   marketId: number;
@@ -31,6 +32,7 @@ export default function OrderForm({
   onSuccess
 }: OrderFormProps) {
   const { t } = useTranslation();
+  const toast = useToast();
   const { address: account, isConnected } = useWallet();
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [outcome, setOutcome] = useState(1); // 1 = YES, 0 = NO
@@ -53,12 +55,12 @@ export default function OrderForm({
   // 提交订单
   const handleSubmit = async () => {
     if (!window.ethereum) {
-      alert(t('orderForm.installMetaMask'));
+      toast.warning(t('orderForm.installMetaMask'));
       return;
     }
     
     if (!account || !isConnected) {
-      alert(t('orderForm.connectWalletFirst'));
+      toast.warning(t('orderForm.connectWalletFirst'));
       return;
     }
     
@@ -90,12 +92,17 @@ export default function OrderForm({
         
         console.log('✅ Polymarket交易成功！', result.transactionHash);
         
-        alert(`✅ 交易成功！\n\n使用 Polymarket 官方 CTF Exchange\n\n交易哈希: ${result.transactionHash.slice(0, 10)}...\n\n点击确定查看详情`);
-        
-        // 打开区块链浏览器
-        if (result.explorerUrl) {
-          window.open(result.explorerUrl, '_blank');
-        }
+        // 显示成功通知
+        toast.success(
+          `${t('orderForm.tradeSuccess')}\n\n${t('orderForm.usingPolymarket')}\n\n${t('orderForm.txHash')}: ${result.transactionHash.slice(0, 10)}...`,
+          {
+            duration: 8000,
+            link: result.explorerUrl ? {
+              label: t('orderForm.viewOnExplorer'),
+              url: result.explorerUrl
+            } : undefined
+          }
+        );
         
         // 重置表单
         setAmount('10');
@@ -111,10 +118,44 @@ export default function OrderForm({
       // 📊 默认模式：链下订单簿
       console.log('📊 使用链下订单簿模式...');
       
-      // 1. 获取 provider 和 signer
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const address = await signer.getAddress();
+      // 1. 获取 provider 和 signer（带错误处理）
+      let provider, signer, address;
+      
+      try {
+        // 确保账户已连接
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('未找到钱包账户');
+        }
+        
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        
+        // 等待确保连接完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        address = await signer.getAddress();
+        
+        console.log('[OrderForm] 用户地址:', address);
+      } catch (walletError: any) {
+        console.error('[OrderForm] 获取钱包信息失败:', walletError);
+        if (walletError.code === 'UNSUPPORTED_OPERATION') {
+          toast.error('钱包未正确连接，请刷新页面后重试');
+        } else {
+          toast.error(`获取钱包信息失败: ${walletError.message}`);
+        }
+        setSubmitting(false);
+        return;
+      }
+      
+      if (!provider || !signer || !address) {
+        toast.error('钱包连接异常，请刷新页面后重试');
+        setSubmitting(false);
+        return;
+      }
       
       // 2. 构造订单（使用市场价）
       const order: Order = {
@@ -149,7 +190,13 @@ export default function OrderForm({
       const result = await response.json();
       
       if (result.success) {
-        alert(`${t('orderForm.orderSuccess')}\n\n${t('orderForm.orderSuccessDetail')}\n\n${t('market.marketId')}: ${order.orderId}`);
+        // 显示成功通知
+        toast.success(
+          `${t('orderForm.orderSuccess')}\n\n${t('orderForm.orderSuccessDetail')}\n\n${t('market.orderId')}: ${order.orderId}`,
+          {
+            duration: 6000
+          }
+        );
         
         // 重置表单
         setAmount('10');
@@ -165,11 +212,11 @@ export default function OrderForm({
     } catch (error: any) {
       console.error('提交订单失败:', error);
       if (error.code === 4001) {
-        alert(t('orderForm.userCancelled'));
+        toast.warning(t('orderForm.userCancelled'));
       } else if (error.message?.includes('user rejected')) {
-        alert(t('orderForm.userRejected'));
+        toast.warning(t('orderForm.userRejected'));
       } else {
-        alert(t('orderForm.orderFailed') + ':\n\n' + error.message);
+        toast.error(`${t('orderForm.orderFailed')}:\n\n${error.message}`);
       }
     } finally {
       setSubmitting(false);
