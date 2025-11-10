@@ -37,7 +37,7 @@ build/
 
 # Hardhat (智能合约编译产物)
 artifacts/
-cache/
+/cache/
 deployment-local.json
 # deployments/ - 改为包含配置文件
 _dev_only_admin/
