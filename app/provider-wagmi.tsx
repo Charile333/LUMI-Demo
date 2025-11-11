@@ -64,7 +64,8 @@ export default function WalletProvider({ children }: WalletProviderProps) {
           // 方法1: 从 connectorClient 获取 provider（推荐方式）
           if (connectorClient) {
             // connectorClient 可能直接是 provider 或者有 account 属性
-            if ('account' in connectorClient && connectorClient.account) {
+            const client = connectorClient as any;
+            if (client && 'account' in client && client.account) {
               // 这是 viem 的客户端，需要转换为 ethers provider
               // 尝试从 connector 获取原始 provider
               if ('getProvider' in connector && typeof connector.getProvider === 'function') {
