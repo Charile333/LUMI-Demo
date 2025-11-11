@@ -14,7 +14,7 @@ export async function GET() {
     databaseUrl: process.env.DATABASE_URL ? '已配置 ✅' : '未配置 ❌',
     connection: { status: '', message: '', error: '' },
     query: { status: '', message: '', error: '' },
-    orders: { status: '', message: '', count: 0 }
+    orders: { status: '', message: '', count: 0, error: '' }
   };
 
   // 测试 1: 基础连接
@@ -67,6 +67,9 @@ export async function GET() {
     }
   });
 }
+
+
+
 
 
 

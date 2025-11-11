@@ -40,3 +40,6 @@ WHERE table_name = 'markets'
 
 
 
+
+
+
