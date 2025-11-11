@@ -8,6 +8,7 @@ const supabase = getSupabase();
 export interface Market {
   id: number;
   questionId: string;
+  question_id?: string; // 添加 question_id 以兼容不同使用场景
   title: string;
   description: string;
   category: string;
@@ -61,6 +62,7 @@ export function useMarketsByCategory(category: string) {
         const formattedMarkets: Market[] = (data || []).map((market: any) => ({
           id: market.id,
           questionId: market.question_id,
+          question_id: market.question_id, // 同时设置 question_id 以兼容
           title: market.title,
           description: market.description || '暂无描述',
           category: market.sub_category || '未分类',
@@ -121,6 +123,7 @@ export function useMarketsByCategory(category: string) {
             const formattedMarket: Market = {
               id: newMarket.id,
               questionId: newMarket.question_id,
+              question_id: newMarket.question_id, // 同时设置 question_id 以兼容
               title: newMarket.title,
               description: newMarket.description || '暂无描述',
               category: newMarket.sub_category || '未分类',
