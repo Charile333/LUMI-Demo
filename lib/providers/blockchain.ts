@@ -157,7 +157,7 @@ export class BlockchainProvider implements IDataProvider {
         ],
         source: 'blockchain' as const,
         sourceUrl: marketUrl,
-        externalUrl: `https://www.oklink.com/amoy/address/${CONTRACTS.testAdapter}`,
+        externalUrl: `https://www.oklink.com/amoy/address/${CONTRACTS.realAdapter}`,
         createdAt: new Date(market.requestTimestamp.toNumber() * 1000).toISOString(),
         updatedAt: new Date().toISOString(),
         metadata: {
@@ -167,7 +167,7 @@ export class BlockchainProvider implements IDataProvider {
           reward: reward,
           rewardToken: market.rewardToken,
           resolved: market.resolved,
-          contract: CONTRACTS.testAdapter
+          contract: CONTRACTS.realAdapter
         }
       };
     } catch (error) {
