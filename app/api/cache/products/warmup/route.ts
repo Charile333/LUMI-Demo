@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { productCache } from '@/lib/cache/product-cache';
 import { fetchPolymarketMarkets } from '@/lib/polymarket/api';
-import { transformPolymarketMarkets } from '@/lib/polymarket/transform';
+import { transformPolymarketMarkets } from '@/lib/polymarket/transformer';
 import { CategoryType } from '@/lib/types/market';
 
 /**
