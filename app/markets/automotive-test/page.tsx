@@ -7,41 +7,25 @@ import { MarketCard } from '@/components/MarketCard';
 const mockMarkets = [
   {
     id: 4,
-    questionId: 'test-question-1',
+    question_id: 'test-question-1',
     title: '特斯拉 Model Y 会在 2025 年成为全球销量第一吗？',
     description: '预测特斯拉 Model Y 是否会在 2025 年成为全球销量最高的车型',
-    category: '品牌月度销量',
-    probability: 65,
-    endDate: '2025-12-31',
-    volume: '$125,000',
-    participants: '1,234人参与',
-    trend: 'up' as const,
-    change: '+5.2%',
     main_category: 'automotive',
     blockchain_status: 'active',
     interested_users: 50,
     views: 1000,
-    activity_score: 85,
-    volumeNum: 125000
+    activity_score: 85
   },
   {
     id: 5,
-    questionId: 'test-question-2',
+    question_id: 'test-question-2',
     title: '比亚迪2025年全球销量会超过特斯拉吗？',
     description: '预测比亚迪是否能在2025年超越特斯拉成为全球电动车销量冠军',
-    category: '品牌月度销量',
-    probability: 45,
-    endDate: '2025-12-31',
-    volume: '$89,000',
-    participants: '856人参与',
-    trend: 'down' as const,
-    change: '-2.1%',
     main_category: 'automotive',
     blockchain_status: 'active',
     interested_users: 30,
     views: 650,
-    activity_score: 70,
-    volumeNum: 89000
+    activity_score: 70
   }
 ];
 
@@ -76,9 +60,6 @@ export default function AutomotiveTestPage() {
             <MarketCard
               key={market.id}
               market={market}
-              onQuickTrade={(side) => {
-                console.log(`Quick trade: ${market.title} - ${side}`);
-              }}
             />
           ))}
         </div>
