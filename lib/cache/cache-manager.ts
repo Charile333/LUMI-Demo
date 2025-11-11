@@ -15,6 +15,7 @@ interface CacheStats {
   misses: number;
   size: number;
   memoryUsage: number;
+  hitRate: number;
 }
 
 export class CacheManager<T = any> {
@@ -29,7 +30,8 @@ export class CacheManager<T = any> {
       hits: 0,
       misses: 0,
       size: 0,
-      memoryUsage: 0
+      memoryUsage: 0,
+      hitRate: 0
     };
     this.maxSize = maxSize;
     this.defaultTTL = defaultTTL; // 默认 60 秒
@@ -198,10 +200,11 @@ export class CacheManager<T = any> {
    * 获取统计信息
    */
   getStats(): CacheStats {
+    const total = this.stats.hits + this.stats.misses;
     return {
       ...this.stats,
-      hitRate: this.stats.hits / (this.stats.hits + this.stats.misses) || 0
-    } as CacheStats & { hitRate: number };
+      hitRate: total > 0 ? this.stats.hits / total : 0
+    };
   }
 
   /**
