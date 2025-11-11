@@ -101,12 +101,12 @@ export class ProductCache {
   /**
    * 📦 缓存单个产品详情
    */
-  getProductDetail(marketId: number): Market | null {
+  getProductDetail(marketId: number | string): Market | null {
     const key = `detail:${marketId}`;
     return this.productDetailCache.get(key);
   }
   
-  setProductDetail(marketId: number, data: Market, ttl?: number): void {
+  setProductDetail(marketId: number | string, data: Market, ttl?: number): void {
     const key = `detail:${marketId}`;
     this.productDetailCache.set(key, data, ttl);
     console.log(`✅ 缓存产品详情: Market ${marketId}`);
@@ -128,7 +128,7 @@ export class ProductCache {
    * 🎯 智能缓存：根据热度调整 TTL
    */
   setProductDetailWithHotness(
-    marketId: number,
+    marketId: number | string,
     data: Market,
     viewCount: number = 0
   ): void {
@@ -170,7 +170,7 @@ export class ProductCache {
   /**
    * 🧹 清除单个产品缓存
    */
-  clearProduct(marketId: number): void {
+  clearProduct(marketId: number | string): void {
     this.productDetailCache.delete(`detail:${marketId}`);
     console.log(`🧹 已清除产品 ${marketId} 的缓存`);
   }
