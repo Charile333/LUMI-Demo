@@ -29,16 +29,22 @@ export async function POST(
     // 2. 检查是否已激活
     if (market.blockchain_status === 'created') {
       return NextResponse.json(
-        { error: '市场已激活' },
+        { error: '市场已激活，无需重复激活' },
         { status: 400 }
       );
     }
     
+    // 如果状态是 'creating'，可能是之前激活失败，允许重试
     if (market.blockchain_status === 'creating') {
-      return NextResponse.json(
-        { error: '市场正在激活中' },
-        { status: 400 }
+      console.log('⚠️ 市场状态为 creating，可能是之前激活失败，现在重置状态并重试...');
+      
+      // 重置状态为 not_created
+      await db.query(
+        `UPDATE markets SET blockchain_status = 'not_created' WHERE id = $1`,
+        [marketId]
       );
+      
+      console.log('✅ 状态已重置为 not_created，继续激活...');
     }
     
     // 3. 激活市场
