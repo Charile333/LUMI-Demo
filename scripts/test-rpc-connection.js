@@ -36,7 +36,7 @@ async function testRPC(url) {
       success: true,
       blockNumber,
       latency,
-      message: `✅ 成功 (${latency}ms)`
+      message: `✅ 成功 (${latency}ms, 区块: ${blockNumber})`
     };
   } catch (error) {
     return {
@@ -49,7 +49,9 @@ async function testRPC(url) {
 }
 
 async function testAllRPCs() {
-  console.log(`📡 测试 ${rpcUrls.length} 个 RPC 端点...\n`);
+  console.log('\n' + '='.repeat(60));
+  console.log(`📡 测试 ${rpcUrls.length} 个 RPC 端点...`);
+  console.log('='.repeat(60) + '\n');
 
   const results = [];
 
@@ -83,15 +85,15 @@ async function testAllRPCs() {
     console.log('');
     
     const fastest = successful.sort((a, b) => a.latency - b.latency)[0];
-    console.log('💡 推荐使用（最快）：');
+    console.log('💡 推荐配置（最快）：');
     console.log(`   NEXT_PUBLIC_RPC_URL=${fastest.url}\n`);
   } else {
     console.log('❌ 所有 RPC 端点都无法连接！\n');
     console.log('💡 解决方案：');
-    console.log('   1. 注册 Alchemy（https://www.alchemy.com/）');
-    console.log('   2. 创建 Polygon Amoy App');
-    console.log('   3. 使用私有 RPC URL');
-    console.log('   4. 或使用 VPN\n');
+    console.log('   1. 检查网络连接');
+    console.log('   2. 检查防火墙设置');
+    console.log('   3. 使用 VPN');
+    console.log('   4. 注册 Alchemy 获取私有 RPC\n');
   }
 
   console.log('='.repeat(60) + '\n');
