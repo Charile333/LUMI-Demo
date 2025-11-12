@@ -28,11 +28,13 @@ function LoginForm() {
 
       if (data.success) {
         // 登录成功，重定向
+        console.log('✅ 登录成功');
         const redirect = searchParams.get('redirect') || '/admin/create-market';
         router.push(redirect);
         router.refresh(); // 刷新页面以更新认证状态
       } else {
         // 显示错误信息，包括剩余尝试次数
+        console.error('❌ 登录失败:', data);
         setError(data.error || '密码错误');
         setRemainingAttempts(data.remainingAttempts || null);
         
@@ -42,8 +44,9 @@ function LoginForm() {
           setRemainingAttempts(0);
         }
       }
-    } catch (error) {
-      setError('登录失败，请重试');
+    } catch (error: any) {
+      console.error('❌ 登录请求失败:', error);
+      setError(`登录失败：${error.message || '请重试'}`);
     } finally {
       setLoading(false);
     }
