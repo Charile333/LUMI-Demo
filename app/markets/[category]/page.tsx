@@ -397,6 +397,8 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
     main_category: market.main_category || category,
     priority_level: market.priorityLevel || (market as any).priority_level,
     question_id: market.question_id,
+    condition_id: market.condition_id,
+    conditionId: market.condition_id
   }));
 
   return (

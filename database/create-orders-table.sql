@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS orders (
   -- 市场信息
   market_id INT NOT NULL,
   question_id VARCHAR(200),
+  condition_id VARCHAR(200),
   
   -- 用户信息
   user_address VARCHAR(42) NOT NULL,
@@ -28,9 +29,11 @@ CREATE TABLE IF NOT EXISTS orders (
   
   -- 签名和安全
   signature TEXT,
+  ctf_signature TEXT,
   salt VARCHAR(100),
   nonce BIGINT,
   expiration BIGINT,
+  ctf_order_data JSONB,
   
   -- 时间戳
   created_at TIMESTAMP DEFAULT NOW(),

@@ -5,8 +5,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
 import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 import { tradingCache } from '@/lib/cache/trading-cache';
-import { convertToCTFOrder, calculateTokenId } from '@/lib/ctf-exchange/service';
+import { convertToCTFOrder, type CTFOrder } from '@/lib/ctf-exchange/service';
 import { ethers } from 'ethers';
+
+const serializeCTFOrder = (ctfOrder: CTFOrder) => ({
+  salt: ctfOrder.salt.toString(),
+  maker: ctfOrder.maker,
+  signer: ctfOrder.signer,
+  taker: ctfOrder.taker,
+  tokenId: ctfOrder.tokenId.toString(),
+  makerAmount: ctfOrder.makerAmount.toString(),
+  takerAmount: ctfOrder.takerAmount.toString(),
+  expiration: ctfOrder.expiration.toString(),
+  nonce: ctfOrder.nonce.toString(),
+  feeRateBps: ctfOrder.feeRateBps.toString(),
+  side: ctfOrder.side,
+  signatureType: ctfOrder.signatureType
+});
 
 /**
  * 准备链上执行数据
@@ -55,39 +70,60 @@ async function prepareOnChainExecution(
     // 确定 outcome（简化：买单=YES=1，卖单=NO=0）
     const outcome = makerOrder.side === 'buy' ? 1 : 0;
 
-    // 转换为 CTF 订单格式
-    const ctfOrder = convertToCTFOrder(
-      {
-        maker: makerOrder.user_address,
-        marketId: makerOrder.market_id,
-        outcome: outcome,
-        side: makerOrder.side as 'buy' | 'sell',
-        price: makerOrder.price.toString(),
-        amount: tradeAmount.toString(),
-        expiration: Math.floor(Date.now() / 1000) + 86400,
-        nonce: Date.now(),
-        salt: ethers.utils.hexlify(ethers.utils.randomBytes(32))
-      },
-      market.condition_id
-    );
+    // 使用存储的 CTF 订单数据（如果存在）
+    let storedCtfOrder: any = makerOrder.ctf_order_data;
+    if (storedCtfOrder) {
+      try {
+        if (typeof storedCtfOrder === 'string') {
+          storedCtfOrder = JSON.parse(storedCtfOrder);
+        }
+      } catch {
+        storedCtfOrder = null;
+      }
+    }
 
-    // 返回链上执行所需的数据（前端会使用）
+    // 如果没有存储的 CTF 订单数据，回退到根据订单信息生成
+    if (!storedCtfOrder) {
+      const fallbackOrder = convertToCTFOrder(
+        {
+          maker: makerOrder.user_address,
+          marketId: makerOrder.market_id,
+          outcome: outcome,
+          side: makerOrder.side as 'buy' | 'sell',
+          price: makerOrder.price.toString(),
+          amount: makerOrder.quantity?.toString() || tradeAmount.toString(),
+          expiration: makerOrder.expiration || Math.floor(Date.now() / 1000) + 86400,
+          nonce: makerOrder.nonce || Date.now(),
+          salt: makerOrder.salt || ethers.utils.hexlify(ethers.utils.randomBytes(32))
+        },
+        market.condition_id
+      );
+      storedCtfOrder = serializeCTFOrder(fallbackOrder);
+    }
+
+    // 计算填充数量（taker 填充金额）
+    let fillAmount = storedCtfOrder.takerAmount;
+    try {
+      const makerAmountBN = ethers.BigNumber.from(storedCtfOrder.makerAmount);
+      const takerAmountBN = ethers.BigNumber.from(storedCtfOrder.takerAmount);
+      const tradeAmountBN = ethers.utils.parseEther(tradeAmount.toString());
+      fillAmount = tradeAmountBN.mul(takerAmountBN).div(makerAmountBN).toString();
+    } catch (error) {
+      console.warn('计算 fillAmount 失败，使用默认值:', error);
+    }
+
+    const makerSignature = makerOrder.ctf_signature || null;
+
     return {
       needsOnChainExecution: true,
-      ctfOrder: {
-        ...ctfOrder,
-        salt: ctfOrder.salt.toString(),
-        tokenId: ctfOrder.tokenId.toString(),
-        makerAmount: ctfOrder.makerAmount.toString(),
-        takerAmount: ctfOrder.takerAmount.toString(),
-        expiration: ctfOrder.expiration.toString(),
-        nonce: ctfOrder.nonce.toString(),
-        feeRateBps: ctfOrder.feeRateBps.toString()
-      },
+      ctfOrder: storedCtfOrder,
       makerOrder: {
         id: makerOrder.id,
-        address: makerOrder.user_address
+        address: makerOrder.user_address,
+        signature: makerSignature,
+        needsSignature: !makerSignature
       },
+      fillAmount,
       tradeAmount: tradeAmount.toString(),
       conditionId: market.condition_id
     };
@@ -107,6 +143,19 @@ export async function POST(request: NextRequest) {
     const side = body.side;
     const price = parseFloat(body.price);
     const quantity = parseFloat(body.amount || body.quantity || 0);
+    const outcome = typeof body.outcome === 'number'
+      ? body.outcome
+      : side === 'buy'
+        ? 1
+        : 0;
+    const orderIdValue = body.orderId || body.order_id || `order-${Date.now()}`;
+    const questionId = body.questionId || body.question_id || null;
+    const salt = body.salt || null;
+    const nonce = body.nonce || null;
+    const expiration = body.expiration || null;
+    const ctfOrderPayload = body.ctfOrder || null;
+    const ctfSignature = body.ctfSignature || null;
+    const conditionIdFromBody = body.conditionId || null;
 
     // 验证输入
     if (!side || !price || !quantity) {
@@ -161,10 +210,19 @@ export async function POST(request: NextRequest) {
         market_id: marketId,
         user_address: userAddress,
         side: side,
+        order_id: orderIdValue,
+        question_id: questionId,
+        outcome,
         price: price,
         quantity: quantity,
         status: 'open',
-        signature: body.signature || null // 保存订单签名（用于链上执行）
+        signature: body.signature || null,
+        ctf_signature: ctfSignature || null,
+        salt,
+        nonce,
+        expiration,
+        condition_id: conditionIdFromBody,
+        ctf_order_data: ctfOrderPayload ? JSON.stringify(ctfOrderPayload) : null
       })
       .select()
       .single();

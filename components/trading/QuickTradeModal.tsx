@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
+import { convertToCTFOrder, type CTFOrder } from '@/lib/ctf-exchange/service';
+import { signCTFOrder } from '@/lib/ctf-exchange/signing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
@@ -16,6 +18,8 @@ interface QuickTradeModalProps {
     id: number;
     title: string;
     questionId: string;
+    conditionId?: string;
+    condition_id?: string;
   };
   side: 'YES' | 'NO';
 }
@@ -36,6 +40,40 @@ export default function QuickTradeModal({
   const [mounted, setMounted] = useState(false);
   const [pendingOnChainExecution, setPendingOnChainExecution] = useState<any>(null);
   const [isExecutingOnChain, setIsExecutingOnChain] = useState(false);
+
+  const conditionIdFromMarket = market.conditionId || market.condition_id;
+
+  const serializeCTFOrder = (ctfOrder: CTFOrder) => ({
+    salt: ctfOrder.salt.toString(),
+    maker: ctfOrder.maker,
+    signer: ctfOrder.signer,
+    taker: ctfOrder.taker,
+    tokenId: ctfOrder.tokenId.toString(),
+    makerAmount: ctfOrder.makerAmount.toString(),
+    takerAmount: ctfOrder.takerAmount.toString(),
+    expiration: ctfOrder.expiration.toString(),
+    nonce: ctfOrder.nonce.toString(),
+    feeRateBps: ctfOrder.feeRateBps.toString(),
+    side: ctfOrder.side,
+    signatureType: ctfOrder.signatureType
+  });
+  const getPendingUsdcAmount = () => {
+    if (!pendingOnChainExecution?.onChainExecution) return null;
+    const oc = pendingOnChainExecution.onChainExecution;
+    try {
+      const formatted = ethers.utils.formatUnits(oc.fillAmount || oc.ctfOrder.takerAmount, 6);
+      return parseFloat(formatted).toFixed(2);
+    } catch {
+      return null;
+    }
+  };
+
+  const getPendingTokenAmount = () => {
+    if (!pendingOnChainExecution?.onChainExecution) return null;
+    const amount = parseFloat(pendingOnChainExecution.onChainExecution.tradeAmount || '0');
+    if (Number.isNaN(amount)) return pendingOnChainExecution.onChainExecution.tradeAmount || null;
+    return amount.toFixed(2);
+  };
 
   // 确保只在客户端渲染（避免 SSR 问题）
   useEffect(() => {
@@ -186,6 +224,12 @@ export default function QuickTradeModal({
         return;
       }
 
+      if (!conditionIdFromMarket) {
+        toast.error('该市场缺少链上 conditionId，无法执行链上交易');
+        setIsSubmitting(false);
+        return;
+      }
+
       // 4. 创建订单数据（使用标准Order接口）
       const outcome = side === 'YES' ? 1 : 0;
       const orderData: Order = {
@@ -201,18 +245,55 @@ export default function QuickTradeModal({
         expiration: Math.floor(Date.now() / 1000) + 86400 // 24小时有效期
       };
 
-      // 5. 使用标准签名函数签名
+      // 5. 生成 CTF Exchange 订单并签名
+      const ctfOrderRaw = convertToCTFOrder(
+        {
+          maker: userAddress,
+          marketId: market.id,
+          outcome,
+          side: 'buy',
+          price: currentPrice.toString(),
+          amount,
+          expiration: orderData.expiration,
+          nonce: orderData.nonce,
+          salt: orderData.salt
+        },
+        conditionIdFromMarket
+      );
+
+      const ctfOrderForSigning = {
+        salt: ctfOrderRaw.salt,
+        maker: ctfOrderRaw.maker,
+        signer: ctfOrderRaw.signer,
+        taker: ctfOrderRaw.taker,
+        tokenId: ctfOrderRaw.tokenId,
+        makerAmount: ctfOrderRaw.makerAmount,
+        takerAmount: ctfOrderRaw.takerAmount,
+        expiration: ctfOrderRaw.expiration,
+        nonce: ctfOrderRaw.nonce,
+        feeRateBps: ctfOrderRaw.feeRateBps,
+        side: ctfOrderRaw.side,
+        signatureType: ctfOrderRaw.signatureType
+      };
+
+      const ctfSignature = await signCTFOrder(ctfOrderForSigning, signer);
+      const ctfOrderPayload = serializeCTFOrder(ctfOrderRaw);
+
+      // 6. 使用链下签名函数签名（用于数据库校验）
       const signature = await signOrder(orderData, signer);
       
       const order = {
         ...orderData,
-        questionId: market.questionId, // 添加questionId用于API
-        signature
+        questionId: market.questionId,
+        signature,
+        conditionId: conditionIdFromMarket,
+        ctfOrder: ctfOrderPayload,
+        ctfSignature
       };
 
       console.log('[QuickTrade] 提交订单:', order);
 
-      // 6. 提交订单到 API
+      // 7. 提交订单到 API
       const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: {
@@ -234,17 +315,16 @@ export default function QuickTradeModal({
           );
           
           // 存储链上执行数据，供后续使用
-          sessionStorage.setItem('pendingOnChainExecution', JSON.stringify({
+          setPendingOnChainExecution({
             orderId: result.order.id,
             onChainExecution: result.onChainExecution,
             marketTitle: market.title,
-            side: side,
-            amount: amount
-          }));
+            side,
+            amount
+          });
           
           // 不关闭弹窗，等待用户执行链上交易
-          // 可以显示一个"执行链上交易"按钮
-          return; // 暂时返回，不关闭弹窗
+          return;
         } else {
           toast.success(
             `🎉 ${t('orderForm.orderSuccess')}\n\n` +
@@ -296,18 +376,69 @@ export default function QuickTradeModal({
       const ctfOrder = onChainExecution.ctfOrder;
 
       // 1. 检查是否需要 Maker 签名
-      if (onChainExecution.makerOrder.needsSignature) {
-        toast.warning('Maker 需要先签名订单，请联系订单创建者');
-        setIsExecutingOnChain(false);
-        return;
+      let makerSignature = onChainExecution.makerOrder?.signature || '';
+      const makerAddress = onChainExecution.makerOrder?.address?.toLowerCase();
+
+      if (!makerSignature) {
+        if (!window.ethereum) {
+          toast.error('检测不到钱包环境，无法签名');
+          setIsExecutingOnChain(false);
+          return;
+        }
+
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        });
+        const currentUser = accounts?.[0]?.toLowerCase();
+
+        if (currentUser && makerAddress && currentUser === makerAddress) {
+          // 当前用户是订单的 maker，要求其签署 CTF 订单
+          toast.info('请在钱包中确认签名，以授权链上交易');
+          const providerForSignature = new ethers.providers.Web3Provider(window.ethereum);
+          const signerForSignature = providerForSignature.getSigner();
+          const orderForSign = {
+            ...ctfOrder,
+            side: Number(ctfOrder.side),
+            signatureType: Number(ctfOrder.signatureType)
+          };
+          const signature = await signCTFOrder(orderForSign, signerForSignature as any);
+          makerSignature = signature;
+
+          // 保存签名到服务器
+          await fetch(`/api/orders/${onChainExecution.makerOrder.id}/signature`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ signature })
+          });
+
+          setPendingOnChainExecution((prev: any) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              onChainExecution: {
+                ...prev.onChainExecution,
+                makerOrder: {
+                  ...prev.onChainExecution.makerOrder,
+                  signature
+                }
+              }
+            };
+          });
+        } else {
+          toast.warning('订单需要 Maker 签名。请联系订单创建者完成签名后再执行。');
+          setIsExecutingOnChain(false);
+          return;
+        }
       }
 
       // 2. 转换订单格式为 CTF Exchange 需要的格式
       const ctfOrderFormatted = {
         salt: ethers.BigNumber.from(ctfOrder.salt),
         maker: ctfOrder.maker,
-        signer: ctfOrder.maker,
-        taker: ethers.constants.AddressZero,
+        signer: ctfOrder.signer,
+        taker: ctfOrder.taker,
         tokenId: ethers.BigNumber.from(ctfOrder.tokenId),
         makerAmount: ethers.BigNumber.from(ctfOrder.makerAmount),
         takerAmount: ethers.BigNumber.from(ctfOrder.takerAmount),
@@ -315,44 +446,11 @@ export default function QuickTradeModal({
         nonce: ethers.BigNumber.from(ctfOrder.nonce),
         feeRateBps: ethers.BigNumber.from(ctfOrder.feeRateBps),
         side: ctfOrder.side,
-        signatureType: 0
+        signatureType: ctfOrder.signatureType
       };
 
-      // 3. 获取 Maker 的签名（从后端API获取）
-      const signatureResponse = await fetch(`/api/orders/${onChainExecution.makerOrder.id}/signature`);
-      let makerSignature = '';
-      
-      if (signatureResponse.ok) {
-        const sigData = await signatureResponse.json();
-        makerSignature = sigData.signature || '';
-      }
-      
-      // 如果订单没有 CTF Exchange 格式的签名，需要 Maker 重新签名
-      if (!makerSignature) {
-        // 检查是否是当前用户的订单
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        const currentUser = accounts[0]?.toLowerCase();
-        
-        if (currentUser === onChainExecution.makerOrder.address.toLowerCase()) {
-          // 是当前用户的订单，需要重新用 CTF Exchange 格式签名
-          toast.warning('需要重新签名订单（CTF Exchange 格式）。请确认钱包签名。');
-          
-          // TODO: 调用签名函数
-          // 这里需要让用户签名 CTF Exchange 格式的订单
-          // 暂时跳过，提示用户
-          setIsExecutingOnChain(false);
-          return;
-        } else {
-          toast.warning('订单需要 Maker 签名。请联系订单创建者签名。');
-          setIsExecutingOnChain(false);
-          return;
-        }
-      }
-
       // 4. 调用 fillOrder
-      const fillAmount = ethers.BigNumber.from(onChainExecution.tradeAmount);
+      const fillAmount = ethers.BigNumber.from(onChainExecution.fillAmount || ctfOrder.takerAmount);
       const result = await polymarket.fillOrder(
         ctfOrderFormatted as any,
         makerSignature,
@@ -521,7 +619,7 @@ export default function QuickTradeModal({
                     ⚡ 订单已撮合，需要执行链上交易完成资产转移
                   </p>
                   <p className="text-xs text-gray-400">
-                    成交金额: ${pendingOnChainExecution.amount} @ {(parseFloat(pendingOnChainExecution.onChainExecution.ctfOrder.takerAmount) / 1e6).toFixed(2)} USDC
+                    成交数量: {getPendingTokenAmount() || pendingOnChainExecution.amount} ，预计支付: {getPendingUsdcAmount() || '--'} USDC
                   </p>
                 </div>
                 <button
