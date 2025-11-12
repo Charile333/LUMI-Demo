@@ -32,16 +32,16 @@ const nextConfig = {
 
     return config;
   },
-  // 排除特定页面不参与构建
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': [
-        'app/admin/**/*',
-        'app/*-test/**/*',
-        'app/test-*/**/*'
-      ]
-    }
-  }
+  // 排除特定页面不参与构建（保留测试页面，admin 页面现在参与构建）
+  // experimental: {
+  //   outputFileTracingExcludes: {
+  //     '*': [
+  //       'app/admin/**/*', // ❌ 已移除，让管理页面参与构建
+  //       'app/*-test/**/*',
+  //       'app/test-*/**/*'
+  //     ]
+  //   }
+  // }
 }
 
 module.exports = nextConfig

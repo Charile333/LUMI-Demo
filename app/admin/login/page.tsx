@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
@@ -40,6 +40,43 @@ export default function AdminLoginPage() {
   };
 
   return (
+    <form onSubmit={handleLogin} className="space-y-6">
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          管理员密码
+        </label>
+        <input
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          placeholder="请输入管理员密码"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+          required
+          autoFocus
+        />
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <p className="text-red-700 text-sm">❌ {error}</p>
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 shadow-lg"
+      >
+        {loading ? '登录中...' : '🔓 登录'}
+      </button>
+    </form>
+  );
+}
+
+export default function AdminLoginPage() {
+  const router = useRouter();
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-blue-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
         {/* Logo */}
@@ -55,37 +92,10 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {/* 登录表单 */}
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              管理员密码
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="请输入管理员密码"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-              required
-              autoFocus
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-red-700 text-sm">❌ {error}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 shadow-lg"
-          >
-            {loading ? '登录中...' : '🔓 登录'}
-          </button>
-        </form>
+        {/* 登录表单 - 使用 Suspense 包裹 */}
+        <Suspense fallback={<div className="text-center py-8">加载中...</div>}>
+          <LoginForm />
+        </Suspense>
 
         {/* 提示 */}
         <div className="mt-6 space-y-3">
@@ -100,7 +110,7 @@ export default function AdminLoginPage() {
           
           <div className="p-4 bg-yellow-50 rounded-lg">
             <p className="text-xs text-yellow-700">
-              🔒 生产环境需要在 <code className="bg-yellow-100 px-1 rounded">.env</code> 中配置 <code className="bg-yellow-100 px-1 rounded">ADMIN_PASSWORD</code>
+              🔒 生产环境需要在 Vercel 环境变量中配置 <code className="bg-yellow-100 px-1 rounded">ADMIN_PASSWORD</code>
             </p>
           </div>
         </div>
