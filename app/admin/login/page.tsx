@@ -29,14 +29,27 @@ function LoginForm() {
       if (data.success) {
         // 登录成功，重定向
         console.log('✅ 登录成功，准备跳转');
+        console.log('📦 响应数据:', data);
         
         // 等待一小段时间确保 Cookie 已设置
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // 检查认证状态
+        console.log('🔍 开始检查认证状态...');
         const checkAuth = await fetch('/api/admin/check-auth');
         const authStatus = await checkAuth.json();
         console.log('🔍 认证状态检查:', authStatus);
+        
+        if (!authStatus.authenticated) {
+          console.error('❌ 认证检查失败！Cookie 可能未正确设置');
+          console.log('🔍 运行完整诊断...');
+          const fullDebug = await fetch('/api/admin/full-debug');
+          const debugInfo = await fullDebug.json();
+          console.log('🔍 完整诊断信息:', debugInfo);
+          
+          setError('登录成功但 Cookie 未设置，请检查浏览器设置是否允许 Cookie。详情请查看控制台。');
+          return;
+        }
         
         const redirect = searchParams.get('redirect') || '/admin/create-market';
         console.log('📍 跳转到:', redirect);
