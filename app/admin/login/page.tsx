@@ -9,11 +9,13 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setRemainingAttempts(null);
 
     try {
       const response = await fetch('/api/admin/auth/login', {
@@ -30,7 +32,15 @@ function LoginForm() {
         router.push(redirect);
         router.refresh(); // 刷新页面以更新认证状态
       } else {
+        // 显示错误信息，包括剩余尝试次数
         setError(data.error || '密码错误');
+        setRemainingAttempts(data.remainingAttempts || null);
+        
+        // 如果 IP 被锁定，显示特殊提示
+        if (response.status === 429 || data.blocked) {
+          setError(data.error || '登录尝试过多，IP 已被锁定 15 分钟。请稍后再试。');
+          setRemainingAttempts(0);
+        }
       }
     } catch (error) {
       setError('登录失败，请重试');
@@ -59,6 +69,16 @@ function LoginForm() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
           <p className="text-red-700 text-sm">❌ {error}</p>
+          {remainingAttempts !== null && remainingAttempts > 0 && (
+            <p className="text-red-600 text-xs mt-1">
+              剩余尝试次数：{remainingAttempts}
+            </p>
+          )}
+          {remainingAttempts === 0 && (
+            <p className="text-red-600 text-xs mt-1 font-semibold">
+              ⚠️ IP 已被锁定 15 分钟，请稍后再试
+            </p>
+          )}
         </div>
       )}
 
