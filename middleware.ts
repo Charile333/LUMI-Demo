@@ -69,11 +69,21 @@ export function middleware(request: NextRequest) {
     
     // 验证认证 token
     const authCookie = request.cookies.get('admin_authenticated');
+    
+    console.log('🔍 中间件检查:', {
+      path: request.nextUrl.pathname,
+      hasCookie: !!authCookie,
+      cookieValue: authCookie ? authCookie.value.substring(0, 20) + '...' : 'none'
+    });
+    
     if (!authCookie || !verifyAuthToken(authCookie.value)) {
+      console.log('❌ 认证失败，重定向到登录页');
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
+    
+    console.log('✅ 认证成功，允许访问');
   }
   
   // 保护所有 /api/admin 路径

@@ -64,9 +64,17 @@ export async function POST(request: NextRequest) {
       response.cookies.set('admin_authenticated', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict', // 更严格的同站策略
-        maxAge: 60 * 60 * 24, // 24 小时（缩短有效期）
-        path: '/admin' // 限制 cookie 路径
+        sameSite: 'lax', // 改为 lax 以允许跳转后访问
+        maxAge: 60 * 60 * 24, // 24 小时
+        path: '/' // 改为根路径，确保整个应用都能访问
+      });
+      
+      console.log('✅ Cookie 已设置:', {
+        name: 'admin_authenticated',
+        value: token.substring(0, 20) + '...',
+        path: '/',
+        sameSite: 'lax',
+        httpOnly: true
       });
 
       logLoginAttempt(clientIP, true);

@@ -28,10 +28,21 @@ function LoginForm() {
 
       if (data.success) {
         // 登录成功，重定向
-        console.log('✅ 登录成功');
+        console.log('✅ 登录成功，准备跳转');
+        
+        // 等待一小段时间确保 Cookie 已设置
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 检查认证状态
+        const checkAuth = await fetch('/api/admin/check-auth');
+        const authStatus = await checkAuth.json();
+        console.log('🔍 认证状态检查:', authStatus);
+        
         const redirect = searchParams.get('redirect') || '/admin/create-market';
-        router.push(redirect);
-        router.refresh(); // 刷新页面以更新认证状态
+        console.log('📍 跳转到:', redirect);
+        
+        // 使用 window.location 而不是 router.push，确保完整的页面刷新
+        window.location.href = redirect;
       } else {
         // 显示错误信息，包括剩余尝试次数
         console.error('❌ 登录失败:', data);
