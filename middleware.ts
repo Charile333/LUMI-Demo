@@ -11,36 +11,40 @@ import { verifyAuthToken, getClientIP } from '@/lib/admin/auth';
  * 只在本地环境允许访问
  */
 function isAllowedToAccessAdmin(request: NextRequest): boolean {
-  // 检查是否在本地环境
-  const hostname = request.nextUrl.hostname;
-  const isLocalhost = 
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '0.0.0.0' ||
-    hostname.startsWith('192.168.') ||
-    hostname.startsWith('10.') ||
-    hostname.startsWith('172.16.') ||
-    hostname.startsWith('172.17.') ||
-    hostname.startsWith('172.18.') ||
-    hostname.startsWith('172.19.') ||
-    hostname.startsWith('172.20.') ||
-    hostname.startsWith('172.21.') ||
-    hostname.startsWith('172.22.') ||
-    hostname.startsWith('172.23.') ||
-    hostname.startsWith('172.24.') ||
-    hostname.startsWith('172.25.') ||
-    hostname.startsWith('172.26.') ||
-    hostname.startsWith('172.27.') ||
-    hostname.startsWith('172.28.') ||
-    hostname.startsWith('172.29.') ||
-    hostname.startsWith('172.30.') ||
-    hostname.startsWith('172.31.');
-  
   // 检查环境变量是否允许生产环境访问
   const allowProduction = process.env.ALLOW_ADMIN_IN_PRODUCTION === 'true';
   
-  // 如果在本地环境，或者明确允许生产环境访问，则允许访问
-  return isLocalhost || allowProduction;
+  // 如果明确允许生产环境访问，则允许访问
+  if (allowProduction) {
+    return true;
+  }
+  
+  // 检查是否在本地环境
+  const hostname = request.nextUrl.hostname;
+  
+  // 检查是否是 localhost
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+    return true;
+  }
+  
+  // 检查是否是私有 IP 地址（局域网）
+  // 192.168.x.x
+  if (hostname.startsWith('192.168.')) {
+    return true;
+  }
+  
+  // 10.x.x.x
+  if (hostname.match(/^10\./)) {
+    return true;
+  }
+  
+  // 172.16.0.0 - 172.31.255.255
+  if (hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
+    return true;
+  }
+  
+  // 其他情况（生产环境）不允许访问
+  return false;
 }
 
 export function middleware(request: NextRequest) {
