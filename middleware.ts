@@ -62,28 +62,9 @@ export function middleware(request: NextRequest) {
       );
     }
     
-    // 排除登录页面本身
-    if (request.nextUrl.pathname === '/admin/login') {
-      return NextResponse.next();
-    }
-    
-    // 验证认证 token
-    const authCookie = request.cookies.get('admin_authenticated');
-    
-    console.log('🔍 中间件检查:', {
-      path: request.nextUrl.pathname,
-      hasCookie: !!authCookie,
-      cookieValue: authCookie ? authCookie.value.substring(0, 20) + '...' : 'none'
-    });
-    
-    if (!authCookie || !verifyAuthToken(authCookie.value)) {
-      console.log('❌ 认证失败，重定向到登录页');
-      const loginUrl = new URL('/admin/login', request.url);
-      loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-    
-    console.log('✅ 认证成功，允许访问');
+    // ✅ 如果是本地环境，直接允许访问，无需密码验证
+    console.log('✅ 本地环境，允许直接访问管理后台');
+    return NextResponse.next();
   }
   
   // 保护所有 /api/admin 路径
@@ -100,29 +81,9 @@ export function middleware(request: NextRequest) {
       );
     }
     
-    // 排除登录、登出和调试 API（这些不需要认证）
-    if (request.nextUrl.pathname === '/api/admin/auth/login' ||
-        request.nextUrl.pathname === '/api/admin/auth/logout' ||
-        request.nextUrl.pathname === '/api/admin/debug' ||
-        request.nextUrl.pathname === '/api/admin/full-debug' ||
-        request.nextUrl.pathname === '/api/admin/check-auth') {
-      return NextResponse.next();
-    }
-    
-    // 验证认证 token
-    const authHeader = request.headers.get('Authorization');
-    const cookieAuth = request.cookies.get('admin_authenticated');
-    
-    // 检查认证（支持 Header 或 Cookie）
-    // 注意：Header 认证需要 ADMIN_API_SECRET，这里只检查 Cookie
-    const isAuthenticated = cookieAuth && verifyAuthToken(cookieAuth.value);
-    
-    if (!isAuthenticated) {
-      return NextResponse.json(
-        { error: 'Unauthorized - 需要管理员权限' },
-        { status: 401 }
-      );
-    }
+    // ✅ 如果是本地环境，直接允许访问所有管理 API
+    console.log('✅ 本地环境，允许访问管理 API');
+    return NextResponse.next();
   }
   
   return NextResponse.next();
