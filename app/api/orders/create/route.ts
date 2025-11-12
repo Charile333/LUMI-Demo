@@ -5,6 +5,97 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
 import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 import { tradingCache } from '@/lib/cache/trading-cache';
+import { convertToCTFOrder, calculateTokenId } from '@/lib/ctf-exchange/service';
+import { ethers } from 'ethers';
+
+/**
+ * 准备链上执行数据
+ */
+async function prepareOnChainExecution(
+  orderId: number,
+  matchedOrderId: number,
+  marketId: number
+): Promise<any> {
+  try {
+    // 获取市场信息（需要 conditionId）
+    const { data: market } = await supabaseAdmin
+      .from('markets')
+      .select('id, condition_id, question_id')
+      .eq('id', marketId)
+      .single();
+
+    if (!market || !market.condition_id) {
+      console.warn('市场缺少 condition_id，跳过链上执行');
+      return null;
+    }
+
+    // 获取订单信息
+    const { data: order1 } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    const { data: order2 } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('id', matchedOrderId)
+      .single();
+
+    if (!order1 || !order2) return null;
+
+    // 确定 maker 和 taker
+    const makerOrder = order1.created_at < order2.created_at ? order1 : order2;
+    const tradeAmount = Math.min(
+      parseFloat(makerOrder.quantity) - parseFloat(makerOrder.filled_quantity || '0'),
+      parseFloat(order1.id === makerOrder.id ? order2.quantity : order1.quantity) - 
+      parseFloat((order1.id === makerOrder.id ? order2.filled_quantity : order1.filled_quantity) || '0')
+    );
+
+    // 确定 outcome（简化：买单=YES=1，卖单=NO=0）
+    const outcome = makerOrder.side === 'buy' ? 1 : 0;
+
+    // 转换为 CTF 订单格式
+    const ctfOrder = convertToCTFOrder(
+      {
+        maker: makerOrder.user_address,
+        marketId: makerOrder.market_id,
+        outcome: outcome,
+        side: makerOrder.side as 'buy' | 'sell',
+        price: makerOrder.price.toString(),
+        amount: tradeAmount.toString(),
+        expiration: Math.floor(Date.now() / 1000) + 86400,
+        nonce: Date.now(),
+        salt: ethers.utils.hexlify(ethers.utils.randomBytes(32))
+      },
+      market.condition_id
+    );
+
+    // 返回链上执行所需的数据（前端会使用）
+    return {
+      needsOnChainExecution: true,
+      ctfOrder: {
+        ...ctfOrder,
+        salt: ctfOrder.salt.toString(),
+        tokenId: ctfOrder.tokenId.toString(),
+        makerAmount: ctfOrder.makerAmount.toString(),
+        takerAmount: ctfOrder.takerAmount.toString(),
+        expiration: ctfOrder.expiration.toString(),
+        nonce: ctfOrder.nonce.toString(),
+        feeRateBps: ctfOrder.feeRateBps.toString()
+      },
+      makerOrder: {
+        id: makerOrder.id,
+        address: makerOrder.user_address
+      },
+      tradeAmount: tradeAmount.toString(),
+      conditionId: market.condition_id
+    };
+  } catch (error) {
+    console.error('准备链上执行数据失败:', error);
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +132,29 @@ export async function POST(request: NextRequest) {
 
     console.log('📝 创建订单:', { marketId, userAddress, side, price, quantity });
 
-    // 1. 创建订单记录
+    // 0. 校验市场是否存在，避免外键错误
+    const { data: marketRow, error: marketCheckError } = await supabaseAdmin
+      .from('markets')
+      .select('id, status')
+      .eq('id', marketId)
+      .maybeSingle();
+
+    if (marketCheckError) {
+      console.error('❌ 校验市场存在性失败:', marketCheckError);
+      return NextResponse.json(
+        { success: false, error: '市场校验失败，请稍后重试' },
+        { status: 500 }
+      );
+    }
+
+    if (!marketRow) {
+      return NextResponse.json(
+        { success: false, error: `市场不存在或未创建（id=${marketId}）` },
+        { status: 400 }
+      );
+    }
+
+    // 1. 创建订单记录（保存签名，如果提供）
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -50,7 +163,8 @@ export async function POST(request: NextRequest) {
         side: side,
         price: price,
         quantity: quantity,
-        status: 'open'
+        status: 'open',
+        signature: body.signature || null // 保存订单签名（用于链上执行）
       })
       .select()
       .single();
@@ -64,6 +178,9 @@ export async function POST(request: NextRequest) {
 
     // 2. 简单撮合逻辑：查找对手盘
     let matched = false;
+    let matchedOrderId: number | null = null;
+    let matchQty = 0;
+    
     if (side === 'buy') {
       // 买单：查找价格<=买入价的卖单
       const { data: matchingSells } = await supabaseAdmin
@@ -78,7 +195,8 @@ export async function POST(request: NextRequest) {
       
       if (matchingSells && matchingSells.length > 0) {
         const matchOrder = matchingSells[0];
-        const matchQty = Math.min(quantity, parseFloat(matchOrder.quantity) - parseFloat(matchOrder.filled_quantity || '0'));
+        matchQty = Math.min(quantity, parseFloat(matchOrder.quantity) - parseFloat(matchOrder.filled_quantity || '0'));
+        matchedOrderId = matchOrder.id;
         
         // 更新双方订单
         await supabaseAdmin
@@ -114,7 +232,8 @@ export async function POST(request: NextRequest) {
       
       if (matchingBuys && matchingBuys.length > 0) {
         const matchOrder = matchingBuys[0];
-        const matchQty = Math.min(quantity, parseFloat(matchOrder.quantity) - parseFloat(matchOrder.filled_quantity || '0'));
+        matchQty = Math.min(quantity, parseFloat(matchOrder.quantity) - parseFloat(matchOrder.filled_quantity || '0'));
+        matchedOrderId = matchOrder.id;
         
         // 更新双方订单
         await supabaseAdmin
@@ -135,6 +254,20 @@ export async function POST(request: NextRequest) {
         
         matched = true;
         console.log('✅ 订单已撮合:', matchQty, '@', matchOrder.price);
+      }
+    }
+    
+    // 🚀 如果撮合成功，准备链上执行数据
+    let onChainData: any = null;
+    if (matched && matchedOrderId) {
+      try {
+        onChainData = await prepareOnChainExecution(order.id, matchedOrderId, marketId);
+        if (onChainData) {
+          console.log('📝 链上执行数据已准备');
+        }
+      } catch (onChainError) {
+        console.warn('⚠️ 准备链上执行失败（非致命）:', onChainError);
+        // 不影响链下撮合的成功
       }
     }
 
@@ -275,18 +408,27 @@ export async function POST(request: NextRequest) {
     console.log(`🧹 已清除市场 ${marketId} 和用户 ${userAddress.slice(0, 10)}... 的相关缓存`);
 
     // 返回兼容旧格式的结果
-    return NextResponse.json({
+    const response: any = {
       success: true,
       order: {
         id: order.id,
         orderId: order.id.toString(),
         status: order.status,
-        filledAmount: '0',
-        remainingAmount: quantity.toString()
+        filledAmount: matched ? matchQty.toString() : '0',
+        remainingAmount: matched ? (quantity - matchQty).toString() : quantity.toString()
       },
       trades: [],
-      message: '订单已提交到订单簿'
-    });
+      message: matched ? '订单已撮合' : '订单已提交到订单簿',
+      matched: matched
+    };
+
+    // 如果撮合成功，添加链上执行数据
+    if (matched && onChainData) {
+      response.onChainExecution = onChainData;
+      response.message += '，需要链上执行';
+    }
+
+    return NextResponse.json(response);
 
   } catch (error: any) {
     console.error('❌ 创建订单失败:', error);

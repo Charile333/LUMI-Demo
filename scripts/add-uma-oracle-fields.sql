@@ -223,3 +223,4 @@ SELECT '✅ UMA 预言机字段和函数已创建' as status;
 
 
 
+

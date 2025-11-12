@@ -7,6 +7,7 @@ import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
+import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
 
 interface QuickTradeModalProps {
   isOpen: boolean;
@@ -27,11 +28,14 @@ export default function QuickTradeModal({
 }: QuickTradeModalProps) {
   const { t } = useTranslation();
   const toast = useToast();
+  const polymarket = useLUMIPolymarket();
   const [amount, setAmount] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0.50);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [pendingOnChainExecution, setPendingOnChainExecution] = useState<any>(null);
+  const [isExecutingOnChain, setIsExecutingOnChain] = useState(false);
 
   // 确保只在客户端渲染（避免 SSR 问题）
   useEffect(() => {
@@ -97,7 +101,48 @@ export default function QuickTradeModal({
         return;
       }
 
-      // 2. 连接钱包并获取地址
+      // 2. 确保在正确的网络（Polygon Amoy 80002）
+      try {
+        const targetChainIdHex = '0x13882'; // 80002
+        const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+        if (currentChainId?.toLowerCase() !== targetChainIdHex) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: targetChainIdHex }]
+            });
+          } catch (switchError: any) {
+            // 链未添加到钱包
+            if (switchError?.code === 4902) {
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: targetChainIdHex,
+                    chainName: 'Polygon Amoy',
+                    nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+                    rpcUrls: ['https://polygon-amoy-bor-rpc.publicnode.com'],
+                    blockExplorerUrls: ['https://www.oklink.com/amoy']
+                  }]
+                });
+              } catch (addError: any) {
+                toast.error('请在钱包中手动切换至 Polygon Amoy (80002) 网络');
+                setIsSubmitting(false);
+                return;
+              }
+            } else {
+              toast.error('请在钱包中切换至 Polygon Amoy (80002) 网络');
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        }
+      } catch (netErr) {
+        // 忽略，继续后续流程，但很可能会在签名时报错
+        console.warn('网络检查/切换失败', netErr);
+      }
+
+      // 3. 连接钱包并获取地址
       let provider, signer, userAddress;
       
       try {
@@ -141,7 +186,7 @@ export default function QuickTradeModal({
         return;
       }
 
-      // 3. 创建订单数据（使用标准Order接口）
+      // 4. 创建订单数据（使用标准Order接口）
       const outcome = side === 'YES' ? 1 : 0;
       const orderData: Order = {
         orderId: generateOrderId(),
@@ -156,7 +201,7 @@ export default function QuickTradeModal({
         expiration: Math.floor(Date.now() / 1000) + 86400 // 24小时有效期
       };
 
-      // 4. 使用标准签名函数签名
+      // 5. 使用标准签名函数签名
       const signature = await signOrder(orderData, signer);
       
       const order = {
@@ -167,7 +212,7 @@ export default function QuickTradeModal({
 
       console.log('[QuickTrade] 提交订单:', order);
 
-      // 5. 提交订单到 API
+      // 6. 提交订单到 API
       const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: {
@@ -179,20 +224,43 @@ export default function QuickTradeModal({
       const result = await response.json();
 
       if (result.success) {
-        toast.success(
-          `🎉 ${t('orderForm.orderSuccess')}\n\n` +
-          `${t('quickTrade.market')}: ${market.title}\n` +
-          `${t('orderForm.outcome')}: ${side}\n` +
-          `${t('quickTrade.amount')}: $${amount}\n` +
-          `${t('quickTrade.avgPrice')}: $${currentPrice.toFixed(2)}`,
-          { duration: 5000 }
-        );
-        onClose();
-        
-        // 刷新页面以显示更新后的数据
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        // 🚀 如果撮合成功且有链上执行数据，提示用户执行链上交易
+        if (result.matched && result.onChainExecution) {
+          toast.success(
+            `✅ 订单已撮合！\n\n` +
+            `需要执行链上交易以完成资产转移。\n` +
+            `点击"执行链上交易"按钮继续。`,
+            { duration: 8000 }
+          );
+          
+          // 存储链上执行数据，供后续使用
+          sessionStorage.setItem('pendingOnChainExecution', JSON.stringify({
+            orderId: result.order.id,
+            onChainExecution: result.onChainExecution,
+            marketTitle: market.title,
+            side: side,
+            amount: amount
+          }));
+          
+          // 不关闭弹窗，等待用户执行链上交易
+          // 可以显示一个"执行链上交易"按钮
+          return; // 暂时返回，不关闭弹窗
+        } else {
+          toast.success(
+            `🎉 ${t('orderForm.orderSuccess')}\n\n` +
+            `${t('quickTrade.market')}: ${market.title}\n` +
+            `${t('orderForm.outcome')}: ${side}\n` +
+            `${t('quickTrade.amount')}: $${amount}\n` +
+            `${t('quickTrade.avgPrice')}: $${currentPrice.toFixed(2)}`,
+            { duration: 5000 }
+          );
+          onClose();
+          
+          // 刷新页面以显示更新后的数据
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        }
       } else {
         throw new Error(result.error || '提交失败');
       }
@@ -209,6 +277,109 @@ export default function QuickTradeModal({
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  /**
+   * 执行链上交易
+   */
+  const handleOnChainExecution = async () => {
+    if (!pendingOnChainExecution || !polymarket.isConnected) {
+      toast.warning('请先连接钱包');
+      return;
+    }
+
+    try {
+      setIsExecutingOnChain(true);
+
+      const { onChainExecution } = pendingOnChainExecution;
+      const ctfOrder = onChainExecution.ctfOrder;
+
+      // 1. 检查是否需要 Maker 签名
+      if (onChainExecution.makerOrder.needsSignature) {
+        toast.warning('Maker 需要先签名订单，请联系订单创建者');
+        setIsExecutingOnChain(false);
+        return;
+      }
+
+      // 2. 转换订单格式为 CTF Exchange 需要的格式
+      const ctfOrderFormatted = {
+        salt: ethers.BigNumber.from(ctfOrder.salt),
+        maker: ctfOrder.maker,
+        signer: ctfOrder.maker,
+        taker: ethers.constants.AddressZero,
+        tokenId: ethers.BigNumber.from(ctfOrder.tokenId),
+        makerAmount: ethers.BigNumber.from(ctfOrder.makerAmount),
+        takerAmount: ethers.BigNumber.from(ctfOrder.takerAmount),
+        expiration: ethers.BigNumber.from(ctfOrder.expiration),
+        nonce: ethers.BigNumber.from(ctfOrder.nonce),
+        feeRateBps: ethers.BigNumber.from(ctfOrder.feeRateBps),
+        side: ctfOrder.side,
+        signatureType: 0
+      };
+
+      // 3. 获取 Maker 的签名（从后端API获取）
+      const signatureResponse = await fetch(`/api/orders/${onChainExecution.makerOrder.id}/signature`);
+      let makerSignature = '';
+      
+      if (signatureResponse.ok) {
+        const sigData = await signatureResponse.json();
+        makerSignature = sigData.signature || '';
+      }
+      
+      // 如果订单没有 CTF Exchange 格式的签名，需要 Maker 重新签名
+      if (!makerSignature) {
+        // 检查是否是当前用户的订单
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        const currentUser = accounts[0]?.toLowerCase();
+        
+        if (currentUser === onChainExecution.makerOrder.address.toLowerCase()) {
+          // 是当前用户的订单，需要重新用 CTF Exchange 格式签名
+          toast.warning('需要重新签名订单（CTF Exchange 格式）。请确认钱包签名。');
+          
+          // TODO: 调用签名函数
+          // 这里需要让用户签名 CTF Exchange 格式的订单
+          // 暂时跳过，提示用户
+          setIsExecutingOnChain(false);
+          return;
+        } else {
+          toast.warning('订单需要 Maker 签名。请联系订单创建者签名。');
+          setIsExecutingOnChain(false);
+          return;
+        }
+      }
+
+      // 4. 调用 fillOrder
+      const fillAmount = ethers.BigNumber.from(onChainExecution.tradeAmount);
+      const result = await polymarket.fillOrder(
+        ctfOrderFormatted as any,
+        makerSignature,
+        fillAmount
+      );
+
+      toast.success(
+        `✅ 链上交易成功！\n\n` +
+        `交易哈希: ${result.transactionHash.slice(0, 10)}...\n` +
+        `查看: ${result.explorerUrl}`,
+        { duration: 8000 }
+      );
+
+      // 清除待执行数据
+      setPendingOnChainExecution(null);
+      
+      // 关闭弹窗并刷新
+      setTimeout(() => {
+        onClose();
+        window.location.reload();
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('链上交易失败:', error);
+      toast.error(`链上交易失败: ${error.message}`);
+    } finally {
+      setIsExecutingOnChain(false);
     }
   };
 
@@ -341,25 +512,65 @@ export default function QuickTradeModal({
           </div>
 
           {/* 底部按钮 */}
-          <div className="p-6 pt-0">
-            <button
-              onClick={handleTrade}
-              disabled={isSubmitting || !amount || parseFloat(amount) <= 0}
-              className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform
-                ${side === 'YES'
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:shadow-green-500/50'
-                  : 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 hover:shadow-red-500/50'
-              } text-white shadow-lg hover:shadow-2xl hover:scale-[1.02] 
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">⏳</span> {t('quickTrade.processing')}
-                </span>
-              ) : (
-                `${t('quickTrade.buyFor')} ${side} ${t('quickTrade.for')} $${amount}`
-              )}
-            </button>
+          <div className="p-6 pt-0 space-y-3">
+            {/* 如果有待执行的链上交易 */}
+            {pendingOnChainExecution ? (
+              <>
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-3">
+                  <p className="text-sm text-amber-400 mb-2">
+                    ⚡ 订单已撮合，需要执行链上交易完成资产转移
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    成交金额: ${pendingOnChainExecution.amount} @ {(parseFloat(pendingOnChainExecution.onChainExecution.ctfOrder.takerAmount) / 1e6).toFixed(2)} USDC
+                  </p>
+                </div>
+                <button
+                  onClick={handleOnChainExecution}
+                  disabled={isExecutingOnChain || !polymarket.isConnected}
+                  className="w-full py-4 rounded-xl font-bold text-lg transition-all transform
+                    bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 
+                    text-white shadow-lg hover:shadow-2xl hover:scale-[1.02] 
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {isExecutingOnChain ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin">⏳</span> 执行链上交易中...
+                    </span>
+                  ) : (
+                    '🚀 执行链上交易'
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setPendingOnChainExecution(null);
+                    onClose();
+                    setTimeout(() => window.location.reload(), 500);
+                  }}
+                  className="w-full py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  稍后执行
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleTrade}
+                disabled={isSubmitting || !amount || parseFloat(amount) <= 0}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform
+                  ${side === 'YES'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:shadow-green-500/50'
+                    : 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 hover:shadow-red-500/50'
+                } text-white shadow-lg hover:shadow-2xl hover:scale-[1.02] 
+                disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">⏳</span> {t('quickTrade.processing')}
+                  </span>
+                ) : (
+                  `${t('quickTrade.buyFor')} ${side} ${t('quickTrade.for')} $${amount}`
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
