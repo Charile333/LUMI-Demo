@@ -47,29 +47,85 @@ export default function AdminMarketsPage() {
   };
 
   const handleActivate = async (marketId: number) => {
-    if (!confirm('确定要激活这个市场到区块链上吗？\n\n需要支付：\n- Gas 费（约0.01 POL）\n- USDC 奖励（约10 USDC）')) {
+    const market = markets.find(m => m.id === marketId);
+    
+    if (!market) {
+      alert('❌ 市场不存在');
+      return;
+    }
+
+    // 检查是否有 question_id
+    if (!market.question_id) {
+      alert('❌ 市场缺少 Question ID，无法激活！\n\n请先为市场设置 question_id。');
+      return;
+    }
+
+    if (!confirm(
+      `确定要激活这个市场到区块链上吗？\n\n` +
+      `市场: ${market.title}\n` +
+      `Question ID: ${market.question_id}\n\n` +
+      `需要支付：\n` +
+      `- Gas 费（约0.01 POL）\n` +
+      `- USDC 奖励（约10 USDC）\n\n` +
+      `激活过程可能需要 30-60 秒，请耐心等待。`
+    )) {
       return;
     }
 
     try {
       setActivating(marketId);
       
+      console.log(`🚀 开始激活市场 ${marketId}...`);
+      
       const response = await fetch(`/api/admin/markets/${marketId}/activate`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
       const data = await response.json();
       
+      if (!response.ok) {
+        throw new Error(data.error || '激活失败');
+      }
+      
       if (data.success) {
-        alert('✅ 市场激活成功！\n\n' +
-              `Condition ID: ${data.conditionId}\n` +
-              `交易哈希: ${data.txHash}`);
-        loadMarkets(); // 刷新列表
+        console.log('✅ 市场激活成功！', data);
+        
+        // 显示成功消息，包含链接
+        const explorerUrl = data.txHash 
+          ? `https://amoy.polygonscan.com/tx/${data.txHash}`
+          : null;
+        
+        const message = 
+          `✅ 市场激活成功！\n\n` +
+          `Condition ID: ${data.conditionId}\n` +
+          (data.txHash ? `交易哈希: ${data.txHash}\n` : '') +
+          (explorerUrl ? `\n点击确定查看交易详情` : '');
+        
+        alert(message);
+        
+        if (explorerUrl) {
+          window.open(explorerUrl, '_blank');
+        }
+        
+        // 刷新列表
+        loadMarkets();
       } else {
-        alert('❌ 激活失败：\n' + data.error);
+        throw new Error(data.error || '激活失败');
       }
     } catch (error: any) {
-      alert('❌ 激活失败：\n' + error.message);
+      console.error('❌ 激活失败:', error);
+      
+      const errorMessage = error.message || '激活失败，请检查：\n' +
+        '1. 平台钱包配置是否正确\n' +
+        '2. 钱包是否有足够的 USDC 余额\n' +
+        '3. 钱包是否有足够的 Gas 费\n' +
+        '4. 网络连接是否正常\n' +
+        '5. 智能合约是否已部署';
+      
+      alert(`❌ 激活失败：\n\n${errorMessage}\n\n详情请查看浏览器控制台`);
     } finally {
       setActivating(null);
     }
@@ -240,12 +296,22 @@ export default function AdminMarketsPage() {
                       {market.description?.length > 150 ? '...' : ''}
                     </p>
                     
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
                       <span>🆔 ID: {market.id}</span>
                       <span>📂 {market.main_category || market.categoryType}</span>
                       {market.sub_category && <span>📁 {market.sub_category}</span>}
                       {market.question_id && (
-                        <span className="font-mono">🔗 {market.question_id.substring(0, 20)}...</span>
+                        <span className="font-mono" title={market.question_id}>
+                          🔗 Question ID: {market.question_id.substring(0, 20)}...
+                        </span>
+                      )}
+                      {!market.question_id && (
+                        <span className="text-red-500">⚠️ 缺少 Question ID</span>
+                      )}
+                      {market.condition_id && (
+                        <span className="font-mono text-green-600" title={market.condition_id}>
+                          ✅ Condition ID: {market.condition_id.substring(0, 20)}...
+                        </span>
                       )}
                     </div>
                   </div>
@@ -304,19 +370,62 @@ export default function AdminMarketsPage() {
                 {/* 区块链信息（如果已上链） */}
                 {market.blockchain_status === 'created' && (
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                       {market.condition_id && (
-                        <div>
-                          <span className="text-gray-500">Condition ID:</span>
-                          <span className="ml-2 font-mono text-gray-700">{market.condition_id.substring(0, 20)}...</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500 font-semibold">Condition ID:</span>
+                          <span 
+                            className="font-mono text-gray-700 cursor-pointer hover:text-blue-600" 
+                            onClick={() => {
+                              navigator.clipboard.writeText(market.condition_id);
+                              alert('Condition ID 已复制到剪贴板');
+                            }}
+                            title="点击复制"
+                          >
+                            {market.condition_id}
+                          </span>
+                          <button
+                            onClick={() => window.open(`https://amoy.polygonscan.com/address/${market.condition_id}`, '_blank')}
+                            className="text-blue-600 hover:text-blue-800"
+                            title="查看链上详情"
+                          >
+                            🔗
+                          </button>
+                        </div>
+                      )}
+                      {market.question_id && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500 font-semibold">Question ID:</span>
+                          <span 
+                            className="font-mono text-gray-700 cursor-pointer hover:text-blue-600" 
+                            onClick={() => {
+                              navigator.clipboard.writeText(market.question_id);
+                              alert('Question ID 已复制到剪贴板');
+                            }}
+                            title="点击复制"
+                          >
+                            {market.question_id}
+                          </span>
                         </div>
                       )}
                       {market.adapter_address && (
-                        <div>
-                          <span className="text-gray-500">Adapter:</span>
-                          <span className="ml-2 font-mono text-gray-700">{market.adapter_address.substring(0, 20)}...</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500 font-semibold">Adapter:</span>
+                          <span className="font-mono text-gray-700">{market.adapter_address.substring(0, 20)}...</span>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* 激活失败信息 */}
+                {market.blockchain_status === 'failed' && (
+                  <div className="mt-4 pt-4 border-t border-red-100">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700">
+                      <div className="font-semibold mb-1">⚠️ 激活失败</div>
+                      <div className="text-red-600">
+                        可以点击"🚀 激活上链"按钮重试激活。
+                      </div>
                     </div>
                   </div>
                 )}
