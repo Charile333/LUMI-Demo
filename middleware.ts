@@ -100,9 +100,12 @@ export function middleware(request: NextRequest) {
       );
     }
     
-    // 排除登录和登出 API（这些不需要认证）
+    // 排除登录、登出和调试 API（这些不需要认证）
     if (request.nextUrl.pathname === '/api/admin/auth/login' ||
-        request.nextUrl.pathname === '/api/admin/auth/logout') {
+        request.nextUrl.pathname === '/api/admin/auth/logout' ||
+        request.nextUrl.pathname === '/api/admin/debug' ||
+        request.nextUrl.pathname === '/api/admin/full-debug' ||
+        request.nextUrl.pathname === '/api/admin/check-auth') {
       return NextResponse.next();
     }
     
