@@ -230,6 +230,20 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     
     console.log(`✅ Provider 已创建 (chainId: 80002, RPC: ${rpcUrl})`);
     
+    // 🔧 强制设置 Provider 的网络信息，避免自动检测（解决 ethers.js web 版本问题）
+    try {
+      // 如果 Provider 有 _network 属性，直接设置
+      if ((provider as any)._network === null || (provider as any)._network === undefined) {
+        (provider as any)._network = {
+          name: 'polygon-amoy',
+          chainId: 80002
+        };
+        console.log(`🔧 已强制设置 Provider 网络信息`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ 无法强制设置网络信息: ${e}`);
+    }
+    
     const platformWallet = new ethers.Wallet(privateKey, provider);
     console.log(`💰 平台账户: ${platformWallet.address}`);
     
