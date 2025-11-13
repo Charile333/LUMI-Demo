@@ -400,20 +400,53 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       if (approveError.code === 'NETWORK_ERROR' || approveError.message?.includes('could not detect network')) {
         console.warn(`⚠️ approve 失败（网络检测问题），尝试使用底层方法...`);
         
-        // 使用底层方法：手动构建交易并发送
-        const iface = new ethers.utils.Interface(USDC_ABI);
-        const data = iface.encodeFunctionData('approve', [CONTRACTS.adapter, rewardAmount]);
-        
-        const tx = {
-          to: CONTRACTS.mockUSDC,
-          data: data,
-          gasLimit: 100000
-        };
-        
-        const signedTx = await platformWallet.signTransaction(tx);
-        const approveTx = await provider.sendTransaction(signedTx);
-        await approveTx.wait();
-        console.log('✅ USDC approved (使用底层方法)');
+        try {
+          // 使用底层方法：手动构建交易并发送（完全使用 Node.js 原生模块）
+          const iface = new ethers.utils.Interface(USDC_ABI);
+          const data = iface.encodeFunctionData('approve', [CONTRACTS.adapter, rewardAmount]);
+          
+          // 获取 nonce 和 gasPrice（使用 Node.js 原生模块）
+          const nonceHex = await nodeRpcCall(rpcUrl, 'eth_getTransactionCount', [platformWallet.address, 'latest']);
+          const gasPriceHex = await nodeRpcCall(rpcUrl, 'eth_gasPrice', []);
+          
+          const tx = {
+            to: CONTRACTS.mockUSDC,
+            data: data,
+            gasLimit: ethers.utils.hexlify(100000),
+            gasPrice: gasPriceHex,
+            nonce: nonceHex,
+            chainId: 80002, // 显式指定 chainId
+            value: '0x0'
+          };
+          
+          // 签名交易
+          const signedTx = await platformWallet.signTransaction(tx);
+          
+          // 发送交易（使用 Node.js 原生模块）
+          const txHash = await nodeRpcCall(rpcUrl, 'eth_sendRawTransaction', [signedTx]);
+          
+          console.log(`⏳ 交易已发送: ${txHash}`);
+          
+          // 等待交易确认（使用 Node.js 原生模块轮询）
+          let receipt = null;
+          let attempts = 0;
+          const maxAttempts = 30; // 最多等待 30 秒
+          
+          while (!receipt && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            receipt = await nodeRpcCall(rpcUrl, 'eth_getTransactionReceipt', [txHash]);
+            attempts++;
+          }
+          
+          if (!receipt || receipt.status !== '0x1') {
+            throw new Error('交易失败或超时');
+          }
+          
+          console.log('✅ USDC approved (使用底层方法)');
+        } catch (lowLevelError: any) {
+          console.error(`❌ 底层方法也失败: ${lowLevelError.message}`);
+          throw new Error(`无法 approve USDC: ${approveError.message} (底层方法也失败: ${lowLevelError.message})`);
+        }
       } else {
         throw approveError;
       }
@@ -431,22 +464,121 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     );
     
     console.log('📝 Creating market on-chain...');
-    const tx = await adapter.initialize(
-      questionId,
-      market.title,
-      market.description || '',
-      2, // YES/NO
-      CONTRACTS.mockUSDC,
-      rewardAmount,
-      0, // customLiveness
-      {
-        gasLimit: 1200000
-      }
-    );
     
-    console.log(`⏳ 交易发送: ${tx.hash}`);
-    const receipt = await tx.wait();
-    console.log(`✅ 交易确认，区块: ${receipt.blockNumber}`);
+    // 🔧 在调用 initialize 之前，再次确保网络信息已设置
+    try {
+      if (!(provider as any)._network) {
+        (provider as any)._network = {
+          name: 'polygon-amoy',
+          chainId: 80002
+        };
+        console.log(`🔧 在 initialize 前再次设置网络信息`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ 无法在 initialize 前设置网络信息: ${e}`);
+    }
+    
+    let tx: ethers.ContractTransaction;
+    let receipt: ethers.ContractReceipt;
+    
+    try {
+      tx = await adapter.initialize(
+        questionId,
+        market.title,
+        market.description || '',
+        2, // YES/NO
+        CONTRACTS.mockUSDC,
+        rewardAmount,
+        0, // customLiveness
+        {
+          gasLimit: 1200000
+        }
+      );
+      
+      console.log(`⏳ 交易发送: ${tx.hash}`);
+      receipt = await tx.wait();
+      console.log(`✅ 交易确认，区块: ${receipt.blockNumber}`);
+    } catch (initializeError: any) {
+      // 如果 initialize 失败是因为网络检测问题，尝试使用更底层的方法
+      if (initializeError.code === 'NETWORK_ERROR' || initializeError.message?.includes('could not detect network')) {
+        console.warn(`⚠️ initialize 失败（网络检测问题），尝试使用底层方法...`);
+        
+        try {
+          // 使用底层方法：手动构建交易并发送（完全使用 Node.js 原生模块）
+          const iface = new ethers.utils.Interface(ADAPTER_ABI);
+          const data = iface.encodeFunctionData('initialize', [
+            questionId,
+            market.title,
+            market.description || '',
+            2, // YES/NO
+            CONTRACTS.mockUSDC,
+            rewardAmount,
+            0 // customLiveness
+          ]);
+          
+          // 获取 nonce 和 gasPrice（使用 Node.js 原生模块）
+          const nonceHex = await nodeRpcCall(rpcUrl, 'eth_getTransactionCount', [platformWallet.address, 'latest']);
+          const gasPriceHex = await nodeRpcCall(rpcUrl, 'eth_gasPrice', []);
+          
+          const txData = {
+            to: CONTRACTS.adapter,
+            data: data,
+            gasLimit: ethers.utils.hexlify(1200000),
+            gasPrice: gasPriceHex,
+            nonce: nonceHex,
+            chainId: 80002, // 显式指定 chainId
+            value: '0x0'
+          };
+          
+          // 签名交易
+          const signedTx = await platformWallet.signTransaction(txData);
+          
+          // 发送交易（使用 Node.js 原生模块）
+          const txHash = await nodeRpcCall(rpcUrl, 'eth_sendRawTransaction', [signedTx]);
+          
+          console.log(`⏳ 交易已发送: ${txHash}`);
+          
+          // 等待交易确认（使用 Node.js 原生模块轮询）
+          let receiptData = null;
+          let attempts = 0;
+          const maxAttempts = 60; // 最多等待 60 秒（initialize 可能需要更长时间）
+          
+          while (!receiptData && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            receiptData = await nodeRpcCall(rpcUrl, 'eth_getTransactionReceipt', [txHash]);
+            attempts++;
+          }
+          
+          if (!receiptData || receiptData.status !== '0x1') {
+            throw new Error('交易失败或超时');
+          }
+          
+          // 转换为 ethers 格式的 receipt（用于后续解析事件）
+          receipt = {
+            transactionHash: txHash,
+            blockNumber: parseInt(receiptData.blockNumber, 16),
+            blockHash: receiptData.blockHash,
+            transactionIndex: parseInt(receiptData.transactionIndex, 16),
+            from: receiptData.from,
+            to: receiptData.to,
+            gasUsed: ethers.BigNumber.from(receiptData.gasUsed),
+            cumulativeGasUsed: ethers.BigNumber.from(receiptData.cumulativeGasUsed),
+            logs: receiptData.logs || [],
+            events: [], // 事件需要手动解析
+            status: parseInt(receiptData.status, 16),
+            logsBloom: receiptData.logsBloom,
+            contractAddress: receiptData.contractAddress
+          } as any;
+          
+          console.log(`✅ 交易确认，区块: ${receipt.blockNumber} (使用底层方法)`);
+        } catch (lowLevelError: any) {
+          console.error(`❌ 底层方法也失败: ${lowLevelError.message}`);
+          throw new Error(`无法 initialize 市场: ${initializeError.message} (底层方法也失败: ${lowLevelError.message})`);
+        }
+      } else {
+        throw initializeError;
+      }
+    }
     
     // 7. 解析 conditionId
     let conditionId = '';
