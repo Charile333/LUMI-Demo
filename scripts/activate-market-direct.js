@@ -115,8 +115,17 @@ async function activateMarket(marketId) {
 
   if (allowance.lt(rewardAmount)) {
     console.log('📝 需要 Approve USDC...');
+    
+    // 🔧 获取当前 Gas 价格，并确保不低于最低要求
+    const currentGasPrice = await provider.getGasPrice();
+    const minGasPrice = ethers.utils.parseUnits('30', 'gwei'); // 最低 30 Gwei
+    const gasPrice = currentGasPrice.gt(minGasPrice) ? currentGasPrice : minGasPrice;
+    
+    console.log(`⛽ Gas 价格: ${ethers.utils.formatUnits(gasPrice, 'gwei')} Gwei`);
+    
     const approveTx = await usdc.approve(CONTRACTS.adapter, rewardAmount, {
-      gasLimit: 100000
+      gasLimit: 100000,
+      gasPrice: gasPrice // 使用确保的 Gas 价格
     });
     console.log(`⏳ Approve 交易: ${approveTx.hash}`);
     await approveTx.wait();
@@ -141,6 +150,14 @@ async function activateMarket(marketId) {
   console.log(`   Question ID: ${questionId}`);
 
   try {
+    // 🔧 获取当前 Gas 价格，并确保不低于最低要求
+    const currentGasPrice = await provider.getGasPrice();
+    const minGasPrice = ethers.utils.parseUnits('30', 'gwei'); // 最低 30 Gwei
+    const gasPrice = currentGasPrice.gt(minGasPrice) ? currentGasPrice : minGasPrice;
+    
+    console.log(`⛽ Gas 价格: ${ethers.utils.formatUnits(gasPrice, 'gwei')} Gwei`);
+    console.log(`   (当前: ${ethers.utils.formatUnits(currentGasPrice, 'gwei')} Gwei, 最低: 30 Gwei)\n`);
+
     const tx = await adapter.initialize(
       questionId,
       market.title,
@@ -150,7 +167,8 @@ async function activateMarket(marketId) {
       rewardAmount,
       0, // customLiveness
       {
-        gasLimit: 1200000
+        gasLimit: 1200000,
+        gasPrice: gasPrice // 使用确保的 Gas 价格
       }
     );
 
