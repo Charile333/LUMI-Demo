@@ -79,7 +79,10 @@ export function createNodeRpcProvider(
   
   // 方案：直接使用 ethers.js 的 JsonRpcProvider，但确保在 Node.js 环境中运行
   // 如果还是使用 web 版本，我们可以创建一个自定义的 Provider
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl, network);
+  const provider = new ethers.providers.JsonRpcProvider(
+    rpcUrl, 
+    network as any // Type assertion to avoid TypeScript strict type checking
+  );
   
   // 尝试覆盖内部的 connection.fetch（如果存在）
   if ((provider as any).connection && (provider as any).connection.fetch) {
