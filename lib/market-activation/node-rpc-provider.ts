@@ -120,7 +120,7 @@ export async function nodeRpcCallWithTimeout(
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 30000, // 30 秒超时
+      timeout: timeout, // 可配置超时
     };
     
     const req = client.request(requestOptions, (res) => {
