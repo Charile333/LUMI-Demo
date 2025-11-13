@@ -232,13 +232,40 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     
     // 🔧 强制设置 Provider 的网络信息，避免自动检测（解决 ethers.js web 版本问题）
     try {
-      // 如果 Provider 有 _network 属性，直接设置
+      // 方法1: 直接设置 _network 属性
       if ((provider as any)._network === null || (provider as any)._network === undefined) {
         (provider as any)._network = {
           name: 'polygon-amoy',
           chainId: 80002
         };
-        console.log(`🔧 已强制设置 Provider 网络信息`);
+        console.log(`🔧 已强制设置 Provider 网络信息 (方法1: _network)`);
+      }
+      
+      // 方法2: 如果 Provider 有 _readyPromise，先解析它
+      if ((provider as any)._readyPromise) {
+        try {
+          await (provider as any)._readyPromise;
+          console.log(`🔧 Provider readyPromise 已解析`);
+        } catch (e) {
+          // 如果 readyPromise 失败，忽略（我们已经有网络信息了）
+          console.warn(`⚠️ Provider readyPromise 失败，但继续使用强制设置的网络信息`);
+        }
+      }
+      
+      // 方法3: 尝试调用 getNetwork，但捕获错误（只是为了"预热"）
+      try {
+        const network = await provider.getNetwork();
+        console.log(`🔧 Provider 网络检测成功: ${network.name} (${network.chainId})`);
+      } catch (networkError: any) {
+        // 如果 getNetwork 失败，使用我们强制设置的网络信息
+        console.warn(`⚠️ Provider getNetwork 失败，使用强制设置的网络信息: ${networkError.message}`);
+        // 确保 _network 已设置
+        if (!(provider as any)._network) {
+          (provider as any)._network = {
+            name: 'polygon-amoy',
+            chainId: 80002
+          };
+        }
       }
     } catch (e) {
       console.warn(`⚠️ 无法强制设置网络信息: ${e}`);
