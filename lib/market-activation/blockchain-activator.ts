@@ -375,11 +375,49 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     
     // 5. Approve USDC
     console.log('📝 Approving USDC...');
-    const approveTx = await usdc.approve(CONTRACTS.adapter, rewardAmount, {
-      gasLimit: 100000
-    });
-    await approveTx.wait();
-    console.log('✅ USDC approved');
+    
+    // 🔧 在调用 approve 之前，再次确保网络信息已设置
+    try {
+      if (!(provider as any)._network) {
+        (provider as any)._network = {
+          name: 'polygon-amoy',
+          chainId: 80002
+        };
+        console.log(`🔧 在 approve 前再次设置网络信息`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ 无法在 approve 前设置网络信息: ${e}`);
+    }
+    
+    try {
+      const approveTx = await usdc.approve(CONTRACTS.adapter, rewardAmount, {
+        gasLimit: 100000
+      });
+      await approveTx.wait();
+      console.log('✅ USDC approved');
+    } catch (approveError: any) {
+      // 如果 approve 失败是因为网络检测问题，尝试使用更底层的方法
+      if (approveError.code === 'NETWORK_ERROR' || approveError.message?.includes('could not detect network')) {
+        console.warn(`⚠️ approve 失败（网络检测问题），尝试使用底层方法...`);
+        
+        // 使用底层方法：手动构建交易并发送
+        const iface = new ethers.utils.Interface(USDC_ABI);
+        const data = iface.encodeFunctionData('approve', [CONTRACTS.adapter, rewardAmount]);
+        
+        const tx = {
+          to: CONTRACTS.mockUSDC,
+          data: data,
+          gasLimit: 100000
+        };
+        
+        const signedTx = await platformWallet.signTransaction(tx);
+        const approveTx = await provider.sendTransaction(signedTx);
+        await approveTx.wait();
+        console.log('✅ USDC approved (使用底层方法)');
+      } else {
+        throw approveError;
+      }
+    }
     
     // 6. 调用 initialize 创建市场
     const adapter = new ethers.Contract(
