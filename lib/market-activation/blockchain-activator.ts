@@ -146,26 +146,48 @@ export async function activateMarketOnChain(marketId: number): Promise<{
         console.log(`🌐 尝试连接 RPC: ${url}`);
         const startTime = Date.now();
         
-        // 🚀 创建带超时的 Provider
-        const testProvider = new ethers.providers.StaticJsonRpcProvider(
-          {
-            url,
-            timeout: 10000 // 10秒超时
-          },
+        // 🚀 创建 Provider（使用与测试脚本相同的方式）
+        // 注意：StaticJsonRpcProvider 的构造函数参数格式不同
+        const testProvider = new ethers.providers.JsonRpcProvider(
+          url,
           {
             name: 'polygon-amoy',
             chainId: 80002
           }
         );
         
+        // 设置超时（通过覆盖 fetch 方法）
+        const originalFetch = (testProvider as any).connection;
+        if (originalFetch && originalFetch.fetch) {
+          const originalFetchMethod = originalFetch.fetch;
+          originalFetch.fetch = async (url: string, options: any) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
+            
+            try {
+              const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+              return response;
+            } catch (error: any) {
+              clearTimeout(timeoutId);
+              if (error.name === 'AbortError') {
+                throw new Error('Connection timeout after 15s');
+              }
+              throw error;
+            }
+          };
+        }
+        
         // 🔄 测试连接（带超时保护）
         const blockNumberPromise = testProvider.getBlockNumber();
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout after 10s')), 10000)
+          setTimeout(() => reject(new Error('Connection timeout after 15s')), 15000)
         );
         
-        await Promise.race([blockNumberPromise, timeoutPromise]);
-        
+        const blockNumber = await Promise.race([blockNumberPromise, timeoutPromise]) as number;
         const latency = Date.now() - startTime;
         
         // ✅ 连接成功
@@ -173,15 +195,28 @@ export async function activateMarketOnChain(marketId: number): Promise<{
         rpcUrl = url;
         rpcCache.markAvailable(url, latency);
         
-        console.log(`✅ RPC 连接成功: ${url} (延迟: ${latency}ms)`);
+        console.log(`✅ RPC 连接成功: ${url}`);
+        console.log(`   延迟: ${latency}ms`);
+        console.log(`   当前区块: ${blockNumber}`);
         break;
         
       } catch (error: any) {
         const errorMsg = error.message || error.reason || '未知错误';
         console.warn(`⚠️ RPC ${url} 连接失败: ${errorMsg}`);
         
-        // 标记为不可用
-        rpcCache.markUnavailable(url);
+        // 如果是用户配置的 RPC 失败，给出更详细的提示
+        if (url === userRpcUrl) {
+          console.warn(`⚠️ 您配置的 Alchemy RPC 连接失败！`);
+          console.warn(`   请检查：`);
+          console.warn(`   1. API Key 是否正确`);
+          console.warn(`   2. 网络是否能访问 alchemy.com`);
+          console.warn(`   3. Alchemy App 是否选择了 Polygon Amoy 网络`);
+        }
+        
+        // 标记为不可用（但用户配置的 RPC 不标记，因为可能是临时问题）
+        if (url !== userRpcUrl) {
+          rpcCache.markUnavailable(url);
+        }
         lastError = error;
         
         // 短暂延迟再试下一个（避免过快连续请求）
