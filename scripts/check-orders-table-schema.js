@@ -19,8 +19,15 @@ async function checkOrdersTableSchema() {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // 需要检查的字段
-  const requiredColumns = ['condition_id', 'ctf_signature', 'ctf_order_data'];
+  // 需要检查的字段（包括所有链上交易相关的字段）
+  const requiredColumns = [
+    'condition_id',
+    'ctf_signature', 
+    'ctf_order_data',
+    'expiration',
+    'salt',
+    'nonce'
+  ];
 
   console.log('📋 检查以下字段是否存在：\n');
   requiredColumns.forEach(col => {
@@ -73,6 +80,12 @@ async function checkOrdersTableSchema() {
       let sqlType = 'TEXT';
       if (col === 'ctf_order_data') {
         sqlType = 'JSONB';
+      } else if (col === 'expiration' || col === 'nonce') {
+        sqlType = 'BIGINT';
+      } else if (col === 'salt') {
+        sqlType = 'VARCHAR(100)';
+      } else if (col === 'condition_id') {
+        sqlType = 'VARCHAR(200)';
       }
       console.log(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS ${col} ${sqlType};`);
     });
