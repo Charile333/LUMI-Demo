@@ -42,10 +42,43 @@ export async function GET(request: NextRequest) {
       NODE_ENV: process.env.NODE_ENV
     };
 
-    // 2. 测试 RPC 连接
+    // 2. 测试 RPC 连接（先用原生 fetch 测试，再用 ethers.js）
     if (rpcUrl) {
       try {
         debug.rpc.testing = true;
+        
+        // 先用原生 fetch 测试 RPC 是否可访问
+        const fetchStartTime = Date.now();
+        
+        // 使用 AbortController 实现超时（兼容性更好）
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+        
+        const fetchResponse = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_blockNumber',
+            params: [],
+            id: 1
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        const fetchLatency = Date.now() - fetchStartTime;
+        
+        if (!fetchResponse.ok) {
+          throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
+        }
+        
+        const fetchData = await fetchResponse.json();
+        
+        // 如果原生 fetch 成功，再用 ethers.js 测试
         const provider = new ethers.providers.JsonRpcProvider(rpcUrl, {
           name: 'polygon-amoy',
           chainId: 80002
@@ -59,16 +92,26 @@ export async function GET(request: NextRequest) {
           success: true,
           blockNumber,
           latency: `${latency}ms`,
+          fetchLatency: `${fetchLatency}ms`,
+          fetchSuccess: true,
           network: {
             chainId: provider.network.chainId,
             name: provider.network.name
           }
         };
       } catch (error: any) {
+        // 检查是否是 fetch 错误还是 ethers.js 错误
+        const isFetchError = error.name === 'AbortError' || error.message.includes('fetch');
+        const isEthersError = error.code === 'SERVER_ERROR' || error.code === 'NETWORK_ERROR';
+        
         debug.rpc = {
           success: false,
           error: error.message,
-          stack: error.stack
+          errorCode: error.code,
+          errorName: error.name,
+          isFetchError,
+          isEthersError,
+          stack: error.stack?.substring(0, 500) // 只显示前500字符
         };
       }
     } else {
