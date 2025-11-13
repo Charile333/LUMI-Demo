@@ -80,7 +80,11 @@ async function activateMarket(marketId) {
     chainId: 80002
   });
 
-  const wallet = new ethers.Wallet(privateKey, provider);
+  // 🔧 确保私钥格式正确（如果用户没有输入 0x 前缀，自动添加）
+  const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey;
+  console.log(`🔑 私钥格式: ${normalizedPrivateKey.substring(0, 10)}... (长度: ${normalizedPrivateKey.length} 字符)`);
+  
+  const wallet = new ethers.Wallet(normalizedPrivateKey, provider);
   console.log(`💰 平台钱包: ${wallet.address}`);
 
   // 检查余额

@@ -271,7 +271,11 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       console.warn(`⚠️ 无法强制设置网络信息: ${e}`);
     }
     
-    const platformWallet = new ethers.Wallet(privateKey, provider);
+    // 🔧 确保私钥格式正确（如果用户没有输入 0x 前缀，自动添加）
+    const normalizedPrivateKey = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey;
+    console.log(`🔑 私钥格式: ${normalizedPrivateKey.substring(0, 10)}... (长度: ${normalizedPrivateKey.length} 字符)`);
+    
+    const platformWallet = new ethers.Wallet(normalizedPrivateKey, provider);
     console.log(`💰 平台账户: ${platformWallet.address}`);
     
     // 4. 检查 USDC 余额
