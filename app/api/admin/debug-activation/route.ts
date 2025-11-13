@@ -51,8 +51,9 @@ export async function GET(request: NextRequest) {
         const fetchStartTime = Date.now();
         
         // 使用 AbortController 实现超时（兼容性更好）
+        // 注意：在中国访问 Alchemy 可能需要更长时间，增加到 30 秒
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
         
         const fetchResponse = await fetch(rpcUrl, {
           method: 'POST',
@@ -101,8 +102,9 @@ export async function GET(request: NextRequest) {
         };
       } catch (error: any) {
         // 检查是否是 fetch 错误还是 ethers.js 错误
-        const isFetchError = error.name === 'AbortError' || error.message.includes('fetch');
+        const isFetchError = error.name === 'AbortError' || error.message.includes('fetch') || error.message.includes('aborted');
         const isEthersError = error.code === 'SERVER_ERROR' || error.code === 'NETWORK_ERROR';
+        const isTimeout = error.name === 'AbortError' || error.message.includes('timeout') || error.message.includes('aborted');
         
         debug.rpc = {
           success: false,
@@ -111,6 +113,10 @@ export async function GET(request: NextRequest) {
           errorName: error.name,
           isFetchError,
           isEthersError,
+          isTimeout,
+          suggestion: isTimeout 
+            ? 'RPC 连接超时。可能原因：1) 网络连接慢（国内访问 Alchemy 可能需要代理/VPN） 2) Alchemy API Key 可能无效 3) 网络防火墙阻止连接'
+            : 'RPC 连接失败，请检查网络连接和 API Key',
           stack: error.stack?.substring(0, 500) // 只显示前500字符
         };
       }
