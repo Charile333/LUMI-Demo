@@ -262,40 +262,63 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     }
     console.log(`✅ USDC 合约已验证存在 (代码长度: ${code.length} 字符)`);
     
-    // 使用 try-catch 处理 balanceOf 调用
+    // 使用 Node.js 原生模块获取 USDC 余额（避免 ethers.js web 版本问题）
     let balance;
     try {
-      // 尝试直接调用
-      balance = await usdc.balanceOf(platformWallet.address);
-      console.log(`✅ 成功获取余额 (方法: balanceOf)`);
-    } catch (error: any) {
-      console.warn(`⚠️ balanceOf 调用失败，尝试替代方法...`, error.message || error.reason);
+      console.log(`🔧 使用 Node.js 原生模块获取 USDC 余额...`);
       
-      // 如果 balanceOf 失败，尝试使用 callStatic
+      // 使用 Node.js 原生模块调用 eth_call
+      const iface = new ethers.utils.Interface(USDC_ABI);
+      const data = iface.encodeFunctionData('balanceOf', [platformWallet.address]);
+      
+      // 使用 Node.js 原生模块进行 RPC 调用
+      const result = await nodeRpcCall(rpcUrl, 'eth_call', [
+        {
+          to: CONTRACTS.mockUSDC,
+          data: data
+        },
+        'latest'
+      ]);
+      
+      balance = iface.decodeFunctionResult('balanceOf', result)[0];
+      console.log(`✅ 使用 Node.js 原生模块成功获取余额`);
+    } catch (nodeError: any) {
+      console.warn(`⚠️ Node.js 原生调用失败，尝试使用 ethers.js...`, nodeError.message);
+      
+      // 如果 Node.js 原生调用失败，尝试使用 ethers.js（作为备选）
       try {
-        balance = await usdc.callStatic.balanceOf(platformWallet.address);
-        console.log(`✅ 成功获取余额 (方法: callStatic)`);
-      } catch (staticError: any) {
-        // 最后尝试使用 provider.call
+        // 尝试直接调用
+        balance = await usdc.balanceOf(platformWallet.address);
+        console.log(`✅ 使用 ethers.js balanceOf 成功获取余额`);
+      } catch (error: any) {
+        console.warn(`⚠️ balanceOf 调用失败，尝试 callStatic...`, error.message || error.reason);
+        
+        // 如果 balanceOf 失败，尝试使用 callStatic
         try {
-          const iface = new ethers.utils.Interface(USDC_ABI);
-          const data = iface.encodeFunctionData('balanceOf', [platformWallet.address]);
-          const result = await provider.call({
-            to: CONTRACTS.mockUSDC,
-            data: data
-          });
-          balance = iface.decodeFunctionResult('balanceOf', result)[0];
-          console.log(`✅ 成功获取余额 (方法: provider.call)`);
-        } catch (callError: any) {
-          const errorMsg = error.message || error.reason || staticError.message || staticError.reason || callError.message || '未知错误';
-          throw new Error(
-            `无法获取 USDC 余额。\n` +
-            `  合约地址: ${CONTRACTS.mockUSDC}\n` +
-            `  账户地址: ${platformWallet.address}\n` +
-            `  RPC URL: ${rpcUrl}\n` +
-            `  错误: ${errorMsg}\n` +
-            `  建议: 1) 检查 RPC 节点是否正常 2) 确认合约地址正确 3) 尝试使用其他 RPC 端点`
-          );
+          balance = await usdc.callStatic.balanceOf(platformWallet.address);
+          console.log(`✅ 使用 ethers.js callStatic 成功获取余额`);
+        } catch (staticError: any) {
+          // 最后尝试使用 provider.call
+          try {
+            const iface = new ethers.utils.Interface(USDC_ABI);
+            const data = iface.encodeFunctionData('balanceOf', [platformWallet.address]);
+            const result = await provider.call({
+              to: CONTRACTS.mockUSDC,
+              data: data
+            });
+            balance = iface.decodeFunctionResult('balanceOf', result)[0];
+            console.log(`✅ 使用 ethers.js provider.call 成功获取余额`);
+          } catch (callError: any) {
+            const errorMsg = nodeError.message || error.message || error.reason || staticError.message || staticError.reason || callError.message || '未知错误';
+            throw new Error(
+              `无法获取 USDC 余额。\n` +
+              `  合约地址: ${CONTRACTS.mockUSDC}\n` +
+              `  账户地址: ${platformWallet.address}\n` +
+              `  RPC URL: ${rpcUrl}\n` +
+              `  错误: ${errorMsg}\n` +
+              `  建议: 1) 检查 RPC 节点是否正常 2) 确认合约地址正确 3) 尝试使用其他 RPC 端点`
+            );
+          }
         }
       }
     }
