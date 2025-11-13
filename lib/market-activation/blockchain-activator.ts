@@ -2,6 +2,7 @@
 
 import { ethers } from 'ethers';
 import { db } from '@/lib/db';
+import { nodeRpcCall } from './node-rpc-provider';
 
 // 合约地址配置 - 完整 Polymarket 系统 🔮
 const CONTRACTS = {
