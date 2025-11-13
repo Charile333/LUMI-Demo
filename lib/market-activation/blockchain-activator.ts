@@ -581,20 +581,36 @@ export async function activateMarketOnChain(marketId: number): Promise<{
           const txHash = await nodeRpcCall(rpcUrl, 'eth_sendRawTransaction', [signedTx]);
           
           console.log(`⏳ 交易已发送: ${txHash}`);
+          console.log(`🔍 开始等待交易确认...`);
           
           // 等待交易确认（使用 Node.js 原生模块轮询）
           let receiptData = null;
           let attempts = 0;
-          const maxAttempts = 60; // 最多等待 60 秒（initialize 可能需要更长时间）
+          const maxAttempts = 120; // 最多等待 120 秒（initialize 可能需要更长时间）
           
           while (!receiptData && attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            receiptData = await nodeRpcCall(rpcUrl, 'eth_getTransactionReceipt', [txHash]);
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 每 2 秒检查一次
+            try {
+              receiptData = await nodeRpcCall(rpcUrl, 'eth_getTransactionReceipt', [txHash]);
+              if (receiptData) {
+                console.log(`✅ 交易已确认 (尝试 ${attempts + 1}/${maxAttempts})`);
+                break;
+              } else {
+                console.log(`⏳ 等待交易确认中... (${attempts + 1}/${maxAttempts})`);
+              }
+            } catch (receiptError: any) {
+              // 如果获取 receipt 失败，可能是交易还在 pending，继续等待
+              console.log(`⏳ 交易仍在 pending，继续等待... (${attempts + 1}/${maxAttempts})`);
+            }
             attempts++;
           }
           
-          if (!receiptData || receiptData.status !== '0x1') {
-            throw new Error('交易失败或超时');
+          if (!receiptData) {
+            throw new Error(`交易确认超时（等待了 ${maxAttempts * 2} 秒）。交易哈希: ${txHash}。请手动检查交易状态。`);
+          }
+          
+          if (receiptData.status !== '0x1') {
+            throw new Error(`交易失败。交易哈希: ${txHash}。状态: ${receiptData.status}`);
           }
           
           // 转换为 ethers 格式的 receipt（用于后续解析事件）
