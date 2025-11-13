@@ -9,7 +9,10 @@ import http from 'http';
  * 使用 Node.js 原生 http/https 模块创建 RPC Provider
  * 这样可以避免 Next.js 使用 ethers.js 的 web 版本
  */
-export function createNodeRpcProvider(rpcUrl: string, network?: ethers.utils.Networkish): ethers.providers.JsonRpcProvider {
+export function createNodeRpcProvider(
+  rpcUrl: string, 
+  network?: { name?: string; chainId?: number } | number | string
+): ethers.providers.JsonRpcProvider {
   const url = new URL(rpcUrl);
   const isHttps = url.protocol === 'https:';
   
