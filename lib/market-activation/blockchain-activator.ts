@@ -240,12 +240,21 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       platformWallet
     );
     
-    // 先检查合约是否存在
-    let code;
+    // 先检查合约是否存在（使用 Node.js 原生模块，避免 ethers.js web 版本问题）
+    let code: string;
     try {
-      code = await provider.getCode(CONTRACTS.mockUSDC);
+      console.log(`🔧 使用 Node.js 原生模块检查 USDC 合约代码...`);
+      code = await nodeRpcCall(rpcUrl, 'eth_getCode', [CONTRACTS.mockUSDC, 'latest']);
+      console.log(`✅ USDC 合约代码获取成功 (长度: ${code.length} 字符)`);
     } catch (codeError: any) {
-      throw new Error(`无法检查 USDC 合约代码: ${codeError.message || codeError.reason}. RPC URL: ${rpcUrl}`);
+      // 如果 Node.js 原生调用失败，尝试使用 ethers.js Provider（作为备选）
+      console.warn(`⚠️ Node.js 原生调用失败，尝试使用 ethers.js Provider...`);
+      try {
+        code = await provider.getCode(CONTRACTS.mockUSDC);
+        console.log(`✅ 使用 ethers.js Provider 获取合约代码成功`);
+      } catch (ethersError: any) {
+        throw new Error(`无法检查 USDC 合约代码: ${codeError.message || codeError.reason}. RPC URL: ${rpcUrl}`);
+      }
     }
     
     if (code === '0x' || code === '0x0') {

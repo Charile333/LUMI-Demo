@@ -95,6 +95,18 @@ export async function nodeRpcCall(
   method: string,
   params: any[] = []
 ): Promise<any> {
+  return nodeRpcCallWithTimeout(rpcUrl, method, params, 30000);
+}
+
+/**
+ * 带超时的 RPC 调用
+ */
+export async function nodeRpcCallWithTimeout(
+  rpcUrl: string,
+  method: string,
+  params: any[] = [],
+  timeout: number = 30000
+): Promise<any> {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(rpcUrl);
     const isHttps = urlObj.protocol === 'https:';
