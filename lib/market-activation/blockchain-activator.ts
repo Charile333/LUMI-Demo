@@ -275,11 +275,33 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     console.log(`💰 平台账户: ${platformWallet.address}`);
     
     // 4. 检查 USDC 余额
-    const usdc = new ethers.Contract(
-      CONTRACTS.mockUSDC,
-      USDC_ABI,
-      platformWallet
-    );
+    let usdc: ethers.Contract;
+    try {
+      usdc = new ethers.Contract(
+        CONTRACTS.mockUSDC,
+        USDC_ABI,
+        platformWallet
+      );
+    } catch (contractError: any) {
+      // 如果创建 Contract 失败是因为网络检测问题，记录警告但继续
+      if (contractError.code === 'NETWORK_ERROR' || contractError.message?.includes('could not detect network')) {
+        console.warn(`⚠️ 创建 USDC Contract 时网络检测失败，但继续尝试（错误: ${contractError.message}）`);
+        // 强制设置网络信息后重试
+        if (!(provider as any)._network) {
+          (provider as any)._network = {
+            name: 'polygon-amoy',
+            chainId: 80002
+          };
+        }
+        usdc = new ethers.Contract(
+          CONTRACTS.mockUSDC,
+          USDC_ABI,
+          platformWallet
+        );
+      } else {
+        throw contractError;
+      }
+    }
     
     // 先检查合约是否存在（使用 Node.js 原生模块，避免 ethers.js web 版本问题）
     let code: string;
@@ -453,11 +475,33 @@ export async function activateMarketOnChain(marketId: number): Promise<{
     }
     
     // 6. 调用 initialize 创建市场
-    const adapter = new ethers.Contract(
-      CONTRACTS.adapter,
-      ADAPTER_ABI,
-      platformWallet
-    );
+    let adapter: ethers.Contract;
+    try {
+      adapter = new ethers.Contract(
+        CONTRACTS.adapter,
+        ADAPTER_ABI,
+        platformWallet
+      );
+    } catch (contractError: any) {
+      // 如果创建 Contract 失败是因为网络检测问题，记录警告但继续
+      if (contractError.code === 'NETWORK_ERROR' || contractError.message?.includes('could not detect network')) {
+        console.warn(`⚠️ 创建 Adapter Contract 时网络检测失败，但继续尝试（错误: ${contractError.message}）`);
+        // 强制设置网络信息后重试
+        if (!(provider as any)._network) {
+          (provider as any)._network = {
+            name: 'polygon-amoy',
+            chainId: 80002
+          };
+        }
+        adapter = new ethers.Contract(
+          CONTRACTS.adapter,
+          ADAPTER_ABI,
+          platformWallet
+        );
+      } else {
+        throw contractError;
+      }
+    }
     
     const questionId = ethers.utils.keccak256(
       ethers.utils.toUtf8Bytes(market.question_id)
