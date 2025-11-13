@@ -578,10 +578,15 @@ export async function activateMarketOnChain(marketId: number): Promise<{
           const signedTx = await platformWallet.signTransaction(txData);
           
           // 发送交易（使用 Node.js 原生模块）
-          const txHash = await nodeRpcCall(rpcUrl, 'eth_sendRawTransaction', [signedTx]);
-          
-          console.log(`⏳ 交易已发送: ${txHash}`);
-          console.log(`🔍 开始等待交易确认...`);
+          let txHash: string;
+          try {
+            txHash = await nodeRpcCall(rpcUrl, 'eth_sendRawTransaction', [signedTx]);
+            console.log(`⏳ 交易已发送: ${txHash}`);
+            console.log(`🔍 开始等待交易确认...`);
+          } catch (sendError: any) {
+            console.error(`❌ 发送交易失败: ${sendError.message}`);
+            throw new Error(`无法发送交易: ${sendError.message}`);
+          }
           
           // 等待交易确认（使用 Node.js 原生模块轮询）
           let receiptData = null;
