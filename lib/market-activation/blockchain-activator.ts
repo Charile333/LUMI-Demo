@@ -89,29 +89,52 @@ export async function activateMarketOnChain(marketId: number): Promise<{
       throw new Error('PLATFORM_WALLET_PRIVATE_KEY 未配置');
     }
     
-    // 🚀 支持多个 RPC 端点作为 fallback（已优化：添加更多端点和缓存）
-    const rpcUrls = [
-      process.env.NEXT_PUBLIC_RPC_URL,
-      'https://rpc-amoy.polygon.technology',
-      'https://polygon-amoy.g.alchemy.com/v2/demo',
-      'https://polygon-amoy.drpc.org',
-      'https://polygon-amoy-bor-rpc.publicnode.com',
-      'https://rpc.ankr.com/polygon_amoy',
-      'https://polygon-amoy.public.blastapi.io'
-    ].filter(Boolean) as string[];
+    // 🚀 支持多个 RPC 端点作为 fallback（优先使用用户配置的 RPC）
+    const userRpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+    
+    // 如果用户配置了 RPC，优先使用；否则使用公共端点列表
+    const rpcUrls = userRpcUrl 
+      ? [
+          userRpcUrl, // 用户配置的 RPC 放在第一位
+          'https://rpc-amoy.polygon.technology',
+          'https://polygon-amoy.g.alchemy.com/v2/demo',
+          'https://polygon-amoy.drpc.org',
+          'https://polygon-amoy-bor-rpc.publicnode.com',
+          'https://rpc.ankr.com/polygon_amoy',
+          'https://polygon-amoy.public.blastapi.io'
+        ].filter(Boolean) as string[]
+      : [
+          'https://rpc-amoy.polygon.technology',
+          'https://polygon-amoy.g.alchemy.com/v2/demo',
+          'https://polygon-amoy.drpc.org',
+          'https://polygon-amoy-bor-rpc.publicnode.com',
+          'https://rpc.ankr.com/polygon_amoy',
+          'https://polygon-amoy.public.blastapi.io'
+        ];
+    
+    console.log(`🌐 用户配置的 RPC: ${userRpcUrl || '未配置'}`);
+    console.log(`🌐 将尝试 ${rpcUrls.length} 个 RPC 端点（优先使用用户配置的）`);
     
     // 🚀 导入 RPC 缓存
     const { rpcCache } = await import('@/lib/cache/rpc-cache');
     
-    // 获取可尝试的 RPC 端点（排除已知失败的）
-    const triableRPCs = rpcCache.getTriableRPCs(rpcUrls);
-    
-    if (triableRPCs.length === 0) {
-      console.warn('⚠️ 所有 RPC 端点都暂时不可用，尝试全部端点');
-      triableRPCs.push(...rpcUrls);
+    // 如果用户配置了 RPC，直接使用，不经过缓存过滤
+    let triableRPCs: string[];
+    if (userRpcUrl) {
+      // 用户配置了 RPC，优先使用，不经过缓存过滤
+      triableRPCs = [userRpcUrl, ...rpcUrls.filter(url => url !== userRpcUrl)];
+      console.log(`✅ 使用用户配置的 RPC: ${userRpcUrl}`);
+    } else {
+      // 没有用户配置，使用缓存过滤
+      triableRPCs = rpcCache.getTriableRPCs(rpcUrls);
+      
+      if (triableRPCs.length === 0) {
+        console.warn('⚠️ 所有 RPC 端点都暂时不可用，尝试全部端点');
+        triableRPCs.push(...rpcUrls);
+      }
     }
     
-    console.log(`🌐 将尝试 ${triableRPCs.length} 个 RPC 端点...`);
+    console.log(`🌐 将尝试 ${triableRPCs.length} 个 RPC 端点（第一个是用户配置的）...`);
     
     let provider: ethers.providers.Provider | null = null;
     let rpcUrl = '';
