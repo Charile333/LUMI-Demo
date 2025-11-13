@@ -147,8 +147,22 @@ export async function activateMarketOnChain(marketId: number): Promise<{
         console.log(`🌐 尝试连接 RPC: ${url}`);
         const startTime = Date.now();
         
-        // 🚀 创建 Provider（显式指定网络，避免自动检测）
-        // 注意：在 Next.js 中，需要显式指定网络信息，否则可能检测失败
+        // 🚀 先使用 Node.js 原生模块测试 RPC 连接（绕过 ethers.js web 版本问题）
+        console.log(`🔧 使用 Node.js 原生模块测试 RPC 连接...`);
+        let blockNumber: number;
+        
+        try {
+          // 使用 Node.js 原生模块进行 RPC 调用
+          const blockNumberHex = await nodeRpcCall(url, 'eth_blockNumber', []);
+          blockNumber = parseInt(blockNumberHex, 16);
+          console.log(`✅ Node.js 原生 RPC 调用成功，区块号: ${blockNumber}`);
+        } catch (nodeError: any) {
+          console.warn(`⚠️ Node.js 原生 RPC 调用失败: ${nodeError.message}`);
+          throw new Error(`RPC 连接失败: ${nodeError.message}`);
+        }
+        
+        // 如果 Node.js 原生调用成功，再创建 ethers.js Provider
+        // 注意：即使 ethers.js 使用 web 版本，我们也可以继续使用，因为我们已经验证了 RPC 可用
         const network = {
           name: 'polygon-amoy',
           chainId: 80002,
@@ -156,15 +170,6 @@ export async function activateMarketOnChain(marketId: number): Promise<{
         };
         
         const testProvider = new ethers.providers.JsonRpcProvider(url, network);
-        
-        // 🔄 测试连接（带超时保护）
-        // 使用 Promise.race 实现超时
-        const blockNumberPromise = testProvider.getBlockNumber();
-        const timeoutPromise = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout after 15s')), 15000)
-        );
-        
-        const blockNumber = await Promise.race([blockNumberPromise, timeoutPromise]);
         const latency = Date.now() - startTime;
         
         // ✅ 连接成功
