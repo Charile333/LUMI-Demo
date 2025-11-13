@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { activateMarketOnChain } from '@/lib/market-activation/blockchain-activator';
 import { db } from '@/lib/db';
 
+// 强制使用 Node.js Runtime（Edge Runtime 对 ethers.js 和 RPC 连接有限制）
+export const runtime = 'nodejs';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { marketId: string } }

@@ -146,48 +146,24 @@ export async function activateMarketOnChain(marketId: number): Promise<{
         console.log(`🌐 尝试连接 RPC: ${url}`);
         const startTime = Date.now();
         
-        // 🚀 创建 Provider（使用与测试脚本相同的方式）
-        // 注意：StaticJsonRpcProvider 的构造函数参数格式不同
-        const testProvider = new ethers.providers.JsonRpcProvider(
-          url,
-          {
-            name: 'polygon-amoy',
-            chainId: 80002
-          }
-        );
+        // 🚀 创建 Provider（显式指定网络，避免自动检测）
+        // 注意：在 Next.js 中，需要显式指定网络信息，否则可能检测失败
+        const network = {
+          name: 'polygon-amoy',
+          chainId: 80002,
+          _defaultProvider: (providers: any) => new providers.JsonRpcProvider(url)
+        };
         
-        // 设置超时（通过覆盖 fetch 方法）
-        const originalFetch = (testProvider as any).connection;
-        if (originalFetch && originalFetch.fetch) {
-          const originalFetchMethod = originalFetch.fetch;
-          originalFetch.fetch = async (url: string, options: any) => {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
-            
-            try {
-              const response = await fetch(url, {
-                ...options,
-                signal: controller.signal
-              });
-              clearTimeout(timeoutId);
-              return response;
-            } catch (error: any) {
-              clearTimeout(timeoutId);
-              if (error.name === 'AbortError') {
-                throw new Error('Connection timeout after 15s');
-              }
-              throw error;
-            }
-          };
-        }
+        const testProvider = new ethers.providers.JsonRpcProvider(url, network);
         
         // 🔄 测试连接（带超时保护）
+        // 使用 Promise.race 实现超时
         const blockNumberPromise = testProvider.getBlockNumber();
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) => 
           setTimeout(() => reject(new Error('Connection timeout after 15s')), 15000)
         );
         
-        const blockNumber = await Promise.race([blockNumberPromise, timeoutPromise]) as number;
+        const blockNumber = await Promise.race([blockNumberPromise, timeoutPromise]);
         const latency = Date.now() - startTime;
         
         // ✅ 连接成功
