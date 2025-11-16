@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase-client';
 
@@ -71,6 +71,7 @@ export default function MarketDetailPage() {
   const [updating, setUpdating] = useState(false); // 用于后台更新，不触发全屏加载
   const [selectedTimeRange, setSelectedTimeRange] = useState('1M');
   const [chartData, setChartData] = useState<any>(null);
+  const [chartLoading, setChartLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -243,38 +244,154 @@ export default function MarketDetailPage() {
   // 价格数据现在由 useMarketPrice hook 统一管理，无需手动获取
   // 已移除旧的 fetchPrices 和 wsOrderBook 逻辑，统一使用 useMarketPrice
 
-  // 生成模拟图表数据（基于当前概率）
-  const generateChartData = (currentProbability: number) => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 30; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(today.getDate() - i);
-      dates.push(date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }));
+  // 🔥 从 API 获取真实历史价格数据（使用 useCallback 避免闭包问题）
+  const fetchPriceHistory = useCallback(async (range: string) => {
+    if (!marketId) return [];
+    
+    try {
+      console.log('📡 请求价格历史 API:', `/api/markets/${marketId}/price-history?range=${range}`);
+      const response = await fetch(`/api/markets/${marketId}/price-history?range=${range}`);
+      
+      // 🔥 检查响应状态
+      if (!response.ok) {
+        console.error('❌ API 响应错误:', response.status, response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('错误详情:', errorData);
+        return [];
+      }
+      
+      const result = await response.json();
+      
+      console.log('📡 API 响应:', {
+        success: result.success,
+        dataLength: result.data?.length || 0,
+        timeRange: result.timeRange,
+        requestedRange: range,
+        warning: result.warning,
+        message: result.message
+      });
+      
+      if (result.success) {
+        // 如果返回了警告信息（例如表不存在），也返回空数组
+        if (result.warning) {
+          console.warn('⚠️ 价格历史API警告:', result.message);
+        }
+        if (result.data && result.data.length > 0) {
+          return result.data;
+        }
+      }
+      return [];
+    } catch (error: any) {
+      console.error('❌ 获取价格历史失败:', error);
+      console.error('错误详情:', {
+        message: error.message,
+        stack: error.stack
+      });
+      return [];
+    }
+  }, [marketId]);
+
+  // 🔥 使用真实历史数据生成图表
+  const generateChartDataFromHistory = (
+    historyData: Array<{ price: number; recordedAt: string }>,
+    currentProbability: number
+  ) => {
+    if (historyData.length === 0) {
+      // 如果没有历史数据，返回空图表结构
+      return {
+        labels: [],
+        datasets: []
+      };
     }
 
-    const generateTrend = (start: number, end: number, volatility: number, points: number) => {
-      const data = [start];
-      for (let i = 1; i < points - 1; i++) {
-        const progress = i / (points - 1);
-        const target = start + (end - start) * progress;
-        const change = (Math.random() - 0.5) * 2 * volatility;
-        let next = target + change;
-        next = Math.max(0, Math.min(100, next));
-        data.push(next);
-      }
-      data.push(end); // 最后一个点是当前概率
-      return data;
-    };
+    // 🔥 格式化日期标签，根据数据密度智能显示
+    const labels: string[] = [];
+    const yesData: number[] = [];
+    const noData: number[] = [];
 
-    const startProbability = Math.max(10, Math.min(90, currentProbability + (Math.random() - 0.5) * 20));
+    // 🔥 使用 Map 来跟踪每个日期对应的数据，确保同一天的不同时间点显示不同标签
+    const dateTimeMap = new Map<string, number>();
+    
+    // 🔍 统计唯一日期数量（用于决定标签格式）
+    const uniqueDates = new Set(
+      historyData.map(d => new Date(d.recordedAt).toLocaleDateString('zh-CN'))
+    );
+    const uniqueDatesCount = uniqueDates.size;
+    
+    historyData.forEach((item, index) => {
+      const date = new Date(item.recordedAt);
+      
+      let label: string;
+      
+      // 🔥 根据唯一日期数和数据点总数智能显示标签
+      // 如果只有少数几个数据点，显示详细时间；如果数据点很多，简化标签
+      if (historyData.length <= 10 || uniqueDatesCount <= 2) {
+        // 数据点很少（<=10个）或只有1-2天：显示完整日期和时间（包含分钟）
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        label = `${date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })} ${hours}:${minutes}`;
+      } else if (uniqueDatesCount <= 3) {
+        // 只有3天：显示日期和时间（包含小时和分钟）
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        label = `${date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })} ${hours}:${minutes}`;
+      } else if (uniqueDatesCount <= 7 || historyData.length <= 24) {
+        // 4-7天或少于24个点：显示日期和小时
+        const hours = date.getHours().toString().padStart(2, '0');
+        label = `${date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })} ${hours}时`;
+      } else if (uniqueDatesCount <= 31) {
+        // 8-31天：显示日期，但如果有同一天的不同时间点，添加序号区分
+        const dateStr = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        const count = dateTimeMap.get(dateStr) || 0;
+        dateTimeMap.set(dateStr, count + 1);
+        label = count > 0 ? `${dateStr} (${count + 1})` : dateStr;
+      } else {
+        // 超过31天：只显示日期
+        label = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      }
+
+      labels.push(label);
+      yesData.push(item.price * 100);
+      noData.push((1 - item.price) * 100);
+    });
+    
+    // 重置 Map 以供后续使用
+    dateTimeMap.clear();
+
+    // 如果历史数据最后一点不是当前价格，添加当前价格作为最后一点
+    const lastHistoryPrice = historyData.length > 0 
+      ? historyData[historyData.length - 1].price * 100 
+      : null;
+    
+    const lastRecordedTime = historyData.length > 0 
+      ? new Date(historyData[historyData.length - 1].recordedAt).getTime()
+      : 0;
+    const now = Date.now();
+    const timeDiff = now - lastRecordedTime;
+    
+    // 如果最后一个记录超过10分钟，或者价格差异较大，添加当前价格
+    if (lastHistoryPrice === null || timeDiff > 10 * 60 * 1000 || Math.abs(lastHistoryPrice - currentProbability) > 0.5) {
+      const nowDate = new Date();
+      let nowLabel: string;
+      if (historyData.length <= 7) {
+        nowLabel = nowDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } else if (historyData.length <= 31) {
+        nowLabel = nowDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit' });
+      } else {
+        nowLabel = nowDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      }
+      
+      labels.push(nowLabel);
+      yesData.push(currentProbability);
+      noData.push(100 - currentProbability);
+    }
 
     return {
-      labels: dates,
+      labels,
       datasets: [
         {
           label: 'YES',
-          data: generateTrend(startProbability, currentProbability, 2.0, 31),
+          data: yesData,
           borderColor: '#10B981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           tension: 0.4,
@@ -286,7 +403,7 @@ export default function MarketDetailPage() {
         },
         {
           label: 'NO',
-          data: generateTrend(100 - startProbability, 100 - currentProbability, 2.0, 31),
+          data: noData,
           borderColor: '#EF4444',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           tension: 0.4,
@@ -300,20 +417,98 @@ export default function MarketDetailPage() {
     };
   };
 
-  // 初始化图表数据
+  // 🔥 加载图表数据（基于真实历史数据）
   useEffect(() => {
-    const initialChartData = generateChartData(50);
-    setChartData(initialChartData);
-  }, []);
+    const loadChartData = async () => {
+      if (!marketId || price.loading) return;
 
-  // 初始化图表数据（基于实时价格）
-  useEffect(() => {
-    if (price.probability && !price.loading) {
-      const newChartData = generateChartData(price.probability);
-      setChartData(newChartData);
-      console.log('📊 Chart updated, current probability:', price.probability.toFixed(1) + '%');
-    }
-  }, [price.probability, price.loading]);
+      setChartLoading(true);
+      try {
+        console.log('📊 开始加载图表数据，时间范围:', selectedTimeRange);
+        
+        // 获取历史数据（显式传递时间范围，避免闭包问题）
+        const historyData = await fetchPriceHistory(selectedTimeRange);
+        
+        console.log('📊 获取到的历史数据点数:', historyData.length, '时间范围:', selectedTimeRange);
+        
+        // 🔍 调试：显示数据日期范围
+        if (historyData.length > 0) {
+          const uniqueDates = new Set(
+            historyData.map(item => new Date(item.recordedAt).toLocaleDateString('zh-CN'))
+          );
+          const firstDate = new Date(historyData[0].recordedAt).toLocaleDateString('zh-CN');
+          const lastDate = new Date(historyData[historyData.length - 1].recordedAt).toLocaleDateString('zh-CN');
+          
+          console.log('📊 前端接收到的数据详情:', {
+            数据点数: historyData.length,
+            唯一日期数: uniqueDates.size,
+            日期范围: `${firstDate} 至 ${lastDate}`,
+            唯一日期列表: Array.from(uniqueDates).sort().join(', ')
+          });
+        }
+        
+        if (historyData.length > 0) {
+          // 使用真实历史数据生成图表
+          const chartData = generateChartDataFromHistory(
+            historyData,
+            price.probability || 50
+          );
+          setChartData(chartData);
+          console.log('📊 图表已更新（使用真实历史数据）:', {
+            dataPoints: historyData.length,
+            currentProbability: price.probability.toFixed(1) + '%',
+            timeRange: selectedTimeRange,
+            labels: chartData.labels?.length || 0
+          });
+        } else {
+          // 如果没有历史数据，创建一个只有当前价格的简单图表
+          const now = new Date();
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          setChartData({
+            labels: [
+              yesterday.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+              now.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+            ],
+            datasets: [
+              {
+                label: 'YES',
+                data: [price.probability || 50, price.probability || 50],
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: false,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: '#10B981'
+              },
+              {
+                label: 'NO',
+                data: [100 - (price.probability || 50), 100 - (price.probability || 50)],
+                borderColor: '#EF4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: false,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: '#EF4444'
+              }
+            ]
+          });
+          console.log('📊 图表已更新（暂无历史数据，使用当前价格）:', price.probability?.toFixed(1) + '%');
+        }
+      } catch (error) {
+        console.error('加载图表数据失败:', error);
+      } finally {
+        setChartLoading(false);
+      }
+    };
+
+    loadChartData();
+  }, [marketId, price.probability, price.loading, selectedTimeRange, fetchPriceHistory]);
 
   // 手动刷新数据（不刷新页面）
   const handleRefresh = async () => {
@@ -519,11 +714,6 @@ export default function MarketDetailPage() {
                 </svg>
                 <span className="text-sm text-gray-300">{refreshing ? t('marketDetail.refreshing') : t('marketDetail.refresh')}</span>
               </button>
-              {/* Realtime连接状态 */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
-                <div className={`w-2 h-2 rounded-full ${price.connected ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-xs text-gray-400">{price.connected ? t('marketDetail.realtime') : t('marketDetail.offline')}</span>
-              </div>
               {/* 后台更新指示器 */}
               {updating && (
                 <div className="flex items-center gap-2 px-3 py-2 bg-blue-500/10 rounded-lg border border-blue-500/30">
@@ -577,15 +767,6 @@ export default function MarketDetailPage() {
                     ${price.loading ? '--' : price.no.toFixed(2)}
                   </div>
                 </div>
-              </div>
-              {/* Realtime 连接状态 */}
-              <div className={`flex items-center px-3 py-2 rounded-lg text-xs ${
-                price.connected ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-500'
-              }`}>
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  price.connected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
-                }`}></div>
-                {price.connected ? t('orderbook.realtimeConnection') : t('common.loading')}
               </div>
             </div>
             
@@ -661,8 +842,15 @@ export default function MarketDetailPage() {
                   ))}
                 </div>
               </div>
-              <div className="h-64">
-                {chartData ? (
+              <div className="h-64 relative">
+                {chartLoading ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto mb-2"></div>
+                      <span>{t('marketDetail.loadingChart')}</span>
+                    </div>
+                  </div>
+                ) : chartData ? (
                   <Line data={chartData} options={chartOptions} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500">

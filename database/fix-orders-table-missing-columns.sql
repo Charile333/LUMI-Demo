@@ -62,3 +62,4 @@ WHERE table_name = 'orders'
   AND column_name IN ('order_id', 'question_id', 'outcome', 'signature')
 ORDER BY column_name;
 
+

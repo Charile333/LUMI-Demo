@@ -125,3 +125,4 @@ if (!marketId) {
 
 verifyMarketStatus(parseInt(marketId)).catch(console.error);
 
+

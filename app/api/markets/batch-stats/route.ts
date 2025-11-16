@@ -189,14 +189,31 @@ export async function POST(request: NextRequest) {
         ob => ob.market_id === market.id
       );
 
-      // 从订单簿提取最佳价格
-      const bestBid = orderbook?.bids?.[0]?.price 
-        ? parseFloat(String(orderbook.bids[0].price)) 
-        : 0.49;
-      
-      const bestAsk = orderbook?.asks?.[0]?.price 
-        ? parseFloat(String(orderbook.asks[0].price)) 
-        : 0.51;
+      // 从订单簿提取最佳价格（与 useMarketPrice 保持一致）
+      let bestBid = 0;
+      let bestAsk = 0;
+
+      // 从订单簿中提取数据
+      if (orderbook?.bids && orderbook.bids.length > 0) {
+        bestBid = parseFloat(String(orderbook.bids[0].price)) || 0;
+      }
+
+      if (orderbook?.asks && orderbook.asks.length > 0) {
+        bestAsk = parseFloat(String(orderbook.asks[0].price)) || 0;
+      }
+
+      // 处理特殊情况（与 useMarketPrice 保持一致）
+      if (bestBid === 0 && bestAsk > 0) {
+        // 只有卖单
+        bestBid = Math.max(0.01, bestAsk - 0.05);
+      } else if (bestAsk === 0 && bestBid > 0) {
+        // 只有买单
+        bestAsk = Math.min(0.99, bestBid + 0.05);
+      } else if (bestBid === 0 && bestAsk === 0) {
+        // 订单簿为空，使用默认值
+        bestBid = 0.49;
+        bestAsk = 0.51;
+      }
 
       // 计算中间价和概率（与 useMarketPrice 保持一致）
       const midPrice = (bestBid + bestAsk) / 2;
@@ -205,7 +222,7 @@ export async function POST(request: NextRequest) {
       // 整合数据
       statsMap[market.id] = {
         // 价格数据
-        probability: parseFloat(probability.toFixed(2)),
+        probability: probability, // 与 useMarketPrice 保持一致，不使用 toFixed(2) 保持精度
         yes: parseFloat(midPrice.toFixed(4)),
         no: parseFloat((1 - midPrice).toFixed(4)),
         bestBid: parseFloat(bestBid.toFixed(4)),

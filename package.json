@@ -13,6 +13,11 @@
     "start:old": "next start",
     "lint": "next lint",
     "cron": "ts-node scripts/cron-scheduler.ts",
+    "cron:start": "pm2 start ecosystem.config.js",
+    "cron:stop": "pm2 stop lumi-cron",
+    "cron:restart": "pm2 restart lumi-cron",
+    "cron:logs": "pm2 logs lumi-cron",
+    "cron:status": "pm2 status",
     "activate-markets": "ts-node scripts/activate-markets-cron.ts",
     "settle-trades": "ts-node scripts/settle-trades-cron.ts",
     "clean-orders": "ts-node scripts/clean-expired-orders.ts",
@@ -50,6 +55,7 @@
     "lightweight-charts": "^4.2.3",
     "lucide-react": "^0.545.0",
     "next": "^14.2.5",
+    "node-cron": "^4.2.1",
     "pg": "^8.16.3",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
@@ -80,6 +86,7 @@
     "hardhat": "^2.26.3",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   },
   "keywords": [

@@ -105,6 +105,9 @@ FOR EACH ROW
 EXECUTE FUNCTION update_market_participants_count();
 
 -- 5️⃣ 创建函数：记录价格历史（手动调用或通过定时任务）
+-- 先删除旧函数（如果存在）
+DROP FUNCTION IF EXISTS record_market_price_history(INTEGER, DECIMAL, DECIMAL, DECIMAL, DECIMAL);
+
 CREATE OR REPLACE FUNCTION record_market_price_history(
   p_market_id INTEGER,
   p_price DECIMAL(10, 4),
@@ -142,6 +145,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 6️⃣ 创建函数：获取24小时价格变化
+-- 先删除旧函数（如果存在）以避免返回类型冲突
+DROP FUNCTION IF EXISTS get_price_change_24h(INTEGER);
+
 CREATE OR REPLACE FUNCTION get_price_change_24h(p_market_id INTEGER)
 RETURNS DECIMAL(10, 2) AS $$
 DECLARE
@@ -180,6 +186,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 7️⃣ 创建函数：批量获取市场统计数据
+-- 先删除旧函数（如果存在）以避免返回类型冲突
+DROP FUNCTION IF EXISTS get_markets_stats_batch(INTEGER[]);
+
 CREATE OR REPLACE FUNCTION get_markets_stats_batch(market_ids INTEGER[])
 RETURNS TABLE (
   market_id INTEGER,
@@ -212,6 +221,9 @@ SET participants_count = (
 WHERE m.participants_count = 0 OR m.participants_count IS NULL;
 
 -- 9️⃣ 创建清理旧数据的函数（可选，保留90天数据）
+-- 先删除旧函数（如果存在）
+DROP FUNCTION IF EXISTS cleanup_old_price_history();
+
 CREATE OR REPLACE FUNCTION cleanup_old_price_history()
 RETURNS INTEGER AS $$
 DECLARE

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Navbar from '@/components/Navbar';
-import QuickTradeModal from '@/components/trading/QuickTradeModal';
 import { useMarketsByCategory } from '@/lib/hooks/useMarketsByCategory';
 import { MarketDataProvider, useMarketDataContext } from '@/lib/contexts/MarketDataContext';
 import { MarketCardOptimized } from '@/components/MarketCardOptimized';
@@ -220,8 +219,6 @@ function MarketsListContent({
   config, 
   filteredMarkets,
   marketsForDisplay,
-  quickTradeModal,
-  setQuickTradeModal,
   t
 }: {
   markets: any[];
@@ -231,8 +228,6 @@ function MarketsListContent({
   config: any;
   filteredMarkets: any[];
   marketsForDisplay: any[];
-  quickTradeModal: any;
-  setQuickTradeModal: any;
   t: any;
 }) {
   const { connected } = useMarketDataContext();
@@ -296,15 +291,6 @@ function MarketsListContent({
         </div>
       )}
 
-      {/* 快速交易弹窗 */}
-      {quickTradeModal.isOpen && quickTradeModal.market && quickTradeModal.side && (
-        <QuickTradeModal
-          isOpen={quickTradeModal.isOpen}
-          onClose={() => setQuickTradeModal({ isOpen: false, market: null, side: null })}
-          market={quickTradeModal.market}
-          side={quickTradeModal.side}
-        />
-      )}
     </>
   );
 }
@@ -317,17 +303,6 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
   const [searchQuery, setSearchQuery] = useState('');
   // 🔥 Polymarket 风格：状态筛选器
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  
-  // 🎯 快速交易弹窗状态
-  const [quickTradeModal, setQuickTradeModal] = useState<{
-    isOpen: boolean;
-    market: any | null;
-    side: 'YES' | 'NO' | null;
-  }>({
-    isOpen: false,
-    market: null,
-    side: null
-  });
   
   // 获取分类配置
   const config = getCategoryConfig(category, t);
@@ -495,8 +470,6 @@ const MarketCategoryPage = ({ params }: { params: { category: string } }) => {
               config={config}
               filteredMarkets={filteredMarkets}
               marketsForDisplay={marketsForDisplay}
-              quickTradeModal={quickTradeModal}
-              setQuickTradeModal={setQuickTradeModal}
               t={t}
             />
           </MarketDataProvider>

@@ -26,7 +26,7 @@ export function MarketCardOptimized({ market }: MarketCardOptimizedProps) {
   const router = useRouter();
   
   // 🔥 从全局Context获取数据（核心优化）
-  const { stats, loading, connected } = useMarketData(market.id);
+  const { stats, loading } = useMarketData(market.id);
   
   // 🐛 调试：输出接收到的数据
   useEffect(() => {
@@ -57,33 +57,6 @@ export function MarketCardOptimized({ market }: MarketCardOptimizedProps) {
     e.stopPropagation();
     setInitialOutcome(outcome);
     setIsTradeModalOpen(true);
-  };
-
-  // 🔮 获取市场状态徽章（Polymarket 风格）
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { icon: string; label: string; className: string }> = {
-      'active': {
-        icon: '🟢',
-        label: t('market.status.active') || '交易中',
-        className: 'bg-green-500/15 text-green-400 border-green-500/30'
-      },
-      'pending_settlement': {
-        icon: '⏳',
-        label: t('market.status.pending') || '待结算',
-        className: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30 animate-pulse'
-      },
-      'resolved': {
-        icon: '✅',
-        label: t('market.status.resolved') || '已结算',
-        className: 'bg-blue-500/15 text-blue-400 border-blue-500/30'
-      },
-      'not_created': {
-        icon: '⚪',
-        label: t('market.status.preparing') || '准备中',
-        className: 'bg-gray-500/15 text-gray-400 border-gray-500/30'
-      }
-    };
-    return badges[status] || null;
   };
 
   // 类别徽章颜色
@@ -161,17 +134,6 @@ export function MarketCardOptimized({ market }: MarketCardOptimizedProps) {
 
         {/* 标签区 */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          {/* 🔥 市场状态徽章（Polymarket 风格 - 最高优先级） */}
-          {(() => {
-            const statusBadge = getStatusBadge(market.blockchain_status);
-            return statusBadge && (
-              <span className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded border font-semibold ${statusBadge.className}`}>
-                <span>{statusBadge.icon}</span>
-                <span>{statusBadge.label}</span>
-              </span>
-            );
-          })()}
-          
           {/* 推荐标签 */}
           {market.priority_level === 'hot' && (
             <span className="flex items-center gap-1 text-xs bg-orange-500/15 text-orange-400 px-2.5 py-1 rounded border border-orange-500/30">
@@ -184,15 +146,6 @@ export function MarketCardOptimized({ market }: MarketCardOptimizedProps) {
           {market.main_category && (
             <span className="text-xs bg-zinc-800 text-gray-400 px-2.5 py-1 rounded">
               {t(`categories.${market.main_category.replace('-', '')}`) || market.main_category}
-            </span>
-          )}
-          
-          {/* 连接状态指示器（开发模式） */}
-          {process.env.NODE_ENV === 'development' && (
-            <span className={`text-xs px-2 py-0.5 rounded ${
-              connected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-            }`}>
-              {connected ? '🟢 实时' : '🔴 离线'}
             </span>
           )}
         </div>

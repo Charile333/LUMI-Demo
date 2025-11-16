@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { matchingEngine } from '@/lib/clob/matching-engine';
 import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 
+// 强制使用 Node.js runtime（避免 Edge Runtime 的 fetch 问题）
+export const runtime = 'nodejs';
 // 强制动态渲染
 export const dynamic = 'force-dynamic';
 

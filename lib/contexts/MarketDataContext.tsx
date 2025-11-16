@@ -184,16 +184,31 @@ export function MarketDataProvider({
           
           console.log(`📈 市场 ${marketId} 订单簿更新（MarketDataContext）`);
 
-          // 提取最佳价格
-          const bestBid = updated.bids?.[0]?.price 
-            ? parseFloat(String(updated.bids[0].price)) 
-            : 0.49;
-          
-          const bestAsk = updated.asks?.[0]?.price 
-            ? parseFloat(String(updated.asks[0].price)) 
-            : 0.51;
+          // 提取最佳价格（与 useMarketPrice 保持一致）
+          let bestBid = 0;
+          let bestAsk = 0;
 
-          const probability = ((bestBid + bestAsk) / 2) * 100;
+          // 从订单簿中提取数据
+          if (updated.bids && updated.bids.length > 0) {
+            bestBid = parseFloat(String(updated.bids[0].price)) || 0;
+          }
+
+          if (updated.asks && updated.asks.length > 0) {
+            bestAsk = parseFloat(String(updated.asks[0].price)) || 0;
+          }
+
+          // 处理特殊情况（与 useMarketPrice 保持一致）
+          if (bestBid === 0 && bestAsk > 0) {
+            // 只有卖单
+            bestBid = Math.max(0.01, bestAsk - 0.05);
+          } else if (bestAsk === 0 && bestBid > 0) {
+            // 只有买单
+            bestAsk = Math.min(0.99, bestBid + 0.05);
+          } else if (bestBid === 0 && bestAsk === 0) {
+            // 订单簿为空，使用默认值
+            bestBid = 0.49;
+            bestAsk = 0.51;
+          }
 
           // 🔥 提取完整订单簿数据
           const orderBook: OrderBookData = {
@@ -207,12 +222,14 @@ export function MarketDataProvider({
             
             // 计算中间价（与 useMarketPrice 保持一致）
             const midPrice = (bestBid + bestAsk) / 2;
+            // 计算概率（与 useMarketPrice 保持一致，不使用 toFixed 保持精度）
+            const calculatedProbability = midPrice * 100;
             
             console.log(`🔥 MarketDataContext 更新市场 ${marketId}:`, {
               bestBid,
               bestAsk,
               midPrice,
-              probability: (midPrice * 100).toFixed(1) + '%',
+              probability: calculatedProbability.toFixed(1) + '%',
               yes: midPrice.toFixed(4),
               no: (1 - midPrice).toFixed(4)
             });
@@ -220,7 +237,7 @@ export function MarketDataProvider({
             if (existing) {
               newMap.set(marketId, {
                 ...existing,
-                probability: parseFloat(probability.toFixed(2)),
+                probability: calculatedProbability, // 与 useMarketPrice 保持一致，不使用 toFixed(2)
                 yes: parseFloat(midPrice.toFixed(4)),
                 no: parseFloat((1 - midPrice).toFixed(4)),
                 bestBid: parseFloat(bestBid.toFixed(4)),
@@ -232,7 +249,7 @@ export function MarketDataProvider({
             } else {
               // 新市场数据
               newMap.set(marketId, {
-                probability: parseFloat(probability.toFixed(2)),
+                probability: calculatedProbability, // 与 useMarketPrice 保持一致，不使用 toFixed(2)
                 yes: parseFloat(midPrice.toFixed(4)),
                 no: parseFloat((1 - midPrice).toFixed(4)),
                 bestBid: parseFloat(bestBid.toFixed(4)),

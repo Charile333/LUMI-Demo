@@ -5,9 +5,13 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
+import { signCTFOrder } from '@/lib/ctf-exchange/signing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { useMarketPrice } from '@/hooks/useMarketPrice';
+import { useWallet } from '@/app/provider-wagmi';
+import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
+import WalletConnect from '@/components/WalletConnect';
 
 interface CompactTradeModalProps {
   isOpen: boolean;
@@ -29,11 +33,17 @@ export default function CompactTradeModal({
   const { t } = useTranslation();
   const toast = useToast();
   
+  // 🔥 使用统一的 useWallet hook（和 OrderForm、导航栏一致）
+  const { address: account, isConnected, connectWallet } = useWallet();
+  const polymarket = useLUMIPolymarket();
+  
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [outcome, setOutcome] = useState<'yes' | 'no'>(initialOutcome);
   const [amount, setAmount] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [pendingOnChainExecution, setPendingOnChainExecution] = useState<any>(null);
+  const [isExecutingOnChain, setIsExecutingOnChain] = useState(false);
   
   // 🔥 使用统一的 useMarketPrice hook 获取实时价格（和市场卡片、详情页一致）
   const price = useMarketPrice(market.id, true);
@@ -47,8 +57,29 @@ export default function CompactTradeModal({
   useEffect(() => {
     if (isOpen) {
       setOutcome(initialOutcome);
+      setPendingOnChainExecution(null); // 重置链上执行状态
     }
   }, [isOpen, initialOutcome]);
+
+  // 辅助函数：获取待执行的 USDC 数量
+  const getPendingUsdcAmount = () => {
+    if (!pendingOnChainExecution?.onChainExecution) return null;
+    const oc = pendingOnChainExecution.onChainExecution;
+    try {
+      const formatted = ethers.utils.formatUnits(oc.fillAmount || oc.ctfOrder.takerAmount, 6);
+      return parseFloat(formatted).toFixed(2);
+    } catch {
+      return null;
+    }
+  };
+
+  // 辅助函数：获取待执行的 Token 数量
+  const getPendingTokenAmount = () => {
+    if (!pendingOnChainExecution?.onChainExecution) return null;
+    const amount = parseFloat(pendingOnChainExecution.onChainExecution.tradeAmount || '0');
+    if (Number.isNaN(amount)) return pendingOnChainExecution.onChainExecution.tradeAmount || null;
+    return amount.toFixed(2);
+  };
 
   if (!isOpen || !mounted) return null;
 
@@ -62,60 +93,44 @@ export default function CompactTradeModal({
     try {
       setIsSubmitting(true);
       
-      // 1. 检查钱包
-      if (typeof window.ethereum === 'undefined') {
-        toast.warning(t('orderForm.installMetaMask'));
+      // 1. 检查钱包连接状态
+      if (!isConnected || !account) {
+        toast.warning('请先连接钱包');
+        try {
+          await connectWallet();
+        } catch (error) {
+          console.error('[CompactTrade] 连接钱包失败:', error);
+        }
         setIsSubmitting(false);
         return;
       }
 
-      // 2. 连接钱包并获取地址
-      console.log('[CompactTrade] 连接钱包...');
+      console.log('[CompactTrade] 用户地址:', account);
       
-      let provider, signer, userAddress;
+      // 2. 获取 provider 和 signer（使用 Wagmi 的 provider）
+      let provider, signer;
       
       try {
-        // 先请求账户访问权限
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        
-        if (!accounts || accounts.length === 0) {
-          throw new Error('未找到钱包账户，请先连接 MetaMask');
+        if (typeof window.ethereum === 'undefined') {
+          throw new Error('未找到钱包，请安装 MetaMask');
         }
         
-        console.log('[CompactTrade] 账户已连接:', accounts[0]);
-        
-        // 创建 provider 和 signer
         provider = new ethers.providers.Web3Provider(window.ethereum);
         signer = provider.getSigner();
         
-        // 等待一下确保连接完成
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // 获取用户地址
-        userAddress = await signer.getAddress();
-        
-        console.log('[CompactTrade] 用户地址:', userAddress);
-      } catch (walletError: any) {
-        console.error('[CompactTrade] 钱包连接失败:', walletError);
-        if (walletError.code === 4001) {
-          toast.warning('用户拒绝连接钱包');
-        } else if (walletError.code === 'UNSUPPORTED_OPERATION') {
-          toast.error('钱包未正确连接，请刷新页面后重试');
-        } else {
-          toast.error(`钱包连接失败: ${walletError.message}`);
+        // 验证地址是否匹配
+        const signerAddress = await signer.getAddress();
+        if (signerAddress.toLowerCase() !== account.toLowerCase()) {
+          throw new Error('钱包地址不匹配，请重新连接');
         }
+      } catch (walletError: any) {
+        console.error('[CompactTrade] 获取 provider 失败:', walletError);
+        toast.error(`钱包连接异常: ${walletError.message}`);
         setIsSubmitting(false);
         return;
       }
       
-      // 确保已获取到必要的对象
-      if (!provider || !signer || !userAddress) {
-        toast.error('钱包连接异常，请刷新页面后重试');
-        setIsSubmitting(false);
-        return;
-      }
+      const userAddress = account;
 
       // 3. 创建订单
       const outcomeValue = outcome === 'yes' ? 1 : 0;
@@ -155,18 +170,41 @@ export default function CompactTradeModal({
       const result = await response.json();
 
       if (result.success) {
-        toast.success(
-          `🎉 ${t('orderForm.orderSuccess')}\n\n` +
-          `${side === 'buy' ? '买入' : '卖出'} ${outcome.toUpperCase()}\n` +
-          `数量: $${amount}\n` +
-          `价格: $${currentPrice.toFixed(2)}`,
-          { duration: 5000 }
-        );
-        onClose();
-        
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        // 🚀 如果撮合成功且有链上执行数据，提示用户执行链上交易
+        if (result.matched && result.onChainExecution) {
+          toast.success(
+            `✅ 订单已撮合！\n\n` +
+            `需要执行链上交易以完成资产转移。\n` +
+            `点击"执行链上交易"按钮继续。`,
+            { duration: 8000 }
+          );
+          
+          // 存储链上执行数据，供后续使用
+          setPendingOnChainExecution({
+            orderId: result.order.id,
+            onChainExecution: result.onChainExecution,
+            marketTitle: market.title,
+            side,
+            amount
+          });
+          
+          // 不关闭弹窗，等待用户执行链上交易
+          setIsSubmitting(false);
+          return;
+        } else {
+          toast.success(
+            `🎉 ${t('orderForm.orderSuccess')}\n\n` +
+            `${side === 'buy' ? '买入' : '卖出'} ${outcome.toUpperCase()}\n` +
+            `数量: $${amount}\n` +
+            `价格: $${currentPrice.toFixed(2)}`,
+            { duration: 5000 }
+          );
+          onClose();
+          
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        }
       } else {
         throw new Error(result.error || '提交失败');
       }
@@ -181,6 +219,127 @@ export default function CompactTradeModal({
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  /**
+   * 执行链上交易
+   */
+  const handleOnChainExecution = async () => {
+    if (!pendingOnChainExecution || !polymarket.isConnected) {
+      toast.warning('请先连接钱包');
+      return;
+    }
+
+    try {
+      setIsExecutingOnChain(true);
+
+      const { onChainExecution } = pendingOnChainExecution;
+      const ctfOrder = onChainExecution.ctfOrder;
+
+      // 1. 检查是否需要 Maker 签名
+      let makerSignature = onChainExecution.makerOrder?.signature || '';
+      const makerAddress = onChainExecution.makerOrder?.address?.toLowerCase();
+
+      if (!makerSignature) {
+        if (!window.ethereum) {
+          toast.error('检测不到钱包环境，无法签名');
+          setIsExecutingOnChain(false);
+          return;
+        }
+
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        });
+        const currentUser = accounts?.[0]?.toLowerCase();
+
+        if (currentUser && makerAddress && currentUser === makerAddress) {
+          // 当前用户是订单的 maker，要求其签署 CTF 订单
+          toast.info('请在钱包中确认签名，以授权链上交易');
+          const providerForSignature = new ethers.providers.Web3Provider(window.ethereum);
+          const signerForSignature = providerForSignature.getSigner();
+          const orderForSign = {
+            ...ctfOrder,
+            side: Number(ctfOrder.side),
+            signatureType: Number(ctfOrder.signatureType)
+          };
+          const signature = await signCTFOrder(orderForSign, signerForSignature as any);
+          makerSignature = signature;
+
+          // 保存签名到服务器
+          await fetch(`/api/orders/${onChainExecution.makerOrder.id}/signature`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ signature })
+          });
+
+          setPendingOnChainExecution((prev: any) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              onChainExecution: {
+                ...prev.onChainExecution,
+                makerOrder: {
+                  ...prev.onChainExecution.makerOrder,
+                  signature
+                }
+              }
+            };
+          });
+        } else {
+          toast.warning('订单需要 Maker 签名。请联系订单创建者完成签名后再执行。');
+          setIsExecutingOnChain(false);
+          return;
+        }
+      }
+
+      // 2. 转换订单格式为 CTF Exchange 需要的格式
+      const ctfOrderFormatted = {
+        salt: ethers.BigNumber.from(ctfOrder.salt),
+        maker: ctfOrder.maker,
+        signer: ctfOrder.signer,
+        taker: ctfOrder.taker,
+        tokenId: ethers.BigNumber.from(ctfOrder.tokenId),
+        makerAmount: ethers.BigNumber.from(ctfOrder.makerAmount),
+        takerAmount: ethers.BigNumber.from(ctfOrder.takerAmount),
+        expiration: ethers.BigNumber.from(ctfOrder.expiration),
+        nonce: ethers.BigNumber.from(ctfOrder.nonce),
+        feeRateBps: ethers.BigNumber.from(ctfOrder.feeRateBps),
+        side: ctfOrder.side,
+        signatureType: ctfOrder.signatureType
+      };
+
+      // 3. 调用 fillOrder
+      const fillAmount = ethers.BigNumber.from(onChainExecution.fillAmount || ctfOrder.takerAmount);
+      const result = await polymarket.fillOrder(
+        ctfOrderFormatted as any,
+        makerSignature,
+        fillAmount
+      );
+
+      toast.success(
+        `✅ 链上交易成功！\n\n` +
+        `交易哈希: ${result.transactionHash.slice(0, 10)}...\n` +
+        `查看: ${result.explorerUrl}`,
+        { duration: 8000 }
+      );
+
+      // 清除待执行数据
+      setPendingOnChainExecution(null);
+      
+      // 关闭弹窗并刷新
+      setTimeout(() => {
+        onClose();
+        window.location.reload();
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('链上交易失败:', error);
+      toast.error(`链上交易失败: ${error.message}`);
+    } finally {
+      setIsExecutingOnChain(false);
     }
   };
 
@@ -334,29 +493,94 @@ export default function CompactTradeModal({
             </div>
           </div>
 
-          {/* 交易按钮 */}
-          <button
-            onClick={handleTrade}
-            disabled={isSubmitting || !amount || parseFloat(amount) <= 0 || price.loading}
-            className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform
-              ${side === 'buy'
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg hover:shadow-emerald-500/30'
-                : 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-lg hover:shadow-rose-500/30'
-            } text-white hover:scale-[1.02] 
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none`}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
-                处理中...
-              </span>
-            ) : (
-              `${side === 'buy' ? '买入' : '卖出'} ${outcome.toUpperCase()}`
-            )}
-          </button>
+          {/* 钱包连接状态 */}
+          {!isConnected ? (
+            <div className="space-y-3">
+              <div className="p-3 bg-amber-400/10 border border-amber-400/30 rounded-lg">
+                <p className="text-sm text-amber-400 text-center mb-3">
+                  请先连接钱包
+                </p>
+                <div className="flex justify-center">
+                  <WalletConnect />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* 显示已连接的钱包地址 */}
+              {account && (
+                <div className="p-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <p className="text-xs text-green-400 text-center">
+                    已连接: {account.substring(0, 6)}...{account.substring(38)}
+                  </p>
+                </div>
+              )}
+
+              {/* 如果有待执行的链上交易 */}
+              {pendingOnChainExecution ? (
+                <>
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                    <p className="text-sm text-amber-400 mb-2">
+                      ⚡ 订单已撮合，需要执行链上交易完成资产转移
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      成交数量: {getPendingTokenAmount() || pendingOnChainExecution.amount}，预计支付: {getPendingUsdcAmount() || '--'} USDC
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleOnChainExecution}
+                    disabled={isExecutingOnChain || !polymarket.isConnected}
+                    className="w-full py-4 rounded-xl font-bold text-lg transition-all transform
+                      bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 
+                      text-white shadow-lg hover:shadow-2xl hover:scale-[1.02] 
+                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {isExecutingOnChain ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="animate-spin">⏳</span> 执行链上交易中...
+                      </span>
+                    ) : (
+                      '🚀 执行链上交易'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingOnChainExecution(null);
+                      onClose();
+                      setTimeout(() => window.location.reload(), 500);
+                    }}
+                    className="w-full py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    稍后执行
+                  </button>
+                </>
+              ) : (
+                /* 交易按钮 */
+                <button
+                  onClick={handleTrade}
+                  disabled={isSubmitting || !amount || parseFloat(amount) <= 0 || price.loading}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform
+                    ${side === 'buy'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg hover:shadow-emerald-500/30'
+                      : 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-lg hover:shadow-rose-500/30'
+                  } text-white hover:scale-[1.02] 
+                  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none`}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      处理中...
+                    </span>
+                  ) : (
+                    `${side === 'buy' ? '买入' : '卖出'} ${outcome.toUpperCase()}`
+                  )}
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>,

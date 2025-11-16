@@ -65,3 +65,4 @@ const provider = new ethers.providers.JsonRpcProvider(rpcUrl, network);
 2. Contract 创建时是否触发网络检测
 3. 是否可以在不检测网络的情况下创建 Contract
 
+

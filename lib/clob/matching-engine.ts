@@ -313,27 +313,44 @@ export class MatchingEngine {
     
     try {
       // ✅ 使用 Supabase REST API 查询买单
-      const { data: bidsData, error: bidsError } = await supabaseAdmin
-        .from('orders')
-        .select('price, quantity, filled_quantity')
-        .eq('market_id', marketId)
-        .eq('side', 'buy')
-        .in('status', ['open', 'partial']);
+      let bidsData = null;
+      let asksData = null;
       
-      if (bidsError) {
-        console.warn('⚠️ 查询买单失败:', bidsError);
+      try {
+        const bidsResult = await supabaseAdmin
+          .from('orders')
+          .select('price, quantity, filled_quantity')
+          .eq('market_id', marketId)
+          .eq('side', 'buy')
+          .in('status', ['open', 'partial']);
+        
+        if (bidsResult.error) {
+          console.warn('⚠️ 查询买单失败:', bidsResult.error);
+        } else {
+          bidsData = bidsResult.data;
+        }
+      } catch (bidsErr: any) {
+        console.warn('⚠️ 查询买单异常:', bidsErr?.message || bidsErr);
+        // 继续执行，使用空数据
       }
       
       // ✅ 使用 Supabase REST API 查询卖单
-      const { data: asksData, error: asksError } = await supabaseAdmin
-        .from('orders')
-        .select('price, quantity, filled_quantity')
-        .eq('market_id', marketId)
-        .eq('side', 'sell')
-        .in('status', ['open', 'partial']);
-      
-      if (asksError) {
-        console.warn('⚠️ 查询卖单失败:', asksError);
+      try {
+        const asksResult = await supabaseAdmin
+          .from('orders')
+          .select('price, quantity, filled_quantity')
+          .eq('market_id', marketId)
+          .eq('side', 'sell')
+          .in('status', ['open', 'partial']);
+        
+        if (asksResult.error) {
+          console.warn('⚠️ 查询卖单失败:', asksResult.error);
+        } else {
+          asksData = asksResult.data;
+        }
+      } catch (asksErr: any) {
+        console.warn('⚠️ 查询卖单异常:', asksErr?.message || asksErr);
+        // 继续执行，使用空数据
       }
       
       // 聚合买单数据（按价格分组）
@@ -394,15 +411,23 @@ export class MatchingEngine {
       return result;
     } catch (error: any) {
       // 数据库连接失败时返回空订单簿，而不是抛出错误
-      const isConnectionError = error.code === 'ENOTFOUND' || error.message?.includes('getaddrinfo');
-      const isTimeout = error.message?.includes('timeout');
+      const errorMessage = error?.message || String(error);
+      const isConnectionError = 
+        error?.code === 'ENOTFOUND' || 
+        errorMessage?.includes('getaddrinfo') ||
+        errorMessage?.includes('fetch failed') ||
+        errorMessage?.includes('ECONNREFUSED') ||
+        errorMessage?.includes('network');
+      const isTimeout = 
+        errorMessage?.includes('timeout') ||
+        errorMessage?.includes('ETIMEDOUT');
       
       if (isConnectionError) {
-        console.warn(`⚠️ 订单簿获取失败（数据库连接不可用），返回空订单簿`);
+        console.warn(`⚠️ 订单簿获取失败（数据库连接不可用），返回空订单簿:`, errorMessage);
       } else if (isTimeout) {
-        console.warn(`⚠️ 订单簿查询超时 (${marketId})，返回空订单簿`);
+        console.warn(`⚠️ 订单簿查询超时 (${marketId})，返回空订单簿:`, errorMessage);
       } else {
-        console.warn('⚠️ 获取订单簿失败，返回空订单簿:', error.message);
+        console.warn('⚠️ 获取订单簿失败，返回空订单簿:', errorMessage);
       }
       
       // 返回空订单簿
@@ -411,10 +436,10 @@ export class MatchingEngine {
         asks: []
       };
       
-      // 缓存空结果（避免频繁重试）
+      // 缓存空结果（避免频繁重试，但使用较短缓存时间）
       orderbookCache.set(cacheKey, {
         data: emptyResult,
-        timestamp: Date.now()
+        timestamp: Date.now() - (CACHE_TTL / 2) // 使用一半的缓存时间，更快重试
       });
       
       return emptyResult;

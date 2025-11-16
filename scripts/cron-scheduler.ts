@@ -56,11 +56,28 @@ cron.schedule('*/5 * * * *', () => {
   timezone: 'Asia/Shanghai'
 });
 
+// 4. 价格历史记录任务 - 每分钟运行一次
+cron.schedule('* * * * *', () => {
+  console.log('\n⏰ 触发：价格历史记录任务');
+  console.log('时间:', new Date().toLocaleString('zh-CN'));
+  
+  try {
+    execSync('npx ts-node scripts/record-price-history-cron.ts', {
+      stdio: 'inherit'
+    });
+  } catch (error) {
+    console.error('❌ 价格历史记录任务失败:', error);
+  }
+}, {
+  timezone: 'Asia/Shanghai'
+});
+
 console.log('✅ Cron 调度器已启动\n');
 console.log('任务列表:');
 console.log('  1. 市场激活 - 每小时 (0 * * * *)');
 console.log('  2. 清理订单 - 每 30 分钟 (*/30 * * * *)');
 console.log('  3. 批量结算 - 每 5 分钟 (*/5 * * * *)');
+console.log('  4. 价格历史记录 - 每分钟 (* * * * *)');
 console.log('\n按 Ctrl+C 停止调度器\n');
 
 // 保持进程运行

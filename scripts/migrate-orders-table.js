@@ -110,3 +110,4 @@ async function migrateOrdersTable() {
 
 migrateOrdersTable().catch(console.error);
 
+

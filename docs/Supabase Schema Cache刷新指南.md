@@ -94,3 +94,4 @@ npm run dev
 - `scripts/refresh-supabase-schema-cache.js` - 刷新 cache 脚本
 - `database/fix-orders-table-missing-columns.sql` - 修复表结构 SQL
 
+
