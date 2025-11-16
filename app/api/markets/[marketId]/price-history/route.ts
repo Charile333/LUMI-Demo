@@ -126,10 +126,14 @@ export async function GET(
   request: NextRequest,
   { params }: PriceHistoryParams
 ) {
+  // 在 try 块外部定义变量，以便在 catch 块中使用
+  let marketId: number = NaN;
+  let timeRange: string = '1M';
+  
   try {
-    const marketId = parseInt(params.marketId);
+    marketId = parseInt(params.marketId);
     const { searchParams } = new URL(request.url);
-    const timeRange = searchParams.get('range') || '1M'; // 1D, 1W, 1M, 3M, ALL
+    timeRange = searchParams.get('range') || '1M'; // 1D, 1W, 1M, 3M, ALL
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : null;
 
     console.log(`📊 价格历史 API 调用: marketId=${marketId}, timeRange=${timeRange}`);
@@ -307,8 +311,8 @@ export async function GET(
     console.error('错误详情:', {
       message: error.message,
       stack: error.stack,
-      marketId,
-      timeRange
+      marketId: isNaN(marketId) ? 'invalid' : marketId,
+      timeRange: timeRange || 'unknown'
     });
     return NextResponse.json(
       { 
