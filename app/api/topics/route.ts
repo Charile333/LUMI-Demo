@@ -140,22 +140,38 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const { data, error } = await supabase
-      .from('user_topics')
-      .insert({
-        title: title.trim(),
-        description: description?.trim() || '',
-        created_by: userAddress,
-        votes: 0
-      })
-      .select()
-      .single();
+    // ✅ 增强错误处理：确保所有错误都被正确捕获
+    let data, error;
+    try {
+      const result = await supabase
+        .from('user_topics')
+        .insert({
+          title: title.trim(),
+          description: description?.trim() || '',
+          created_by: userAddress,
+          votes: 0
+        })
+        .select()
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    } catch (insertError: any) {
+      console.error('插入操作异常:', insertError);
+      return NextResponse.json(
+        { success: false, error: '插入数据时发生异常: ' + (insertError.message || '未知错误') },
+        { status: 500 }
+      );
+    }
 
     if (error) {
       console.error('Supabase 插入失败:', error);
+      console.error('错误代码:', error.code);
+      console.error('错误消息:', error.message);
+      console.error('错误详情:', JSON.stringify(error, null, 2));
       
       // ✅ 处理表不存在的情况
-      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+      if (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('relation') && error.message?.includes('does not exist')) {
         return NextResponse.json(
           { success: false, error: '话题表尚未创建，请联系管理员' },
           { status: 503 }
@@ -170,7 +186,25 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      throw error;
+      // ✅ 返回详细的错误信息，而不是抛出错误
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: '创建话题失败: ' + (error.message || error.code || '未知错误'),
+          errorCode: error.code,
+          errorDetails: process.env.NODE_ENV === 'development' ? error : undefined
+        },
+        { status: 500 }
+      );
+    }
+
+    // ✅ 验证数据是否存在
+    if (!data) {
+      console.error('插入成功但未返回数据');
+      return NextResponse.json(
+        { success: false, error: '创建话题成功但未返回数据' },
+        { status: 500 }
+      );
     }
 
     // 转换字段名
@@ -183,16 +217,27 @@ export async function POST(request: NextRequest) {
       createdAt: data.created_at
     };
 
+    console.log('✅ 话题创建成功:', topic.id);
     return NextResponse.json({
       success: true,
       topic
     }, { status: 201 });
     
   } catch (error: any) {
-    console.error('创建话题失败:', error);
+    console.error('创建话题失败（catch 块）:', error);
+    console.error('错误堆栈:', error.stack);
+    
+    // ✅ 确保返回友好的错误信息
+    const errorMessage = error.message || '未知错误';
+    const errorCode = error.code || 'UNKNOWN';
     
     return NextResponse.json(
-      { success: false, error: '创建话题失败: ' + (error.message || '未知错误') },
+      { 
+        success: false, 
+        error: '创建话题失败: ' + errorMessage,
+        errorCode,
+        errorDetails: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
