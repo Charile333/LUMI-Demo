@@ -9,7 +9,31 @@ export const dynamic = 'force-dynamic';
 // 获取所有话题
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
+    // ✅ 检查环境变量
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('⚠️ Supabase 环境变量未配置，返回空话题列表');
+      return NextResponse.json({
+        success: true,
+        topics: [],
+        warning: 'Supabase 未配置'
+      });
+    }
+    
+    // ✅ 修复：安全地获取 Supabase 客户端
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch (initError: any) {
+      console.error('初始化 Supabase 客户端失败:', initError);
+      return NextResponse.json({
+        success: true,
+        topics: [],
+        warning: 'Supabase 客户端初始化失败'
+      });
+    }
     
     const { data, error } = await supabase
       .from('user_topics')
@@ -20,6 +44,17 @@ export async function GET() {
 
     if (error) {
       console.error('Supabase 查询失败:', error);
+      
+      // ✅ 处理表不存在的情况（42P01）
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('⚠️ user_topics 表不存在，返回空列表');
+        return NextResponse.json({
+          success: true,
+          topics: [],
+          warning: '话题表尚未创建'
+        });
+      }
+      
       throw error;
     }
 
@@ -39,9 +74,15 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('获取话题失败:', error);
+    
+    // ✅ 返回 200 而不是 500，避免前端报错
     return NextResponse.json(
-      { success: false, error: '获取话题失败: ' + (error.message || '未知错误') },
-      { status: 500 }
+      { 
+        success: false, 
+        topics: [],
+        error: '获取话题失败: ' + (error.message || '未知错误') 
+      },
+      { status: 200 } // 改为 200，让前端可以正常处理
     );
   }
 }
@@ -49,6 +90,17 @@ export async function GET() {
 // 创建新话题
 export async function POST(request: NextRequest) {
   try {
+    // ✅ 检查环境变量
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json(
+        { success: false, error: 'Supabase 未配置，无法创建话题' },
+        { status: 503 }
+      );
+    }
+    
     const { title, description } = await request.json();
 
     // 验证
@@ -76,8 +128,17 @@ export async function POST(request: NextRequest) {
     // 获取用户信息
     const userAddress = request.headers.get('x-user-address') || 'anonymous';
 
-    // 使用 Supabase 客户端插入
-    const supabase = getSupabaseAdmin();
+    // ✅ 修复：安全地获取 Supabase 客户端
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch (initError: any) {
+      console.error('初始化 Supabase 客户端失败:', initError);
+      return NextResponse.json(
+        { success: false, error: 'Supabase 客户端初始化失败' },
+        { status: 503 }
+      );
+    }
     
     const { data, error } = await supabase
       .from('user_topics')
@@ -92,6 +153,14 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Supabase 插入失败:', error);
+      
+      // ✅ 处理表不存在的情况
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        return NextResponse.json(
+          { success: false, error: '话题表尚未创建，请联系管理员' },
+          { status: 503 }
+        );
+      }
       
       // 检查是否是重复标题
       if (error.code === '23505') {

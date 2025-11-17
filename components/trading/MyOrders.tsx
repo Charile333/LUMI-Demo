@@ -3,7 +3,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
+import { useWallet } from '@/app/provider-wagmi';
+import WalletConnect from '@/components/WalletConnect';
 
 interface MyOrdersProps {
   marketId?: number;
@@ -12,32 +13,10 @@ interface MyOrdersProps {
 export default function MyOrders({ marketId }: MyOrdersProps) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [account, setAccount] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'open' | 'filled' | 'cancelled'>('all');
   
-  useEffect(() => {
-    loadAccount();
-    
-    // ✅ 监听账户变化
-    if (window.ethereum) {
-      const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts.length > 0) {
-          console.log('[MyOrders] 账户已切换:', accounts[0]);
-          setAccount(accounts[0]);
-        } else {
-          console.log('[MyOrders] 钱包已断开');
-          setAccount(null);
-          setOrders([]);
-        }
-      };
-      
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      
-      return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      };
-    }
-  }, []);
+  // ✅ 统一使用 useWallet() hook，避免自己管理连接
+  const { address: account, isConnected } = useWallet();
   
   useEffect(() => {
     if (account) {
@@ -46,39 +25,12 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
       // 每10秒刷新一次
       const interval = setInterval(loadOrders, 10000);
       return () => clearInterval(interval);
+    } else {
+      // 如果钱包断开，清空订单列表
+      setOrders([]);
+      setLoading(false);
     }
   }, [account, filter]);
-  
-  const loadAccount = async () => {
-    if (!window.ethereum) return;
-    
-    try {
-      // ✅ 修复：先请求账户访问权限，不要只使用 listAccounts
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      });
-      
-      if (accounts && accounts.length > 0) {
-        setAccount(accounts[0]);
-        console.log('[MyOrders] 钱包已连接:', accounts[0]);
-      } else {
-        // 如果没有账户，尝试静默获取（钱包已授权的情况）
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const existingAccounts = await provider.listAccounts();
-        if (existingAccounts.length > 0) {
-          setAccount(existingAccounts[0]);
-          console.log('[MyOrders] 使用已授权账户:', existingAccounts[0]);
-        }
-      }
-    } catch (error: any) {
-      // 用户拒绝连接
-      if (error.code === 4001) {
-        console.warn('[MyOrders] 用户拒绝连接钱包');
-      } else {
-        console.error('[MyOrders] 获取账户失败:', error);
-      }
-    }
-  };
   
   const loadOrders = async () => {
     if (!account) return;
@@ -100,15 +52,33 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
   };
   
   const cancelOrder = async (orderId: string) => {
-    if (!window.ethereum || !account) return;
+    if (!account) return;
     
     const confirmed = confirm('确定要取消这个订单吗？');
     if (!confirmed) return;
     
     try {
+      // ✅ 使用 useWallet() hook 提供的 provider（如果需要签名）
+      // 注意：这里需要从 useWallet() 获取 signer，但当前 hook 没有暴露 signer
+      // 暂时保持原有实现，但使用 account 而不是 window.ethereum 检查
+      if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error('钱包未连接');
+      }
+      
       // 签名取消消息
+      // ✅ 修复：先验证账户，再创建 signer
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_accounts' 
+      });
+      
+      if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
+        throw new Error('钱包账户未授权，请先连接钱包');
+      }
+      
+      const { ethers } = await import('ethers');
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
+      const signer = provider.getSigner(accounts[0]); // 明确指定账户地址
       const message = `Cancel order: ${orderId}`;
       const signature = await signer.signMessage(message);
       
@@ -133,20 +103,18 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
     }
   };
   
-  if (!account) {
+  if (!account || !isConnected) {
     return (
       <div className="text-center py-8">
         <div className="text-gray-400 mb-4">
           请先连接钱包查看订单
         </div>
-        <button
-          onClick={loadAccount}
-          className="px-6 py-2 bg-amber-400 hover:bg-amber-500 text-black font-semibold rounded-lg transition-colors"
-        >
-          连接钱包
-        </button>
+        {/* ✅ 使用统一的 WalletConnect 组件，避免连接冲突 */}
+        <div className="flex justify-center">
+          <WalletConnect />
+        </div>
         <div className="text-xs text-gray-500 mt-2">
-          点击按钮将弹出 MetaMask 连接请求
+          连接钱包后即可查看您的订单
         </div>
       </div>
     );

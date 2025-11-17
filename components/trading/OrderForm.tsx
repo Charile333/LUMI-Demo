@@ -118,51 +118,52 @@ export default function OrderForm({
       // 📊 默认模式：链下订单簿
       console.log('📊 使用链下订单簿模式...');
       
-      // 1. 获取 provider 和 signer（带错误处理）
-      let provider, signer, address;
-      
-      try {
-        // 确保账户已连接
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        
-        if (!accounts || accounts.length === 0) {
-          throw new Error('未找到钱包账户');
-        }
-        
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        
-        // 等待确保连接完成
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        address = await signer.getAddress();
-        
-        console.log('[OrderForm] 用户地址:', address);
-      } catch (walletError: any) {
-        console.error('[OrderForm] 获取钱包信息失败:', walletError);
-        if (walletError.code === 'UNSUPPORTED_OPERATION') {
-          toast.error('钱包未正确连接，请刷新页面后重试');
-        } else {
-          toast.error(`获取钱包信息失败: ${walletError.message}`);
-        }
+      // ✅ 统一：直接使用 useWallet() hook 提供的 address，不再调用 eth_requestAccounts
+      if (!account) {
+        toast.error('钱包未连接，请先连接钱包');
         setSubmitting(false);
         return;
       }
       
-      if (!provider || !signer || !address) {
+      // 1. 获取 provider 和 signer（仅用于签名，不用于连接）
+      let provider, signer;
+      
+      try {
+        // ✅ 只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_accounts' 
+        });
+        
+        if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
+          throw new Error('钱包账户不匹配，请刷新页面后重试');
+        }
+        
+        // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner(accounts[0]); // 明确指定账户地址
+        
+        console.log('[OrderForm] 使用已连接的钱包地址:', account);
+      } catch (walletError: any) {
+        console.error('[OrderForm] 获取签名器失败:', walletError);
+        toast.error(`获取签名器失败: ${walletError.message || '未知错误'}`);
+        setSubmitting(false);
+        return;
+      }
+      
+      if (!provider || !signer) {
         toast.error('钱包连接异常，请刷新页面后重试');
         setSubmitting(false);
         return;
       }
+      
+      const address = account; // 使用 hook 提供的 address
       
       // 2. 构造订单（使用市场价）
       const order: Order = {
         orderId: generateOrderId(),
         marketId,
         questionId,
-        maker: address,
+        maker: address.toLowerCase(), // 使用统一格式
         side,
         outcome,
         price: marketPrice.toFixed(2), // 使用市场价

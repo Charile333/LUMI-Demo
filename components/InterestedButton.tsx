@@ -28,8 +28,19 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
       if (!window.ethereum) return;
 
       try {
+        // ✅ 修复：先检查账户是否已授权，避免 "unknown account #0" 错误
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_accounts' 
+        });
+        
+        if (!accounts || accounts.length === 0) {
+          // 未授权，不设置地址
+          return;
+        }
+        
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+        // ✅ 修复：明确指定账户地址创建 signer
+        const signer = provider.getSigner(accounts[0]);
         const address = await signer.getAddress();
         setUserAddress(address);
 
@@ -40,7 +51,8 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
         // setIsInterested(data.isInterested);
 
       } catch (error) {
-        console.error(t('market.interestedButton.checkFailed'), error);
+        // 静默失败，不显示错误（用户可能还没有连接钱包）
+        console.log(t('market.interestedButton.checkFailed'), error);
       }
     };
 
@@ -58,10 +70,25 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
     setError('');
 
     try {
-      // 连接钱包
+      // ✅ 修复：先检查账户是否已授权
+      let accounts = await window.ethereum.request({ 
+        method: 'eth_accounts' 
+      });
+      
+      // 如果没有账户，再请求连接（用户主动点击按钮，这是允许的）
+      if (!accounts || accounts.length === 0) {
+        accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('钱包连接失败，请重试');
+        }
+      }
+      
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = provider.getSigner();
+      // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
+      const signer = provider.getSigner(accounts[0]);
       const address = await signer.getAddress();
 
       if (isInterested) {

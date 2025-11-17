@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ConnectWallet } from '@/components/wallet/ConnectWallet';
+import WalletConnect from '@/components/WalletConnect';
 import { OrderBook } from '@/components/OrderBook/OrderBook';
 import { TradingForm } from '@/components/OrderBook/TradingForm';
 
@@ -100,7 +100,7 @@ export default function TradePage() {
               <div className="text-gray-300">|</div>
               <h1 className="text-2xl font-bold text-gray-900">订单簿交易</h1>
             </div>
-            <ConnectWallet />
+            <WalletConnect />
           </div>
         </div>
       </div>

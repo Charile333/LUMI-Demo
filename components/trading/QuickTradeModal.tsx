@@ -10,6 +10,7 @@ import { signCTFOrder } from '@/lib/ctf-exchange/signing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
+import { useWallet } from '@/app/provider-wagmi';
 
 interface QuickTradeModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export default function QuickTradeModal({
   const { t } = useTranslation();
   const toast = useToast();
   const polymarket = useLUMIPolymarket();
+  // ✅ 统一：使用 useWallet() hook 获取钱包状态
+  const { address: account, isConnected } = useWallet();
   const [amount, setAmount] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0.50);
@@ -133,6 +136,12 @@ export default function QuickTradeModal({
       setIsSubmitting(true);
       
       // 1. 检查钱包连接
+      if (!account || !isConnected) {
+        toast.warning('请先连接钱包');
+        setIsSubmitting(false);
+        return;
+      }
+      
       if (typeof window.ethereum === 'undefined') {
         toast.warning(t('orderForm.installMetaMask'));
         setIsSubmitting(false);
@@ -180,49 +189,40 @@ export default function QuickTradeModal({
         console.warn('网络检查/切换失败', netErr);
       }
 
-      // 3. 连接钱包并获取地址
-      let provider, signer, userAddress;
+      // 3. 获取 provider 和 signer（仅用于签名，不用于连接）
+      // ✅ 统一：直接使用 useWallet() hook 提供的 address，不再调用 eth_requestAccounts
+      let provider, signer;
       
       try {
-        // 请求账户访问权限
+        // ✅ 只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
         const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
+          method: 'eth_accounts' 
         });
         
-        if (!accounts || accounts.length === 0) {
-          throw new Error('未找到钱包账户');
+        if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
+          throw new Error('钱包账户不匹配，请刷新页面后重试');
         }
         
-        // 创建 provider 和 signer
+        // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
         provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
+        signer = provider.getSigner(accounts[0]); // 明确指定账户地址
         
-        // 等待确保连接完成
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // 获取用户地址
-        userAddress = await signer.getAddress();
-        
-        console.log('[QuickTrade] 用户地址:', userAddress);
+        console.log('[QuickTrade] 使用已连接的钱包地址:', account);
       } catch (walletError: any) {
-        console.error('[QuickTrade] 钱包连接失败:', walletError);
-        if (walletError.code === 4001) {
-          toast.warning('用户拒绝连接钱包');
-        } else if (walletError.code === 'UNSUPPORTED_OPERATION') {
-          toast.error('钱包未正确连接，请刷新页面后重试');
-        } else {
-          toast.error(`钱包连接失败: ${walletError.message}`);
-        }
+        console.error('[QuickTrade] 获取签名器失败:', walletError);
+        toast.error(`获取签名器失败: ${walletError.message || '未知错误'}`);
         setIsSubmitting(false);
         return;
       }
       
       // 确保已获取到必要的对象
-      if (!provider || !signer || !userAddress) {
+      if (!provider || !signer) {
         toast.error('钱包连接异常，请刷新页面后重试');
         setIsSubmitting(false);
         return;
       }
+      
+      const userAddress = account; // 使用 hook 提供的 address
 
       if (!conditionIdFromMarket) {
         toast.error('该市场缺少链上 conditionId，无法执行链上交易');
@@ -386,16 +386,34 @@ export default function QuickTradeModal({
           return;
         }
 
+        // ✅ 统一：只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
+        // 使用 useWallet() hook 提供的 address
         const accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts'
+          method: 'eth_accounts'
         });
-        const currentUser = accounts?.[0]?.toLowerCase();
+        
+        if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account?.toLowerCase()) {
+          throw new Error('钱包账户不匹配，请刷新页面后重试');
+        }
+        
+        const currentUser = account?.toLowerCase();
 
         if (currentUser && makerAddress && currentUser === makerAddress) {
           // 当前用户是订单的 maker，要求其签署 CTF 订单
           toast.info('请在钱包中确认签名，以授权链上交易');
+          
+          // ✅ 修复：先验证账户，再创建 signer
+          const accountsForSign = await window.ethereum.request({ 
+            method: 'eth_accounts' 
+          });
+          
+          if (!accountsForSign || accountsForSign.length === 0 || accountsForSign[0].toLowerCase() !== account?.toLowerCase()) {
+            throw new Error('钱包账户未授权，请先连接钱包');
+          }
+          
+          // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
           const providerForSignature = new ethers.providers.Web3Provider(window.ethereum);
-          const signerForSignature = providerForSignature.getSigner();
+          const signerForSignature = providerForSignature.getSigner(accountsForSign[0]); // 明确指定账户地址
           const orderForSign = {
             ...ctfOrder,
             side: Number(ctfOrder.side),

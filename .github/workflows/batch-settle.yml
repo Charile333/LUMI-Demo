@@ -1,0 +1,48 @@
+name: Batch Settle Trades
+
+on:
+  schedule:
+    # 每 5 分钟执行一次（UTC 时间）
+    # 注意：GitHub Actions 使用 UTC 时间
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  settle-trades:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Batch Settle API
+        run: |
+          echo "🔄 触发批量结算 API..."
+          echo "时间: $(date)"
+          
+          # 检查 CRON_SECRET 是否配置
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "❌ 错误: CRON_SECRET 未配置"
+            echo "请到 GitHub Settings > Secrets and variables > Actions 中添加 CRON_SECRET"
+            exit 1
+          fi
+          
+          # 调用 Vercel API
+          # ⚠️ 重要：请将 YOUR_VERCEL_APP_URL 替换为你的实际 Vercel 域名
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            https://YOUR_VERCEL_APP_URL.vercel.app/api/cron/settle-trades)
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP 状态码: $http_code"
+          echo "响应内容:"
+          echo "$body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ 批量结算触发成功"
+          else
+            echo "❌ 批量结算触发失败 (HTTP $http_code)"
+            # 不退出，避免阻止后续执行
+            # exit 1
+          fi
+
