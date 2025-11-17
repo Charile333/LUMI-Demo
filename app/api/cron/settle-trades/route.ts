@@ -1,14 +1,9 @@
 /**
  * Vercel Cron Job: 批量结算交易
  * 
- * 配置在 vercel.json 中（示例）：
- * {
- *   "crons": [{
- *     "path": "/api/cron/settle-trades",
- *     "schedule": "*/5 * * * *"
- *   }]
- * }
- * 注意：schedule 格式为 cron 表达式，每 5 分钟执行一次
+ * 配置说明：
+ * 在 vercel.json 中添加 cron 配置，path 为 "/api/cron/settle-trades"
+ * schedule 格式为 cron 表达式，每 5 分钟执行一次
  * 
  * 安全验证：
  * - Vercel 会自动在请求头中添加 Authorization: Bearer <CRON_SECRET>
