@@ -350,7 +350,7 @@ export default function LumiSoonPage() {
       <Script src="/wormhole-background.js" strategy="afterInteractive" />
       <div className="font-sans relative min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#0a0a0a] to-[#080808]" data-page="landing">
       {/* 左上角Logo - 固定在顶部，与语言切换器垂直居中对齐 */}
-      <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)', display: 'none' }}>
+      <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)' }}>
         <Image 
           src="/image/LUMI-logo.png" 
           alt="LUMI Logo" 
@@ -361,11 +361,11 @@ export default function LumiSoonPage() {
       </div>
       
       {/* 右上角语言切换器 - 与Logo垂直居中对齐 */}
-      <div style={{ position: 'fixed', top: 'calc(2rem + 100px)', right: '2rem', zIndex: 50, transform: 'translateY(-50%)', display: 'none' }}>
+      <div style={{ position: 'fixed', top: 'calc(2rem + 100px)', right: '2rem', zIndex: 50, transform: 'translateY(-50%)' }}>
         <LanguageSwitcher />
       </div>
 
-      <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8" style={{ display: 'none' }}>
+      <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="text-center w-full">
           {/* BETA SOON 卡片 */}
           <div className="mb-10 flex justify-center">
@@ -387,7 +387,7 @@ export default function LumiSoonPage() {
               </div>
               
         {/* 专业黑白主题时间轴 */}
-        <div className="mt-16 w-full" style={{ display: 'none' }}>
+        <div className="mt-16 w-full">
           <div className="relative max-w-7xl mx-auto px-9">
             <div className="absolute left-[-9999px] right-[-12000px] top-6 h-[0.5px] bg-white z-0 transform -translate-y-1/2"></div>
             <div className="flex justify-between relative z-10">
@@ -426,7 +426,7 @@ export default function LumiSoonPage() {
         </div>
         
         {/* 进入市场按钮 - 虫洞科技风格 */}
-        <div className="relative z-20 flex justify-center py-8 mt-8" style={{ display: 'none' }}>
+        <div className="relative z-20 flex justify-center py-8 mt-8">
           <Link 
             href="/markets/automotive"
             className="group relative inline-block"
@@ -544,7 +544,7 @@ export default function LumiSoonPage() {
         </div>
         
         {/* 动态下滑指引 - 双V形箭头 (右下角) */}
-        <div className="fixed right-8 bottom-8 z-20" style={{ display: 'none' }}>
+        <div className="fixed right-8 bottom-8 z-20">
           <div className="scroll-indicator" onClick={handleScrollDown}>
             <div className="scroll-text">
               <span className="text-white/60 text-sm font-medium tracking-wider">
@@ -564,7 +564,7 @@ export default function LumiSoonPage() {
       </main>
 
       {/* Our Apps 毛玻璃方框 */}
-      <section className="relative z-20 flex justify-center px-4 mt-24 py-16 sm:px-6 lg:px-8" style={{ display: 'none' }}>
+      <section className="relative z-20 flex justify-center px-4 mt-24 py-16 sm:px-6 lg:px-8">
         <div className="w-full max-w-6xl">
           <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 md:p-8">
             {/* 标题 */}
@@ -890,7 +890,7 @@ export default function LumiSoonPage() {
         </section>
 
       {/* 底部信息 */}
-      <footer className="relative z-20 text-center text-gray-300/40 text-sm p-8" style={{ display: 'none' }}>
+      <footer className="relative z-20 text-center text-gray-300/40 text-sm p-8">
         <p>© 2025 LUMI. {t('footer.allRightsReserved')}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <a href="#" className="hover:text-white transition-colors">
