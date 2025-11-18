@@ -5,6 +5,7 @@ import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { wagmiConfig } from '@/lib/wagmi/config';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 创建 QueryClient 实例（使用单例模式避免重复创建）
 let queryClient: QueryClient | undefined;
@@ -30,11 +31,26 @@ interface WagmiProviderWrapperProps {
 }
 
 export default function WagmiProviderWrapper({ children }: WagmiProviderWrapperProps) {
+  // ✅ 获取当前语言设置
+  const { i18n } = useTranslation();
+  
+  // ✅ 将 i18n 语言代码映射到 RainbowKit 的 locale
+  // RainbowKit 支持: 'en', 'es', 'fr', 'de', 'it', 'pt', 'zh', 'ja', 'ko', 'ru', 'tr', 'vi'
+  const getRainbowKitLocale = (lang: string): 'en' | 'zh' => {
+    if (lang === 'zh' || lang.startsWith('zh')) {
+      return 'zh';
+    }
+    return 'en'; // 默认英文
+  };
+  
+  const locale = getRainbowKitLocale(i18n.language || 'en');
+  
   // WagmiProvider 和 RainbowKitProvider 都支持 SSR
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={getQueryClient()}>
         <RainbowKitProvider
+          locale={locale}
           theme={darkTheme({
             accentColor: '#f59e0b', // 琥珀色（与 LUMI 主题一致）
             accentColorForeground: 'white',
