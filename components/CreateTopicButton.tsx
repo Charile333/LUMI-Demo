@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useWallet } from '@/app/provider-wagmi'
 
 interface Topic {
   id: number
@@ -16,6 +17,7 @@ interface Topic {
 
 export function CreateTopicButton() {
   const { t } = useTranslation()
+  const { address: userAddress, isConnected, connectWallet } = useWallet()
   const [isOpen, setIsOpen] = useState(false)
   const [topics, setTopics] = useState<Topic[]>([])
   const [newTopic, setNewTopic] = useState({ title: '', description: '' })
@@ -27,19 +29,50 @@ export function CreateTopicButton() {
       const response = await fetch('/api/topics')
       if (response.ok) {
         const data = await response.json()
-        setTopics(data.topics || [])
+        const topics = data.topics || []
+        
+        // ✅ 如果有用户地址，检查每个话题的投票状态
+        if (userAddress) {
+          const topicsWithVoteStatus = await Promise.all(
+            topics.map(async (topic: Topic) => ({
+              ...topic,
+              hasVoted: await checkUserVoted(topic.id, userAddress)
+            }))
+          )
+          setTopics(topicsWithVoteStatus)
+        } else {
+          // 没有用户地址，设置默认值
+          setTopics(topics.map((topic: Topic) => ({
+            ...topic,
+            hasVoted: false
+          })))
+        }
       }
     } catch (error) {
       console.error('加载话题失败:', error)
     }
   }
 
-  // 打开窗口时加载数据
+  // ✅ 检查用户是否已投票
+  const checkUserVoted = async (topicId: number, address: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/topics/${topicId}/vote/check?userAddress=${address}`)
+      if (response.ok) {
+        const data = await response.json()
+        return data.hasVoted || false
+      }
+    } catch (error) {
+      console.error('检查投票状态失败:', error)
+    }
+    return false
+  }
+
+  // 打开窗口时加载数据，当用户地址变化时也重新加载
   useEffect(() => {
     if (isOpen) {
       loadTopics()
     }
-  }, [isOpen])
+  }, [isOpen, userAddress])
 
   // 提交新话题
   const handleSubmitTopic = async (e: React.FormEvent) => {
@@ -129,27 +162,70 @@ export function CreateTopicButton() {
     }
   }
 
-  // 投票
+  // ✅ 投票（增强版：要求用户连接钱包）
   const handleVote = async (topicId: number) => {
+    // ✅ 检查用户是否已连接钱包
+    if (!isConnected || !userAddress) {
+      const shouldConnect = confirm(
+        `${t('topic.voteRequiresWallet') || '投票需要连接钱包'}\n\n${t('topic.connectWalletToVote') || '请连接钱包后继续投票。'}`
+      )
+      if (shouldConnect) {
+        try {
+          await connectWallet()
+        } catch (error: any) {
+          alert(`❌ ${error.message || t('topic.connectWalletFailed') || '连接钱包失败'}`)
+        }
+      }
+      return
+    }
+
+    // ✅ 检查是否已投票（防止重复点击）
+    const topic = topics.find(t => t.id === topicId)
+    if (topic?.hasVoted) {
+      alert(t('topic.alreadyVoted') || '您已经投过票了')
+      return
+    }
+
     try {
       const response = await fetch(`/api/topics/${topicId}/vote`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-address': userAddress
+        },
+        body: JSON.stringify({
+          userAddress: userAddress
+        })
       })
 
-      if (response.ok) {
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        // ✅ 更新本地状态
         setTopics(prev => prev.map(topic => 
           topic.id === topicId 
-            ? { ...topic, votes: topic.votes + 1, hasVoted: true }
+            ? { ...topic, votes: data.votes || topic.votes + 1, hasVoted: true }
             : topic
         ))
-        alert(t('topic.voteSuccess'))
+        alert(t('topic.voteSuccess') || '✅ 投票成功！')
       } else {
-        const error = await response.json()
-        alert(`❌ ${error.error || t('topic.voteFailed')}`)
+        // ✅ 增强错误处理
+        const errorMessage = data.error || t('topic.voteFailed') || '投票失败'
+        
+        // ✅ 如果是重复投票错误，更新本地状态
+        if (errorMessage.includes('已经投过') || errorMessage.includes('already voted')) {
+          setTopics(prev => prev.map(topic => 
+            topic.id === topicId 
+              ? { ...topic, hasVoted: true }
+              : topic
+          ))
+        }
+        
+        alert(`❌ ${errorMessage}`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('投票失败:', error)
-      alert(t('topic.voteFailed'))
+      alert(`❌ ${error.message || t('topic.voteFailed') || '投票失败'}`)
     }
   }
 
