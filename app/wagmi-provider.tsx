@@ -30,8 +30,8 @@ interface WagmiProviderWrapperProps {
   children: ReactNode;
 }
 
-export default function WagmiProviderWrapper({ children }: WagmiProviderWrapperProps) {
-  // ✅ 获取当前语言设置
+// ✅ 内部组件：处理语言变化
+function RainbowKitProviderWithLocale({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation();
   
   // ✅ 将 i18n 语言代码映射到 RainbowKit 的 locale
@@ -45,23 +45,32 @@ export default function WagmiProviderWrapper({ children }: WagmiProviderWrapperP
   
   const locale = getRainbowKitLocale(i18n.language || 'en');
   
+  return (
+    <RainbowKitProvider
+      key={locale} // ✅ 使用 key 强制重新渲染以更新 locale
+      locale={locale}
+      theme={darkTheme({
+        accentColor: '#f59e0b', // 琥珀色（与 LUMI 主题一致）
+        accentColorForeground: 'white',
+        borderRadius: 'medium',
+        fontStack: 'system',
+      })}
+      showRecentTransactions={true}
+      coolMode={true}
+    >
+      {children}
+    </RainbowKitProvider>
+  );
+}
+
+export default function WagmiProviderWrapper({ children }: WagmiProviderWrapperProps) {
   // WagmiProvider 和 RainbowKitProvider 都支持 SSR
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={getQueryClient()}>
-        <RainbowKitProvider
-          locale={locale}
-          theme={darkTheme({
-            accentColor: '#f59e0b', // 琥珀色（与 LUMI 主题一致）
-            accentColorForeground: 'white',
-            borderRadius: 'medium',
-            fontStack: 'system',
-          })}
-          showRecentTransactions={true}
-          coolMode={true}
-        >
+        <RainbowKitProviderWithLocale>
           {children}
-        </RainbowKitProvider>
+        </RainbowKitProviderWithLocale>
       </QueryClientProvider>
     </WagmiProvider>
   );
