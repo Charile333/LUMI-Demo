@@ -66,7 +66,17 @@ export function CreateTopicButton() {
 
       console.log('📥 API 响应状态:', response.status, response.statusText)
       
-      const data = await response.json()
+      // ✅ 确保正确解析响应，即使状态码不是 200
+      let data;
+      try {
+        const text = await response.text()
+        console.log('📥 API 原始响应:', text)
+        data = text ? JSON.parse(text) : {}
+      } catch (parseError) {
+        console.error('❌ 解析响应失败:', parseError)
+        data = { error: '无法解析服务器响应' }
+      }
+      
       console.log('📥 API 响应数据:', data)
 
       if (response.ok && data.success) {
@@ -82,21 +92,31 @@ export function CreateTopicButton() {
         
         console.error('❌ 创建话题失败:', {
           status: response.status,
+          statusText: response.statusText,
           error: errorMessage,
           errorCode,
           errorDetails,
           fullResponse: data
         })
         
-        let alertMessage = `${t('topic.submitFailed')}: ${errorMessage}`
+        // ✅ 显示详细的错误信息
+        let alertMessage = `${t('topic.submitFailed')}\n\n错误: ${errorMessage}`
         if (errorCode) {
           alertMessage += `\n错误代码: ${errorCode}`
         }
-        if (errorDetails && process.env.NODE_ENV === 'development') {
-          alertMessage += `\n详情: ${errorDetails}`
+        if (data.errorDetails && process.env.NODE_ENV === 'development') {
+          alertMessage += `\n详情: ${JSON.stringify(data.errorDetails, null, 2)}`
+        }
+        
+        // ✅ 如果是表不存在错误，提供明确的解决方案
+        if (errorMessage.includes('表尚未创建') || errorMessage.includes('does not exist')) {
+          alertMessage += `\n\n解决方案: 请在 Supabase 中运行 database/create-user-topics-table.sql 创建表`
         }
         
         alert(alertMessage)
+        
+        // ✅ 同时输出到控制台，方便调试
+        console.error('完整错误信息:', JSON.stringify(data, null, 2))
       }
     } catch (error: any) {
       console.error('❌ 提交话题异常:', error)
