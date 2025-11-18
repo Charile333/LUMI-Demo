@@ -1,8 +1,10 @@
 'use client';
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function WalletConnect() {
+  const { t } = useTranslation();
   return (
     <ConnectButton.Custom>
       {({
@@ -45,7 +47,7 @@ export default function WalletConnect() {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M21 18v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1m18-4l-4-4m0 0l-4 4m4-4v12"></path>
                     </svg>
-                    <span>连接钱包</span>
+                    <span>{t('wallet.connect')}</span>
                   </button>
                 );
               }
@@ -57,7 +59,7 @@ export default function WalletConnect() {
                     type="button"
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors duration-200"
                   >
-                    ⚠️ 切换网络
+                    ⚠️ {t('wallet.switchNetwork')}
                   </button>
                 );
               }
@@ -69,7 +71,7 @@ export default function WalletConnect() {
                     onClick={openChainModal}
                     type="button"
                     className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    title="切换网络"
+                    title={t('wallet.switchNetworkTooltip')}
                   >
                     {chain.hasIcon && (
                       <div
@@ -83,7 +85,7 @@ export default function WalletConnect() {
                       >
                         {chain.iconUrl && (
                           <img
-                            alt={chain.name ?? 'Chain icon'}
+                            alt={chain.name ?? t('wallet.chainIcon')}
                             src={chain.iconUrl}
                             style={{ width: 20, height: 20 }}
                           />

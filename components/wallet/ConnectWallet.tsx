@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ConnectWallet() {
+  const { t } = useTranslation();
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
   const [balance, setBalance] = useState<string>('0');
@@ -60,7 +62,7 @@ export function ConnectWallet() {
   
   const connectWallet = async () => {
     if (typeof window.ethereum === 'undefined') {
-      alert('请安装MetaMask！\n\n访问：https://metamask.io/');
+      alert(`${t('wallet.installMetaMask')}\n\n${t('wallet.visitMetaMaskSite')}`);
       return;
     }
     
@@ -84,7 +86,7 @@ export function ConnectWallet() {
       console.log('✅ 钱包已连接:', address);
     } catch (error: any) {
       console.error('连接失败:', error);
-      alert('连接失败: ' + error.message);
+      alert(t('wallet.connectFailedError', { error: error.message }));
     } finally {
       setLoading(false);
     }
@@ -123,12 +125,12 @@ export function ConnectWallet() {
   
   const getNetworkName = (chainId: number) => {
     switch (chainId) {
-      case 80002: return 'Amoy';
-      case 80001: return 'Mumbai (已弃用)';
-      case 137: return 'Polygon';
-      case 1: return 'Ethereum';
-      case 31337: return 'Hardhat本地';
-      default: return `Unknown (${chainId})`;
+      case 80002: return t('wallet.amoy');
+      case 80001: return t('wallet.mumbai');
+      case 137: return t('wallet.polygon');
+      case 1: return t('wallet.ethereum');
+      case 31337: return t('wallet.hardhatLocal');
+      default: return `${t('wallet.unknown')} (${chainId})`;
     }
   };
   
@@ -147,7 +149,7 @@ export function ConnectWallet() {
               ? 'bg-green-100 text-green-800' 
               : 'bg-yellow-100 text-yellow-800'
           }`}>
-            {chainId ? getNetworkName(chainId) : 'Unknown'}
+            {chainId ? getNetworkName(chainId) : t('wallet.unknown')}
           </div>
           
           {/* 切换网络按钮 */}
@@ -156,7 +158,7 @@ export function ConnectWallet() {
               onClick={switchToAmoy}
               className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 text-sm font-medium transition"
             >
-              切换到Amoy
+              {t('wallet.switchToAmoy')}
             </button>
           )}
           
@@ -174,14 +176,14 @@ export function ConnectWallet() {
           disabled={loading}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition flex items-center gap-2"
         >
-          {loading ? (
+              {loading ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              连接中...
+              {t('wallet.connectingMetaMask')}
             </>
           ) : (
             <>
-              🦊 连接钱包
+              🦊 {t('wallet.connect')}
             </>
           )}
         </button>
