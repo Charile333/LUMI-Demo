@@ -387,7 +387,7 @@ export default function LumiSoonPage() {
               </div>
               
         {/* 专业黑白主题时间轴 */}
-        <div className="mt-16 w-full">
+        <div className="mt-16 w-full" style={{ display: 'none' }}>
           <div className="relative max-w-7xl mx-auto px-9">
             <div className="absolute left-[-9999px] right-[-12000px] top-6 h-[0.5px] bg-white z-0 transform -translate-y-1/2"></div>
             <div className="flex justify-between relative z-10">
@@ -426,7 +426,7 @@ export default function LumiSoonPage() {
         </div>
         
         {/* 进入市场按钮 - 虫洞科技风格 */}
-        <div className="relative z-20 flex justify-center py-8 mt-8">
+        <div className="relative z-20 flex justify-center py-8 mt-8" style={{ display: 'none' }}>
           <Link 
             href="/markets/automotive"
             className="group relative inline-block"
@@ -544,7 +544,7 @@ export default function LumiSoonPage() {
         </div>
         
         {/* 动态下滑指引 - 双V形箭头 (右下角) */}
-        <div className="fixed right-8 bottom-8 z-20">
+        <div className="fixed right-8 bottom-8 z-20" style={{ display: 'none' }}>
           <div className="scroll-indicator" onClick={handleScrollDown}>
             <div className="scroll-text">
               <span className="text-white/60 text-sm font-medium tracking-wider">
@@ -564,7 +564,7 @@ export default function LumiSoonPage() {
       </main>
 
       {/* Our Apps 毛玻璃方框 */}
-      <section className="relative z-20 flex justify-center px-4 mt-24 py-16 sm:px-6 lg:px-8">
+      <section className="relative z-20 flex justify-center px-4 mt-24 py-16 sm:px-6 lg:px-8" style={{ display: 'none' }}>
         <div className="w-full max-w-6xl">
           <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 md:p-8">
             {/* 标题 */}
@@ -890,7 +890,7 @@ export default function LumiSoonPage() {
         </section>
 
       {/* 底部信息 */}
-      <footer className="relative z-20 text-center text-gray-300/40 text-sm p-8">
+      <footer className="relative z-20 text-center text-gray-300/40 text-sm p-8" style={{ display: 'none' }}>
         <p>© 2025 LUMI. {t('footer.allRightsReserved')}</p>
         <div className="flex items-center justify-center gap-4 mt-3">
           <a href="#" className="hover:text-white transition-colors">
