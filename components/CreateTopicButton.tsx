@@ -53,6 +53,8 @@ export function CreateTopicButton() {
     setIsSubmitting(true)
 
     try {
+      console.log('📤 提交话题:', { title: newTopic.title, description: newTopic.description })
+      
       const response = await fetch('/api/topics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,17 +64,46 @@ export function CreateTopicButton() {
         })
       })
 
-      if (response.ok) {
+      console.log('📥 API 响应状态:', response.status, response.statusText)
+      
+      const data = await response.json()
+      console.log('📥 API 响应数据:', data)
+
+      if (response.ok && data.success) {
+        console.log('✅ 话题创建成功:', data.topic)
         alert(t('topic.submitSuccess'))
         setNewTopic({ title: '', description: '' })
         loadTopics()
       } else {
-        const error = await response.json()
-        alert(`${t('topic.submitFailed')}: ${error.error || ''}`)
+        // ✅ 增强错误处理：显示详细错误信息
+        const errorMessage = data.error || `HTTP ${response.status}: ${response.statusText}`
+        const errorCode = data.errorCode || ''
+        const errorDetails = data.errorDetails || ''
+        
+        console.error('❌ 创建话题失败:', {
+          status: response.status,
+          error: errorMessage,
+          errorCode,
+          errorDetails,
+          fullResponse: data
+        })
+        
+        let alertMessage = `${t('topic.submitFailed')}: ${errorMessage}`
+        if (errorCode) {
+          alertMessage += `\n错误代码: ${errorCode}`
+        }
+        if (errorDetails && process.env.NODE_ENV === 'development') {
+          alertMessage += `\n详情: ${errorDetails}`
+        }
+        
+        alert(alertMessage)
       }
-    } catch (error) {
-      console.error('提交话题失败:', error)
-      alert(`${t('topic.submitFailed')}，${t('topic.networkError')}`)
+    } catch (error: any) {
+      console.error('❌ 提交话题异常:', error)
+      console.error('错误堆栈:', error.stack)
+      
+      const errorMessage = error.message || '网络错误'
+      alert(`${t('topic.submitFailed')}，${errorMessage}\n\n请检查控制台获取详细错误信息。`)
     } finally {
       setIsSubmitting(false)
     }
