@@ -219,9 +219,22 @@ export async function POST(request: NextRequest) {
       console.error('错误详情:', JSON.stringify(error, null, 2));
       
       // ✅ 处理表不存在的情况
-      if (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      // PostgreSQL 错误: 42P01 (表不存在)
+      // Supabase PostgREST 错误: PGRST205 (表在 schema cache 中找不到)
+      if (
+        error.code === '42P01' || 
+        error.code === 'PGRST205' ||
+        error.message?.includes('does not exist') || 
+        error.message?.includes('Could not find the table') ||
+        (error.message?.includes('relation') && error.message?.includes('does not exist'))
+      ) {
         return NextResponse.json(
-          { success: false, error: '话题表尚未创建，请联系管理员' },
+          { 
+            success: false, 
+            error: '话题表尚未创建',
+            errorCode: error.code || 'TABLE_NOT_FOUND',
+            solution: '请在 Supabase SQL Editor 中运行 database/create-user-topics-table.sql 创建表'
+          },
           { status: 503 }
         );
       }
