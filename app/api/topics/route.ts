@@ -89,19 +89,43 @@ export async function GET() {
 
 // 创建新话题
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
+    console.log('📝 POST /api/topics - 开始处理请求');
+    
     // ✅ 检查环境变量
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
+    console.log('🔍 环境变量检查:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseKey,
+      supabaseUrl: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : '未配置'
+    });
+    
     if (!supabaseUrl || !supabaseKey) {
+      console.warn('⚠️ Supabase 环境变量未配置');
       return NextResponse.json(
         { success: false, error: 'Supabase 未配置，无法创建话题' },
         { status: 503 }
       );
     }
     
-    const { title, description } = await request.json();
+    // ✅ 安全地解析请求体
+    let title, description;
+    try {
+      const body = await request.json();
+      title = body?.title;
+      description = body?.description;
+      console.log('📥 解析请求体成功:', { title, description: description ? `${description.substring(0, 20)}...` : '' });
+    } catch (parseError: any) {
+      console.error('❌ 解析请求体失败:', parseError);
+      return NextResponse.json(
+        { success: false, error: '请求体格式错误: ' + (parseError.message || '无法解析JSON') },
+        { status: 400 }
+      );
+    }
 
     // 验证
     if (!title || title.trim().length === 0) {
@@ -131,11 +155,19 @@ export async function POST(request: NextRequest) {
     // ✅ 修复：安全地获取 Supabase 客户端
     let supabase;
     try {
+      console.log('🔧 初始化 Supabase 客户端...');
       supabase = getSupabaseAdmin();
+      console.log('✅ Supabase 客户端初始化成功');
     } catch (initError: any) {
-      console.error('初始化 Supabase 客户端失败:', initError);
+      console.error('❌ 初始化 Supabase 客户端失败:', initError);
+      console.error('错误堆栈:', initError.stack);
       return NextResponse.json(
-        { success: false, error: 'Supabase 客户端初始化失败' },
+        { 
+          success: false, 
+          error: 'Supabase 客户端初始化失败: ' + (initError.message || '未知错误'),
+          errorCode: initError.code || 'INIT_ERROR',
+          errorDetails: process.env.NODE_ENV === 'development' ? initError.stack : undefined
+        },
         { status: 503 }
       );
     }
@@ -143,6 +175,7 @@ export async function POST(request: NextRequest) {
     // ✅ 增强错误处理：确保所有错误都被正确捕获
     let data, error;
     try {
+      console.log('💾 开始插入数据到 user_topics 表...');
       const result = await supabase
         .from('user_topics')
         .insert({
@@ -154,12 +187,27 @@ export async function POST(request: NextRequest) {
         .select()
         .single();
       
+      console.log('📊 Supabase 插入结果:', {
+        hasData: !!result.data,
+        hasError: !!result.error,
+        errorCode: result.error?.code,
+        errorMessage: result.error?.message
+      });
+      
       data = result.data;
       error = result.error;
     } catch (insertError: any) {
-      console.error('插入操作异常:', insertError);
+      console.error('❌ 插入操作异常:', insertError);
+      console.error('错误堆栈:', insertError.stack);
+      console.error('错误详情:', JSON.stringify(insertError, Object.getOwnPropertyNames(insertError), 2));
+      
       return NextResponse.json(
-        { success: false, error: '插入数据时发生异常: ' + (insertError.message || '未知错误') },
+        { 
+          success: false, 
+          error: '插入数据时发生异常: ' + (insertError.message || '未知错误'),
+          errorCode: insertError.code || 'INSERT_ERROR',
+          errorDetails: process.env.NODE_ENV === 'development' ? insertError.stack : undefined
+        },
         { status: 500 }
       );
     }
@@ -224,21 +272,35 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
     
   } catch (error: any) {
-    console.error('创建话题失败（catch 块）:', error);
+    const executionTime = Date.now() - startTime;
+    console.error('❌ 创建话题失败（catch 块）:', error);
     console.error('错误堆栈:', error.stack);
+    console.error('执行时间:', executionTime + 'ms');
+    console.error('错误类型:', error.constructor?.name);
+    console.error('完整错误对象:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     
     // ✅ 确保返回友好的错误信息
     const errorMessage = error.message || '未知错误';
-    const errorCode = error.code || 'UNKNOWN';
+    const errorCode = error.code || error.name || 'UNKNOWN';
+    
+    // ✅ 捕获常见的错误类型
+    let statusCode = 500;
+    if (error instanceof SyntaxError) {
+      statusCode = 400;
+    } else if (error instanceof TypeError && error.message.includes('fetch')) {
+      statusCode = 502; // Bad Gateway - 服务器连接问题
+    }
     
     return NextResponse.json(
       { 
         success: false, 
         error: '创建话题失败: ' + errorMessage,
         errorCode,
+        errorType: error.constructor?.name,
+        executionTime,
         errorDetails: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 }
