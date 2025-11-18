@@ -350,7 +350,7 @@ export default function LumiSoonPage() {
       <Script src="/wormhole-background.js" strategy="afterInteractive" />
       <div className="font-sans relative min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#0a0a0a] to-[#080808]" data-page="landing">
       {/* 左上角Logo - 固定在顶部，与语言切换器垂直居中对齐 */}
-      <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)' }}>
+      <div style={{ position: 'fixed', top: '2rem', left: '1rem', zIndex: 50, transform: 'translateY(0)', display: 'none' }}>
         <Image 
           src="/image/LUMI-logo.png" 
           alt="LUMI Logo" 
@@ -361,11 +361,11 @@ export default function LumiSoonPage() {
       </div>
       
       {/* 右上角语言切换器 - 与Logo垂直居中对齐 */}
-      <div style={{ position: 'fixed', top: 'calc(2rem + 100px)', right: '2rem', zIndex: 50, transform: 'translateY(-50%)' }}>
+      <div style={{ position: 'fixed', top: 'calc(2rem + 100px)', right: '2rem', zIndex: 50, transform: 'translateY(-50%)', display: 'none' }}>
         <LanguageSwitcher />
       </div>
 
-      <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <main className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8" style={{ display: 'none' }}>
         <div className="text-center w-full">
           {/* BETA SOON 卡片 */}
           <div className="mb-10 flex justify-center">
