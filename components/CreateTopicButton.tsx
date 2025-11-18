@@ -23,6 +23,20 @@ export function CreateTopicButton() {
   const [newTopic, setNewTopic] = useState({ title: '', description: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // ✅ 检查用户是否已投票
+  const checkUserVoted = async (topicId: number, address: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/topics/${topicId}/vote/check?userAddress=${address}`)
+      if (response.ok) {
+        const data = await response.json()
+        return data.hasVoted || false
+      }
+    } catch (error) {
+      console.error('检查投票状态失败:', error)
+    }
+    return false
+  }
+
   // 加载话题列表
   const loadTopics = async () => {
     try {
@@ -53,25 +67,12 @@ export function CreateTopicButton() {
     }
   }
 
-  // ✅ 检查用户是否已投票
-  const checkUserVoted = async (topicId: number, address: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`/api/topics/${topicId}/vote/check?userAddress=${address}`)
-      if (response.ok) {
-        const data = await response.json()
-        return data.hasVoted || false
-      }
-    } catch (error) {
-      console.error('检查投票状态失败:', error)
-    }
-    return false
-  }
-
   // 打开窗口时加载数据，当用户地址变化时也重新加载
   useEffect(() => {
     if (isOpen) {
       loadTopics()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, userAddress])
 
   // 提交新话题
