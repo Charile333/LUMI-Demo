@@ -30,6 +30,9 @@
     "titlePlaceholder": "Enter topic title...",
     "description": "Description",
     "descriptionPlaceholder": "Description (optional)",
+    "category": "Category",
+    "categoryPlaceholder": "Select category",
+    "allCategories": "All Categories",
     "publishTopic": "🚀 Publish Topic",
     "submitting": "Submitting...",
     "allTopics": "📊 All Topics",
@@ -47,7 +50,10 @@
     "topicNotExist": "Topic does not exist",
     "titleTooLong": "Title cannot exceed 100 characters",
     "descriptionTooLong": "Description cannot exceed 500 characters",
-    "networkError": "Please check your network connection"
+    "networkError": "Please check your network connection",
+    "voteRequiresWallet": "Voting requires wallet connection",
+    "connectWalletToVote": "Please connect your wallet to continue voting.",
+    "connectWalletFailed": "Failed to connect wallet"
   },
   "wallet": {
     "connect": "Connect Wallet",

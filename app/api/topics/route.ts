@@ -7,8 +7,12 @@ import { getSupabaseAdmin } from '@/lib/supabase-client';
 export const dynamic = 'force-dynamic';
 
 // 获取所有话题
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // ✅ 获取查询参数（分类筛选）
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    
     // ✅ 检查环境变量
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -35,9 +39,17 @@ export async function GET() {
       });
     }
     
-    const { data, error } = await supabase
+    // ✅ 构建查询（支持分类筛选）
+    let query = supabase
       .from('user_topics')
-      .select('*')
+      .select('*');
+    
+    // 如果指定了分类，添加筛选条件
+    if (category && category !== 'all' && category !== '') {
+      query = query.eq('category', category);
+    }
+    
+    const { data, error } = await query
       .order('votes', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(100);
@@ -65,7 +77,8 @@ export async function GET() {
       description: topic.description,
       votes: topic.votes,
       createdBy: topic.created_by,
-      createdAt: topic.created_at
+      createdAt: topic.created_at,
+      category: topic.category || 'automotive'
     }));
 
     return NextResponse.json({
@@ -113,12 +126,13 @@ export async function POST(request: NextRequest) {
     }
     
     // ✅ 安全地解析请求体
-    let title, description;
+    let title, description, category;
     try {
       const body = await request.json();
       title = body?.title;
       description = body?.description;
-      console.log('📥 解析请求体成功:', { title, description: description ? `${description.substring(0, 20)}...` : '' });
+      category = body?.category || 'automotive'; // 默认分类为 'automotive'
+      console.log('📥 解析请求体成功:', { title, description: description ? `${description.substring(0, 20)}...` : '', category });
     } catch (parseError: any) {
       console.error('❌ 解析请求体失败:', parseError);
       return NextResponse.json(
@@ -145,6 +159,15 @@ export async function POST(request: NextRequest) {
     if (description && description.length > 500) {
       return NextResponse.json(
         { success: false, error: '描述不能超过500个字符' },
+        { status: 400 }
+      );
+    }
+
+    // ✅ 验证分类
+    const validCategories = ['automotive', 'tech-ai', 'entertainment', 'smart-devices', 'sports-gaming', 'economy-social', 'emerging'];
+    if (category && !validCategories.includes(category)) {
+      return NextResponse.json(
+        { success: false, error: '无效的分类' },
         { status: 400 }
       );
     }
@@ -182,7 +205,8 @@ export async function POST(request: NextRequest) {
           title: title.trim(),
           description: description?.trim() || '',
           created_by: userAddress,
-          votes: 0
+          votes: 0,
+          category: category || 'automotive'
         })
         .select()
         .single();
@@ -275,7 +299,8 @@ export async function POST(request: NextRequest) {
       description: data.description,
       votes: data.votes,
       createdBy: data.created_by,
-      createdAt: data.created_at
+      createdAt: data.created_at,
+      category: data.category || 'automotive'
     };
 
     console.log('✅ 话题创建成功:', topic.id);

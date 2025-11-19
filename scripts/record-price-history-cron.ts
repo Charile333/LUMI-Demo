@@ -6,6 +6,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { pathToFileURL } from 'url';
 
 dotenv.config();
 
@@ -215,7 +216,13 @@ async function cleanupOldData() {
 }
 
 // 如果直接运行此脚本
-if (require.main === module) {
+const isMainModule =
+  typeof process !== 'undefined' &&
+  Array.isArray(process.argv) &&
+  process.argv[1] &&
+  pathToFileURL(process.argv[1]).href === import.meta.url;
+
+if (isMainModule) {
   (async () => {
     console.log('╔════════════════════════════════════════════════════════════╗');
     console.log('║       📊 市场价格历史记录任务 (方案A)                      ║');

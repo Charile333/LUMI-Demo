@@ -3,7 +3,12 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import ClientLayout from './client-layout';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: 'LUMI - 预测市场',

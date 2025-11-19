@@ -12,6 +12,7 @@ interface Topic {
   votes: number
   createdBy: string
   createdAt: string
+  category?: string
   hasVoted?: boolean
 }
 
@@ -20,8 +21,21 @@ export function CreateTopicButton() {
   const { address: userAddress, isConnected, connectWallet } = useWallet()
   const [isOpen, setIsOpen] = useState(false)
   const [topics, setTopics] = useState<Topic[]>([])
-  const [newTopic, setNewTopic] = useState({ title: '', description: '' })
+  const [newTopic, setNewTopic] = useState({ title: '', description: '', category: 'automotive' })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  
+  // 话题分类选项
+  const topicCategories = [
+    { value: 'all', label: t('topic.allCategories'), icon: '📊' },
+    { value: 'automotive', label: t('categories.automotive') || '汽车', icon: '🚗' },
+    { value: 'tech-ai', label: t('categories.techAi') || '科技与AI', icon: '🤖' },
+    { value: 'entertainment', label: t('categories.entertainment') || '娱乐', icon: '🎬' },
+    { value: 'smart-devices', label: t('categories.smartDevices') || '智能设备', icon: '📱' },
+    { value: 'sports-gaming', label: t('categories.sportsGaming') || '体育与游戏', icon: '⚽' },
+    { value: 'economy-social', label: t('categories.economySocial') || '经济与社会', icon: '💰' },
+    { value: 'emerging', label: t('categories.emerging') || '新兴', icon: '🌟' },
+  ]
 
   // ✅ 检查用户是否已投票
   const checkUserVoted = async (topicId: number, address: string): Promise<boolean> => {
@@ -38,9 +52,14 @@ export function CreateTopicButton() {
   }
 
   // 加载话题列表
-  const loadTopics = async () => {
+  const loadTopics = async (category?: string) => {
     try {
-      const response = await fetch('/api/topics')
+      const categoryParam = category !== undefined ? category : selectedCategory
+      const url = categoryParam && categoryParam !== 'all' 
+        ? `/api/topics?category=${categoryParam}`
+        : '/api/topics'
+      
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         const topics = data.topics || []
@@ -67,13 +86,13 @@ export function CreateTopicButton() {
     }
   }
 
-  // 打开窗口时加载数据，当用户地址变化时也重新加载
+  // 打开窗口时加载数据，当用户地址或分类变化时也重新加载
   useEffect(() => {
     if (isOpen) {
       loadTopics()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, userAddress])
+  }, [isOpen, userAddress, selectedCategory])
 
   // 提交新话题
   const handleSubmitTopic = async (e: React.FormEvent) => {
@@ -95,6 +114,7 @@ export function CreateTopicButton() {
         body: JSON.stringify({
           title: newTopic.title,
           description: newTopic.description,
+          category: newTopic.category || 'general',
         })
       })
 
@@ -116,7 +136,7 @@ export function CreateTopicButton() {
       if (response.ok && data.success) {
         console.log('✅ 话题创建成功:', data.topic)
         alert(t('topic.submitSuccess'))
-        setNewTopic({ title: '', description: '' })
+        setNewTopic({ title: '', description: '', category: 'automotive' })
         loadTopics()
       } else {
         // ✅ 增强错误处理：显示详细错误信息
@@ -290,6 +310,17 @@ export function CreateTopicButton() {
                 placeholder={t('topic.descriptionPlaceholder')}
                 maxLength={200}
               />
+              <select
+                value={newTopic.category}
+                onChange={(e) => setNewTopic({ ...newTopic, category: e.target.value })}
+                className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-amber-400 bg-white/5 text-white transition-colors"
+              >
+                {topicCategories.filter(cat => cat.value !== 'all').map((cat) => (
+                  <option key={cat.value} value={cat.value} className="bg-zinc-900">
+                    {cat.icon} {cat.label}
+                  </option>
+                ))}
+              </select>
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -305,11 +336,31 @@ export function CreateTopicButton() {
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-md font-semibold text-white">{t('topic.allTopics')} ({topics.length})</h3>
               <button
-                onClick={loadTopics}
+                onClick={() => loadTopics()}
                 className="text-amber-400 hover:text-amber-500 text-sm transition-colors"
               >
                 🔄 {t('common.refresh')}
               </button>
+            </div>
+            
+            {/* 分类筛选器 */}
+            <div className="mb-3 flex flex-wrap gap-2">
+              {topicCategories.map((cat) => (
+                <button
+                  key={cat.value}
+                  onClick={() => {
+                    setSelectedCategory(cat.value)
+                    loadTopics(cat.value)
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    selectedCategory === cat.value
+                      ? 'bg-amber-400 text-black'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {cat.icon} {cat.label}
+                </button>
+              ))}
             </div>
 
             {topics.length === 0 ? (
@@ -341,9 +392,16 @@ export function CreateTopicButton() {
                     )}
 
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-gray-500">
-                        {new Date(topic.createdAt).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {topic.category && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400 border border-white/10">
+                            {topicCategories.find(cat => cat.value === topic.category)?.icon || '📌'} {topicCategories.find(cat => cat.value === topic.category)?.label || topic.category}
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {new Date(topic.createdAt).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })}
+                        </span>
+                      </div>
                       <button
                         onClick={() => handleVote(topic.id)}
                         disabled={topic.hasVoted}

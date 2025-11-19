@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS user_topics (
   description TEXT DEFAULT '',
   created_by VARCHAR(255) NOT NULL DEFAULT 'anonymous',
   votes INTEGER NOT NULL DEFAULT 0,
+  category VARCHAR(50) DEFAULT 'automotive',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS user_topics (
 -- 创建索引以提高查询性能
 CREATE INDEX IF NOT EXISTS idx_user_topics_votes ON user_topics(votes DESC);
 CREATE INDEX IF NOT EXISTS idx_user_topics_created_at ON user_topics(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_user_topics_category ON user_topics(category);
 
 -- 创建话题投票表
 CREATE TABLE IF NOT EXISTS topic_votes (
@@ -30,5 +32,6 @@ CREATE INDEX IF NOT EXISTS idx_topic_votes_user_address ON topic_votes(user_addr
 
 -- 添加注释
 COMMENT ON TABLE user_topics IS '用户创建的话题表';
+COMMENT ON COLUMN user_topics.category IS '话题分类（automotive, tech-ai, entertainment, sports-gaming, economy-social, emerging）';
 COMMENT ON TABLE topic_votes IS '话题投票记录表';
 

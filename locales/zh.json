@@ -30,6 +30,9 @@
     "titlePlaceholder": "输入话题标题...",
     "description": "描述",
     "descriptionPlaceholder": "描述（可选）",
+    "category": "分类",
+    "categoryPlaceholder": "选择分类",
+    "allCategories": "全部分类",
     "publishTopic": "🚀 发布话题",
     "submitting": "提交中...",
     "allTopics": "📊 所有话题",
@@ -47,7 +50,10 @@
     "topicNotExist": "话题不存在",
     "titleTooLong": "标题不能超过100个字符",
     "descriptionTooLong": "描述不能超过500个字符",
-    "networkError": "请检查网络连接"
+    "networkError": "请检查网络连接",
+    "voteRequiresWallet": "投票需要连接钱包",
+    "connectWalletToVote": "请连接钱包后继续投票。",
+    "connectWalletFailed": "连接钱包失败"
   },
   "wallet": {
     "connect": "连接钱包",
