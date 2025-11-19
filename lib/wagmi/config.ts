@@ -54,21 +54,17 @@ function getConnectors() {
     } else {
       // Project ID 有效，启用所有钱包
       // 注意：RainbowKit 会自动将已安装的钱包（EIP-6963）归类到 "Installed" 分组
-      // 其他钱包可以通过 "Popular" 和 "More" 分组显示，或通过 WalletConnect 访问
+      // 未安装的钱包会显示在配置的分组中，或通过 WalletConnect 访问
+      // 将所有钱包放在一个分组中，确保都能显示（包括未安装的）
       cachedConnectors = connectorsForWallets(
         [
           {
             groupName: 'Popular',
             wallets: [
               metaMaskWallet,
-              coinbaseWallet,
               walletConnectWallet, // 通过 WalletConnect 可以访问所有支持的钱包
+              coinbaseWallet,
               okxWallet,
-            ],
-          },
-          {
-            groupName: 'More',
-            wallets: [
               rainbowWallet,
               trustWallet,
             ],
@@ -79,6 +75,13 @@ function getConnectors() {
           projectId,
         }
       );
+      
+      if (typeof window !== 'undefined') {
+        console.log('✅ 钱包连接器已配置，Project ID:', projectId.substring(0, 8) + '...');
+        console.log('✅ 已配置钱包:', ['MetaMask', 'WalletConnect', 'Coinbase Wallet', 'OKX Wallet', 'Rainbow Wallet', 'Trust Wallet']);
+        console.log('ℹ️  已安装的钱包会自动归类到 "Installed" 分组');
+        console.log('ℹ️  未安装的钱包会显示在 "Popular" 分组或通过 WalletConnect 访问');
+      }
     }
   }
   return cachedConnectors;
