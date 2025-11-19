@@ -1,8 +1,40 @@
 # GitLab CI/CD 配置文件
-# 用于批量结算定时任务
+# 用于定时任务：批量结算和价格历史记录
+# 
+# 配置说明：
+# - 价格历史记录任务：用于概率曲线，建议每 5-10 分钟执行一次
+# - 批量结算任务：用于批量结算交易，建议每小时执行一次
+# 
+# 在 GitLab 中创建两个独立的 Schedule：
+# 1. Schedule 1: 价格历史记录（每 5 分钟）
+#    - 在 Schedule 的 Variables 中添加：RUN_PRICE_HISTORY=true
+# 2. Schedule 2: 批量结算（每小时）
+#    - 在 Schedule 的 Variables 中添加：RUN_SETTLE_TRADES=true
 
 stages:
+  - price-history
   - settle-trades
+
+# 价格历史记录任务（用于概率曲线）
+record-price-history:
+  stage: price-history
+  image: node:18-alpine
+  script: |
+    echo "📊 开始记录价格历史..."
+    echo "时间: $(date)"
+    echo "分支: $CI_COMMIT_REF_NAME"
+    echo "触发源: $CI_PIPELINE_SOURCE"
+    
+    npm ci
+    npm run record-prices
+    
+    echo "✅ 价格历史记录完成"
+  rules:
+    # 允许定时任务触发（通过环境变量控制）
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $RUN_PRICE_HISTORY == "true"
+    # 允许手动触发（在主分支）
+    - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
 
 # 批量结算任务
 batch-settle-trades:
@@ -47,8 +79,8 @@ batch-settle-trades:
       exit 1
     fi
   rules:
-    # 允许定时任务触发
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    # 允许定时任务触发（通过环境变量控制）
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $RUN_SETTLE_TRADES == "true"
     # 允许手动触发（在主分支）
     - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
       when: manual
