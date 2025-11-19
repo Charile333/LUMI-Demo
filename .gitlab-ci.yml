@@ -8,49 +8,44 @@ stages:
 batch-settle-trades:
   stage: settle-trades
   image: curlimages/curl:latest
-  script:
-    - echo "🔄 触发批量结算 API..."
-    - echo "时间: $(date)"
-    - echo "分支: $CI_COMMIT_REF_NAME"
-    - echo "触发源: $CI_PIPELINE_SOURCE"
-    
-    # 检查 CRON_SECRET 是否配置
-    - |
-      if [ -z "$CRON_SECRET" ]; then
-        echo "❌ 错误: CRON_SECRET 未配置"
-        echo "请到 GitLab Settings > CI/CD > Variables 中添加 CRON_SECRET"
-        exit 1
-      fi
-    
-    # 检查 VERCEL_APP_URL 是否配置
-    - |
-      if [ -z "$VERCEL_APP_URL" ]; then
-        echo "❌ 错误: VERCEL_APP_URL 未配置"
-        echo "请到 GitLab Settings > CI/CD > Variables 中添加 VERCEL_APP_URL"
-        exit 1
-      fi
-    
-    # 调用 Vercel API
-    - |
-      echo "调用 API: $VERCEL_APP_URL/api/cron/settle-trades"
-      response=$(curl -s -w "\n%{http_code}" -X POST \
-        -H "Authorization: Bearer $CRON_SECRET" \
-        -H "Content-Type: application/json" \
-        $VERCEL_APP_URL/api/cron/settle-trades)
-      
-      http_code=$(echo "$response" | tail -n1)
-      body=$(echo "$response" | sed '$d')
-      
-      echo "HTTP 状态码: $http_code"
-      echo "响应内容:"
-      echo "$body"
-      
-      if [ "$http_code" -eq 200 ]; then
-        echo "✅ 批量结算触发成功"
-      else
-        echo "❌ 批量结算触发失败 (HTTP $http_code)"
-        exit 1
-      fi
+  script: |
+    set -e
+    echo "🔄 触发批量结算 API..."
+    echo "时间: $(date)"
+    echo "分支: $CI_COMMIT_REF_NAME"
+    echo "触发源: $CI_PIPELINE_SOURCE"
+
+    if [ -z "$CRON_SECRET" ]; then
+      echo "❌ 错误: CRON_SECRET 未配置"
+      echo "请到 GitLab Settings > CI/CD > Variables 中添加 CRON_SECRET"
+      exit 1
+    fi
+
+    if [ -z "$VERCEL_APP_URL" ]; then
+      echo "❌ 错误: VERCEL_APP_URL 未配置"
+      echo "请到 GitLab Settings > CI/CD > Variables 中添加 VERCEL_APP_URL"
+      exit 1
+    fi
+
+    echo "调用 API: $VERCEL_APP_URL/api/cron/settle-trades"
+    response=$(curl -s -w "\n%{http_code}" -X POST \
+      -H "Authorization: Bearer $CRON_SECRET" \
+      -H "Content-Type: application/json" \
+      $VERCEL_APP_URL/api/cron/settle-trades)
+
+    http_code=$(echo "$response" | tail -n1)
+    body=$(echo "$response" | sed '$d')
+
+    echo "HTTP 状态码: $http_code"
+    echo "响应内容:"
+    echo "$body"
+
+    if [ "$http_code" -eq 200 ]; then
+      echo "✅ 批量结算触发成功"
+    else
+      echo "❌ 批量结算触发失败 (HTTP $http_code)"
+      exit 1
+    fi
   rules:
     # 允许定时任务触发
     - if: $CI_PIPELINE_SOURCE == "schedule"
