@@ -53,6 +53,8 @@ function getConnectors() {
       );
     } else {
       // Project ID 有效，启用所有钱包
+      // 注意：RainbowKit 会自动将已安装的钱包（EIP-6963）归类到 "Installed" 分组
+      // 其他钱包可以通过 "Popular" 和 "More" 分组显示，或通过 WalletConnect 访问
       cachedConnectors = connectorsForWallets(
         [
           {
@@ -60,8 +62,8 @@ function getConnectors() {
             wallets: [
               metaMaskWallet,
               coinbaseWallet,
+              walletConnectWallet, // 通过 WalletConnect 可以访问所有支持的钱包
               okxWallet,
-              walletConnectWallet,
             ],
           },
           {
