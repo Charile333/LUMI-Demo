@@ -636,6 +636,8 @@
       "active": "活跃",
       "assets": "资产",
       "openFullTerminal": "打开完整终端",
+      "monitoringTicker": "监控中",
+      "monitoringTickerHint": "正在实时监测 BTC/USDT 波动",
       "priceAlertMessage": "实时波动预警 | 最新价格≈${price}"
     }
   },

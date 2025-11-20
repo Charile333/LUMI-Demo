@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useWallet } from '@/app/provider-wagmi'
+import { useToast } from '@/components/Toast'
 
 interface Topic {
   id: number
@@ -19,6 +20,7 @@ interface Topic {
 export function CreateTopicButton() {
   const { t } = useTranslation()
   const { address: userAddress, isConnected, connectWallet } = useWallet()
+  const { success: toastSuccess, error: toastError, info: toastInfo, warning: toastWarning } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [topics, setTopics] = useState<Topic[]>([])
   const [newTopic, setNewTopic] = useState({ title: '', description: '', category: 'automotive' })
@@ -99,7 +101,7 @@ export function CreateTopicButton() {
     e.preventDefault()
     
     if (!newTopic.title.trim()) {
-      alert(t('topic.pleaseEnterTitle'))
+      toastWarning(t('topic.pleaseEnterTitle'))
       return
     }
 
@@ -135,7 +137,7 @@ export function CreateTopicButton() {
 
       if (response.ok && data.success) {
         console.log('✅ 话题创建成功:', data.topic)
-        alert(t('topic.submitSuccess'))
+        toastSuccess(t('topic.submitSuccess'))
         setNewTopic({ title: '', description: '', category: 'automotive' })
         loadTopics()
       } else {
@@ -154,20 +156,20 @@ export function CreateTopicButton() {
         })
         
         // ✅ 显示详细的错误信息
-        let alertMessage = `${t('topic.submitFailed')}\n\n错误: ${errorMessage}`
+        let toastMessage = `${t('topic.submitFailed')}\n\n错误: ${errorMessage}`
         if (errorCode) {
-          alertMessage += `\n错误代码: ${errorCode}`
+          toastMessage += `\n错误代码: ${errorCode}`
         }
         if (data.errorDetails && process.env.NODE_ENV === 'development') {
-          alertMessage += `\n详情: ${JSON.stringify(data.errorDetails, null, 2)}`
+          toastMessage += `\n详情: ${JSON.stringify(data.errorDetails, null, 2)}`
         }
         
         // ✅ 如果是表不存在错误，提供明确的解决方案
         if (errorMessage.includes('表尚未创建') || errorMessage.includes('does not exist')) {
-          alertMessage += `\n\n解决方案: 请在 Supabase 中运行 database/create-user-topics-table.sql 创建表`
+          toastMessage += `\n\n解决方案: 请在 Supabase 中运行 database/create-user-topics-table.sql 创建表`
         }
         
-        alert(alertMessage)
+        toastError(toastMessage, { duration: 8000 })
         
         // ✅ 同时输出到控制台，方便调试
         console.error('完整错误信息:', JSON.stringify(data, null, 2))
@@ -177,7 +179,7 @@ export function CreateTopicButton() {
       console.error('错误堆栈:', error.stack)
       
       const errorMessage = error.message || '网络错误'
-      alert(`${t('topic.submitFailed')}，${errorMessage}\n\n请检查控制台获取详细错误信息。`)
+      toastError(`${t('topic.submitFailed')}，${errorMessage}\n\n请检查控制台获取详细错误信息。`, { duration: 7000 })
     } finally {
       setIsSubmitting(false)
     }
@@ -187,9 +189,10 @@ export function CreateTopicButton() {
   const handleVote = async (topicId: number) => {
     // ✅ 检查用户是否已连接钱包（不在这里弹出第二个连接对话框，统一使用导航栏的 WalletConnect）
     if (!isConnected || !userAddress) {
-      alert(
+      toastInfo(
         `${t('topic.voteRequiresWallet') || '投票需要连接钱包'}\n\n` +
-        `${t('topic.connectWalletToVote') || '请先使用页面右上角的“连接钱包”按钮连接 OKX / MetaMask 等钱包。'}`
+        `${t('topic.connectWalletToVote') || '请先使用页面右上角的“连接钱包”按钮连接 OKX / MetaMask 等钱包。'}`,
+        { duration: 6000 }
       )
       return
     }
@@ -197,7 +200,7 @@ export function CreateTopicButton() {
     // ✅ 检查是否已投票（防止重复点击）
     const topic = topics.find(t => t.id === topicId)
     if (topic?.hasVoted) {
-      alert(t('topic.alreadyVoted') || '您已经投过票了')
+      toastWarning(t('topic.alreadyVoted') || '您已经投过票了')
       return
     }
 
@@ -222,7 +225,7 @@ export function CreateTopicButton() {
             ? { ...topic, votes: data.votes || topic.votes + 1, hasVoted: true }
             : topic
         ))
-        alert(t('topic.voteSuccess') || '✅ 投票成功！')
+        toastSuccess(t('topic.voteSuccess') || '✅ 投票成功！')
       } else {
         // ✅ 增强错误处理
         const errorMessage = data.error || t('topic.voteFailed') || '投票失败'
@@ -236,11 +239,11 @@ export function CreateTopicButton() {
           ))
         }
         
-        alert(`❌ ${errorMessage}`)
+        toastError(`❌ ${errorMessage}`)
       }
     } catch (error: any) {
       console.error('投票失败:', error)
-      alert(`❌ ${error.message || t('topic.voteFailed') || '投票失败'}`)
+      toastError(`❌ ${error.message || t('topic.voteFailed') || '投票失败'}`)
     }
   }
 

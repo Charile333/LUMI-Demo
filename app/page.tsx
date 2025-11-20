@@ -47,8 +47,8 @@ export default function LumiSoonPage() {
       if (isUnmounting) return;
       
       try {
-        // 获取BTC和ETH的24小时数据
-        const symbols = ['BTCUSDT', 'ETHUSDT'];
+        // 仅获取 BTC/USDT 的 24 小时数据
+        const symbols = ['BTCUSDT'];
         const response = await fetch(
           `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
         );
@@ -59,6 +59,7 @@ export default function LumiSoonPage() {
         const newAlerts: RealtimeAlert[] = [];
         
         data.forEach((ticker: any) => {
+          if (ticker.symbol !== 'BTCUSDT') return;
           const priceChange = parseFloat(ticker.priceChangePercent);
           
           // 只显示价格变化超过1%的币种
@@ -120,7 +121,11 @@ export default function LumiSoonPage() {
           const result = await response.json();
           
           if (result.success && result.data && result.data.length > 0) {
-            const newAlerts: RealtimeAlert[] = result.data.map((item: any) => {
+            const btcAlerts = result.data.filter((item: any) => item.symbol === 'BTCUSDT');
+            if (btcAlerts.length === 0) {
+              return;
+            }
+            const newAlerts: RealtimeAlert[] = btcAlerts.map((item: any) => {
               let change = 0;
               if (item.details && item.details.price_change) {
                 change = item.details.price_change * 100;
@@ -189,6 +194,9 @@ export default function LumiSoonPage() {
             
             if (data.type === 'alert' && data.data) {
               const alert = data.data;
+              if (alert.symbol !== 'BTCUSDT') {
+                return;
+              }
               
               let change = 0;
               if (alert.details && alert.details.price_change) {
@@ -244,7 +252,8 @@ export default function LumiSoonPage() {
         const result = await response.json();
         
         if (result.success && result.data) {
-          const alerts: RealtimeAlert[] = result.data.slice(0, 5).map((item: any, index: number) => {
+          const btcAlerts = result.data.filter((item: any) => item.symbol === 'BTCUSDT');
+          const alerts: RealtimeAlert[] = btcAlerts.slice(0, 5).map((item: any, index: number) => {
             let change = 0;
             if (item.details && item.details.price_change) {
               change = item.details.price_change * 100;
@@ -767,6 +776,21 @@ export default function LumiSoonPage() {
                         <span className="text-stone-500">|</span>
                         <span className="text-stone-400">{t('landing.terminal.liveMarketData')}</span>
                       </div>
+                    </div>
+                    {/* 监测中动态提示 */}
+                    <div className="mb-3 flex flex-col sm:flex-row sm:items-center gap-2 text-[10px] font-mono">
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                        </span>
+                        <span className="tracking-[0.3em] text-emerald-300 uppercase">
+                          {t('landing.terminal.monitoringTicker')}
+                        </span>
+                      </div>
+                      <span className="text-stone-500 text-[9px]">
+                        {t('landing.terminal.monitoringTickerHint')}
+                      </span>
                     </div>
                     {/* 实时数据流 - 终端样式 */}
                     <div className="space-y-1 flex-1 overflow-y-auto font-mono text-xs" style={{ willChange: 'contents' }}>
