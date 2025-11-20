@@ -34,7 +34,7 @@ export default function CompactTradeModal({
   const toast = useToast();
   
   // 🔥 使用统一的 useWallet hook（和 OrderForm、导航栏一致）
-  const { address: account, isConnected, connectWallet } = useWallet();
+  const { address: account, isConnected } = useWallet();
   const polymarket = useLUMIPolymarket();
   
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
@@ -93,14 +93,9 @@ export default function CompactTradeModal({
     try {
       setIsSubmitting(true);
       
-      // 1. 检查钱包连接状态
+      // 1. 检查钱包连接状态（只检查，不在这里再次弹出连接对话框）
       if (!isConnected || !account) {
-        toast.warning('请先连接钱包');
-        try {
-          await connectWallet();
-        } catch (error) {
-          console.error('[CompactTrade] 连接钱包失败:', error);
-        }
+        toast.warning('请先在页面顶部或弹窗中的按钮连接钱包');
         setIsSubmitting(false);
         return;
       }

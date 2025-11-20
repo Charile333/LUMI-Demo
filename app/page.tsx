@@ -75,7 +75,10 @@ export default function LumiSoonPage() {
               timestamp: timeString,
               asset: ticker.symbol.replace('USDT', '/USDT'),
               severity: severity,
-              message: `24h 价格变化 ${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)}% | 当前价格: $${parseFloat(ticker.lastPrice).toFixed(2)}`,
+              // 使用双语翻译
+              message: t('landing.terminal.priceAlertMessage', { 
+                price: `$${parseFloat(ticker.lastPrice).toFixed(2)}` 
+              }),
               change: priceChange
             });
           }

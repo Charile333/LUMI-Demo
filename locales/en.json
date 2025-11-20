@@ -635,7 +635,8 @@
       "monitor": "Monitor",
       "active": "ACTIVE",
       "assets": "Assets",
-      "openFullTerminal": "Open Full Terminal"
+      "openFullTerminal": "Open Full Terminal",
+      "priceAlertMessage": "Real-time Volatility Alert | Latest Price ≈ ${price}"
     },
     "matches": {
       "live": "Live",

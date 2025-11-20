@@ -185,18 +185,12 @@ export function CreateTopicButton() {
 
   // ✅ 投票（增强版：要求用户连接钱包）
   const handleVote = async (topicId: number) => {
-    // ✅ 检查用户是否已连接钱包
+    // ✅ 检查用户是否已连接钱包（不在这里弹出第二个连接对话框，统一使用导航栏的 WalletConnect）
     if (!isConnected || !userAddress) {
-      const shouldConnect = confirm(
-        `${t('topic.voteRequiresWallet') || '投票需要连接钱包'}\n\n${t('topic.connectWalletToVote') || '请连接钱包后继续投票。'}`
+      alert(
+        `${t('topic.voteRequiresWallet') || '投票需要连接钱包'}\n\n` +
+        `${t('topic.connectWalletToVote') || '请先使用页面右上角的“连接钱包”按钮连接 OKX / MetaMask 等钱包。'}`
       )
-      if (shouldConnect) {
-        try {
-          await connectWallet()
-        } catch (error: any) {
-          alert(`❌ ${error.message || t('topic.connectWalletFailed') || '连接钱包失败'}`)
-        }
-      }
       return
     }
 
