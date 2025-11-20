@@ -59,14 +59,34 @@ export default function OrderForm({
       return;
     }
     
-    if (!account || !isConnected) {
-      toast.warning(t('orderForm.connectWalletFirst'));
-      return;
-    }
-    
     setSubmitting(true);
     
     try {
+      // ✅ 双重验证：先检查 hook 状态，再验证实际钱包连接
+      // 1. 检查 hook 状态
+      if (!account || !isConnected) {
+        toast.warning(t('orderForm.connectWalletFirst'));
+        setSubmitting(false);
+        return;
+      }
+      
+      // 2. 验证实际钱包连接状态（通过 eth_accounts）
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_accounts' 
+      });
+      
+      if (!accounts || accounts.length === 0) {
+        toast.warning('钱包未连接，请先连接钱包');
+        setSubmitting(false);
+        return;
+      }
+      
+      if (accounts[0].toLowerCase() !== account.toLowerCase()) {
+        toast.warning('钱包地址不匹配，请重新连接钱包');
+        setSubmitting(false);
+        return;
+      }
+      
       // 🎯 如果有 Polymarket 集成，优先使用区块链交易
       if (polymarket && polymarket.isConnected) {
         console.log('🎯 使用 Polymarket 官方组件执行交易...');
@@ -112,31 +132,18 @@ export default function OrderForm({
           onSuccess();
         }
         
+        setSubmitting(false);
         return;
       }
       
       // 📊 默认模式：链下订单簿
       console.log('📊 使用链下订单簿模式...');
       
-      // ✅ 统一：直接使用 useWallet() hook 提供的 address，不再调用 eth_requestAccounts
-      if (!account) {
-        toast.error('钱包未连接，请先连接钱包');
-        setSubmitting(false);
-        return;
-      }
-      
       // 1. 获取 provider 和 signer（仅用于签名，不用于连接）
       let provider, signer;
       
       try {
-        // ✅ 只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_accounts' 
-        });
-        
-        if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
-          throw new Error('钱包账户不匹配，请刷新页面后重试');
-        }
+        // ✅ 账户已验证，现在可以安全创建 signer
         
         // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
         provider = new ethers.providers.Web3Provider(window.ethereum);

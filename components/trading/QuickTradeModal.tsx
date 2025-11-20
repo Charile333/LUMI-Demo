@@ -135,20 +135,38 @@ export default function QuickTradeModal({
     try {
       setIsSubmitting(true);
       
-      // 1. 检查钱包连接
+      if (typeof window.ethereum === 'undefined') {
+        toast.warning(t('orderForm.installMetaMask'));
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // ✅ 双重验证：先检查 hook 状态，再验证实际钱包连接
+      // 1. 检查 hook 状态
       if (!account || !isConnected) {
         toast.warning('请先连接钱包');
         setIsSubmitting(false);
         return;
       }
       
-      if (typeof window.ethereum === 'undefined') {
-        toast.warning(t('orderForm.installMetaMask'));
+      // 2. 验证实际钱包连接状态（通过 eth_accounts）
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_accounts' 
+      });
+      
+      if (!accounts || accounts.length === 0) {
+        toast.warning('钱包未连接，请先连接钱包');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      if (accounts[0].toLowerCase() !== account.toLowerCase()) {
+        toast.warning('钱包地址不匹配，请重新连接钱包');
         setIsSubmitting(false);
         return;
       }
 
-      // 2. 确保在正确的网络（Polygon Amoy 80002）
+      // 3. 确保在正确的网络（Polygon Amoy 80002）
       try {
         const targetChainIdHex = '0x13882'; // 80002
         const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
@@ -189,19 +207,11 @@ export default function QuickTradeModal({
         console.warn('网络检查/切换失败', netErr);
       }
 
-      // 3. 获取 provider 和 signer（仅用于签名，不用于连接）
-      // ✅ 统一：直接使用 useWallet() hook 提供的 address，不再调用 eth_requestAccounts
+      // 4. 获取 provider 和 signer（仅用于签名，不用于连接）
+      // ✅ 账户已验证，现在可以安全创建 signer
       let provider, signer;
       
       try {
-        // ✅ 只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_accounts' 
-        });
-        
-        if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
-          throw new Error('钱包账户不匹配，请刷新页面后重试');
-        }
         
         // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
         provider = new ethers.providers.Web3Provider(window.ethereum);
