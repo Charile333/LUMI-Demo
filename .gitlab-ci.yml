@@ -19,11 +19,15 @@ stages:
 record-price-history:
   stage: price-history
   image: node:20-alpine
+  variables:
+    GIT_DEPTH: 0  # 拉取完整历史，确保获取最新提交
   script: |
     echo "📊 开始记录价格历史..."
     echo "时间: $(date)"
     echo "分支: $CI_COMMIT_REF_NAME"
     echo "触发源: $CI_PIPELINE_SOURCE"
+    echo "当前提交: $(git rev-parse HEAD)"
+    echo "提交信息: $(git log -1 --oneline)"
     
     npm ci
     npm run record-prices
