@@ -11,6 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
 import { useWallet } from '@/app/provider-wagmi';
+import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 
 interface QuickTradeModalProps {
   isOpen: boolean;
@@ -35,7 +36,7 @@ export default function QuickTradeModal({
   const toast = useToast();
   const polymarket = useLUMIPolymarket();
   // ✅ 统一：使用 useWallet() hook 获取钱包状态
-  const { address: account, isConnected } = useWallet();
+  const { address: account, isConnected, provider: walletProvider } = useWallet();
   const [amount, setAmount] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0.50);
@@ -129,13 +130,23 @@ export default function QuickTradeModal({
     fetchOrderBookPrice();
   }, [isOpen, market.id, side]);
 
+  const getActiveProvider = () => {
+    const candidate = walletProvider ?? getBrowserWalletProvider();
+    if (candidate && typeof candidate.request === 'function') {
+      return candidate;
+    }
+    return null;
+  };
+
   if (!isOpen) return null;
 
   const handleTrade = async () => {
     try {
       setIsSubmitting(true);
       
-      if (typeof window.ethereum === 'undefined') {
+      const injectedProvider = getActiveProvider();
+      
+      if (!injectedProvider) {
         toast.warning(t('orderForm.installMetaMask'));
         setIsSubmitting(false);
         return;
@@ -150,9 +161,7 @@ export default function QuickTradeModal({
       }
       
       // 2. 验证实际钱包连接状态（通过 eth_accounts）
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_accounts' 
-      });
+      const accounts = await injectedProvider.request({ method: 'eth_accounts' });
       
       if (!accounts || accounts.length === 0) {
         toast.warning('钱包未连接，请先连接钱包');
@@ -169,10 +178,10 @@ export default function QuickTradeModal({
       // 3. 确保在正确的网络（Polygon Amoy 80002）
       try {
         const targetChainIdHex = '0x13882'; // 80002
-        const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+        const currentChainId = await injectedProvider.request({ method: 'eth_chainId' });
         if (currentChainId?.toLowerCase() !== targetChainIdHex) {
           try {
-            await window.ethereum.request({
+            await injectedProvider.request({
               method: 'wallet_switchEthereumChain',
               params: [{ chainId: targetChainIdHex }]
             });
@@ -180,7 +189,7 @@ export default function QuickTradeModal({
             // 链未添加到钱包
             if (switchError?.code === 4902) {
               try {
-                await window.ethereum.request({
+                await injectedProvider.request({
                   method: 'wallet_addEthereumChain',
                   params: [{
                     chainId: targetChainIdHex,
@@ -214,7 +223,7 @@ export default function QuickTradeModal({
       try {
         
         // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(injectedProvider);
         signer = provider.getSigner(accounts[0]); // 明确指定账户地址
         
         console.log('[QuickTrade] 使用已连接的钱包地址:', account);
@@ -390,7 +399,8 @@ export default function QuickTradeModal({
       const makerAddress = onChainExecution.makerOrder?.address?.toLowerCase();
 
       if (!makerSignature) {
-        if (!window.ethereum) {
+        const injectedProvider = getActiveProvider();
+        if (!injectedProvider) {
           toast.error('检测不到钱包环境，无法签名');
           setIsExecutingOnChain(false);
           return;
@@ -398,9 +408,7 @@ export default function QuickTradeModal({
 
         // ✅ 统一：只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
         // 使用 useWallet() hook 提供的 address
-        const accounts = await window.ethereum.request({
-          method: 'eth_accounts'
-        });
+        const accounts = await injectedProvider.request({ method: 'eth_accounts' });
         
         if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account?.toLowerCase()) {
           throw new Error('钱包账户不匹配，请刷新页面后重试');
@@ -413,16 +421,14 @@ export default function QuickTradeModal({
           toast.info('请在钱包中确认签名，以授权链上交易');
           
           // ✅ 修复：先验证账户，再创建 signer
-          const accountsForSign = await window.ethereum.request({ 
-            method: 'eth_accounts' 
-          });
+          const accountsForSign = await injectedProvider.request({ method: 'eth_accounts' });
           
           if (!accountsForSign || accountsForSign.length === 0 || accountsForSign[0].toLowerCase() !== account?.toLowerCase()) {
             throw new Error('钱包账户未授权，请先连接钱包');
           }
           
           // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
-          const providerForSignature = new ethers.providers.Web3Provider(window.ethereum);
+          const providerForSignature = new ethers.providers.Web3Provider(injectedProvider);
           const signerForSignature = providerForSignature.getSigner(accountsForSign[0]); // 明确指定账户地址
           const orderForSign = {
             ...ctfOrder,

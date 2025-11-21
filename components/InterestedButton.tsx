@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
+import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 
 interface InterestedButtonProps {
   market: {
@@ -25,20 +26,19 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
   // 检查用户是否已标记感兴趣
   useEffect(() => {
     const checkInterested = async () => {
-      if (!window.ethereum) return;
+      const injectedProvider = getBrowserWalletProvider();
+      if (!injectedProvider) return;
 
       try {
         // ✅ 修复：先检查账户是否已授权，避免 "unknown account #0" 错误
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_accounts' 
-        });
+        const accounts = await injectedProvider.request({ method: 'eth_accounts' });
         
         if (!accounts || accounts.length === 0) {
           // 未授权，不设置地址
           return;
         }
         
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const provider = new ethers.providers.Web3Provider(injectedProvider);
         // ✅ 修复：明确指定账户地址创建 signer
         const signer = provider.getSigner(accounts[0]);
         const address = await signer.getAddress();
@@ -61,7 +61,8 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
 
   const handleClick = async () => {
     // 检查钱包
-    if (!window.ethereum) {
+    let injectedProvider = getBrowserWalletProvider();
+    if (!injectedProvider) {
       alert(t('market.interestedButton.installWallet'));
       return;
     }
@@ -71,22 +72,18 @@ export function InterestedButton({ market, onUpdate }: InterestedButtonProps) {
 
     try {
       // ✅ 修复：先检查账户是否已授权
-      let accounts = await window.ethereum.request({ 
-        method: 'eth_accounts' 
-      });
+      let accounts = await injectedProvider.request({ method: 'eth_accounts' });
       
       // 如果没有账户，再请求连接（用户主动点击按钮，这是允许的）
       if (!accounts || accounts.length === 0) {
-        accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
+        accounts = await injectedProvider.request({ method: 'eth_requestAccounts' });
         
         if (!accounts || accounts.length === 0) {
           throw new Error('钱包连接失败，请重试');
         }
       }
       
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(injectedProvider);
       // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
       const signer = provider.getSigner(accounts[0]);
       const address = await signer.getAddress();

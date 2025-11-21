@@ -18,7 +18,7 @@ stages:
 # 价格历史记录任务（用于概率曲线）
 record-price-history:
   stage: price-history
-  image: node:18-alpine
+  image: node:20-alpine
   script: |
     echo "📊 开始记录价格历史..."
     echo "时间: $(date)"

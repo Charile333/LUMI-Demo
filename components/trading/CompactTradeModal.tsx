@@ -10,6 +10,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { useMarketPrice } from '@/hooks/useMarketPrice';
 import { useWallet } from '@/app/provider-wagmi';
+import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
 import WalletConnect from '@/components/WalletConnect';
 
@@ -34,7 +35,7 @@ export default function CompactTradeModal({
   const toast = useToast();
   
   // 🔥 使用统一的 useWallet hook（和 OrderForm、导航栏一致）
-  const { address: account, isConnected } = useWallet();
+  const { address: account, isConnected, provider: walletProvider } = useWallet();
   const polymarket = useLUMIPolymarket();
   
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
@@ -89,6 +90,14 @@ export default function CompactTradeModal({
     ? (outcome === 'yes' ? price.bestAsk : price.bestAsk) // 买入使用卖价
     : (outcome === 'yes' ? price.bestBid : price.bestBid); // 卖出使用买价
 
+  const getActiveProvider = () => {
+    const candidate = walletProvider ?? getBrowserWalletProvider();
+    if (candidate && typeof candidate.request === 'function') {
+      return candidate;
+    }
+    return null;
+  };
+
   const handleTrade = async () => {
     try {
       setIsSubmitting(true);
@@ -107,14 +116,13 @@ export default function CompactTradeModal({
       let provider, signer;
       
       try {
-        if (typeof window.ethereum === 'undefined') {
-          throw new Error('未找到钱包，请安装 MetaMask');
+        const injectedProvider = getActiveProvider();
+        if (!injectedProvider) {
+          throw new Error('未找到钱包，请安装或启用浏览器钱包扩展');
         }
         
         // ✅ 先检查账户是否已授权
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_accounts' 
-        });
+        const accounts = await injectedProvider.request({ method: 'eth_accounts' });
         
         if (!accounts || accounts.length === 0) {
           throw new Error('钱包未连接，请先连接钱包');
@@ -125,7 +133,7 @@ export default function CompactTradeModal({
         }
         
         // ✅ 账户已授权，现在可以安全创建 signer
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(injectedProvider);
         signer = provider.getSigner(accounts[0]); // 明确指定账户地址
         
         // 验证地址是否匹配
@@ -258,7 +266,8 @@ export default function CompactTradeModal({
       const makerAddress = onChainExecution.makerOrder?.address?.toLowerCase();
 
       if (!makerSignature) {
-        if (!window.ethereum) {
+        const injectedProvider = getActiveProvider();
+        if (!injectedProvider) {
           toast.error('检测不到钱包环境，无法签名');
           setIsExecutingOnChain(false);
           return;
@@ -266,9 +275,7 @@ export default function CompactTradeModal({
 
         // ✅ 统一：只使用 eth_accounts 静默检查，不调用 eth_requestAccounts
         // 使用 useWallet() hook 提供的 address
-        const accounts = await window.ethereum.request({
-          method: 'eth_accounts'
-        });
+        const accounts = await injectedProvider.request({ method: 'eth_accounts' });
         
         if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account?.toLowerCase()) {
           throw new Error('钱包账户不匹配，请刷新页面后重试');
@@ -281,15 +288,13 @@ export default function CompactTradeModal({
           toast.info('请在钱包中确认签名，以授权链上交易');
           
           // ✅ 修复：先验证账户，再创建 signer
-          const accountsForSign = await window.ethereum.request({ 
-            method: 'eth_accounts' 
-          });
+          const accountsForSign = await injectedProvider.request({ method: 'eth_accounts' });
           
           if (!accountsForSign || accountsForSign.length === 0 || accountsForSign[0].toLowerCase() !== account?.toLowerCase()) {
             throw new Error('钱包账户未授权，请先连接钱包');
           }
           
-          const providerForSignature = new ethers.providers.Web3Provider(window.ethereum);
+          const providerForSignature = new ethers.providers.Web3Provider(injectedProvider);
           const signerForSignature = providerForSignature.getSigner(accountsForSign[0]); // 明确指定账户地址
           const orderForSign = {
             ...ctfOrder,

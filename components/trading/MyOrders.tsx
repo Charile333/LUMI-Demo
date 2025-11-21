@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { useWallet } from '@/app/provider-wagmi';
 import WalletConnect from '@/components/WalletConnect';
+import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 
 interface MyOrdersProps {
   marketId?: number;
@@ -16,7 +17,7 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
   const [filter, setFilter] = useState<'all' | 'open' | 'filled' | 'cancelled'>('all');
   
   // ✅ 统一使用 useWallet() hook，避免自己管理连接
-  const { address: account, isConnected } = useWallet();
+  const { address: account, isConnected, provider: walletProvider } = useWallet();
   
   useEffect(() => {
     if (account) {
@@ -61,22 +62,21 @@ export default function MyOrders({ marketId }: MyOrdersProps) {
       // ✅ 使用 useWallet() hook 提供的 provider（如果需要签名）
       // 注意：这里需要从 useWallet() 获取 signer，但当前 hook 没有暴露 signer
       // 暂时保持原有实现，但使用 account 而不是 window.ethereum 检查
-      if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error('钱包未连接');
+      const injectedProvider = walletProvider ?? getBrowserWalletProvider();
+      if (!injectedProvider) {
+        throw new Error('钱包未连接或浏览器未注入钱包 provider');
       }
       
       // 签名取消消息
       // ✅ 修复：先验证账户，再创建 signer
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_accounts' 
-      });
+      const accounts = await injectedProvider.request({ method: 'eth_accounts' });
       
       if (!accounts || accounts.length === 0 || accounts[0].toLowerCase() !== account.toLowerCase()) {
         throw new Error('钱包账户未授权，请先连接钱包');
       }
       
       const { ethers } = await import('ethers');
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(injectedProvider);
       // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
       const signer = provider.getSigner(accounts[0]); // 明确指定账户地址
       const message = `Cancel order: ${orderId}`;

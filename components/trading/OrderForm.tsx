@@ -9,6 +9,7 @@ import { signOrder, generateSalt, generateOrderId } from '@/lib/clob/signing';
 import { Order } from '@/lib/clob/types';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
+import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 
 interface OrderFormProps {
   marketId: number;
@@ -33,7 +34,7 @@ export default function OrderForm({
 }: OrderFormProps) {
   const { t } = useTranslation();
   const toast = useToast();
-  const { address: account, isConnected } = useWallet();
+  const { address: account, isConnected, provider: walletProvider } = useWallet();
   const [side, setSide] = useState<'buy' | 'sell'>('buy');
   const [outcome, setOutcome] = useState(1); // 1 = YES, 0 = NO
   const [amount, setAmount] = useState('10');
@@ -52,9 +53,19 @@ export default function OrderForm({
     setOutcome(newOutcome);
   };
   
+  const getActiveProvider = () => {
+    const candidate = walletProvider ?? getBrowserWalletProvider();
+    if (candidate && typeof candidate.request === 'function') {
+      return candidate;
+    }
+    return null;
+  };
+  
   // 提交订单
   const handleSubmit = async () => {
-    if (!window.ethereum) {
+    const injectedProvider = getActiveProvider();
+    
+    if (!injectedProvider) {
       toast.warning(t('orderForm.installMetaMask'));
       return;
     }
@@ -71,9 +82,7 @@ export default function OrderForm({
       }
       
       // 2. 验证实际钱包连接状态（通过 eth_accounts）
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_accounts' 
-      });
+      const accounts = await injectedProvider.request({ method: 'eth_accounts' });
       
       if (!accounts || accounts.length === 0) {
         toast.warning('钱包未连接，请先连接钱包');
@@ -146,7 +155,7 @@ export default function OrderForm({
         // ✅ 账户已验证，现在可以安全创建 signer
         
         // ✅ 修复：明确指定账户地址创建 signer，避免 "unknown account #0" 错误
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(injectedProvider);
         signer = provider.getSigner(accounts[0]); // 明确指定账户地址
         
         console.log('[OrderForm] 使用已连接的钱包地址:', account);
