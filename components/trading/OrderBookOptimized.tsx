@@ -457,6 +457,7 @@ function OrderRow({
   isMarked = false,
   onMouseEnter,
   onMouseLeave,
+  onMouseMove,
   onClick 
 }: OrderRowProps) {
   const isBid = type === 'bid';
