@@ -42,10 +42,10 @@ export default function OrderBook({ marketId, outcome: initialOutcome }: OrderBo
   };
   
   if (loading) {
+    const { LUMILoader } = require('@/components/Loading');
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto mb-2"></div>
-        <div className="text-gray-400">{t('common.loading')}</div>
+        <LUMILoader size="md" text={t('common.loading')} />
       </div>
     );
   }

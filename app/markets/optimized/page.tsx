@@ -83,11 +83,13 @@ function MarketsList({ markets }: { markets: any[] }) {
           </div>
         )}
 
-        {/* 加载状态 */}
+        {/* 加载状态 - 使用骨架屏 */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <div className="mt-4 text-gray-400">正在加载市场数据...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(() => {
+              const { MarketCardSkeleton } = require('@/components/Loading');
+              return <MarketCardSkeleton count={6} />;
+            })()}
           </div>
         )}
 
@@ -168,6 +170,8 @@ export default function OptimizedMarketsPage() {
     </MarketDataProvider>
   );
 }
+
+
 
 
 

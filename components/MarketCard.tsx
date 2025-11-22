@@ -10,6 +10,7 @@ import { useMarketParticipants } from '@/hooks/useMarketParticipants';
 import { usePriceChange24h } from '@/hooks/usePriceChange24h';
 import { supabase } from '@/lib/supabase-client';
 import CompactTradeModal from './trading/CompactTradeModal';
+import { PercentagePriceSkeleton } from './Loading';
 
 interface MarketCardProps {
   market: {
@@ -174,9 +175,7 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
             <div>
               <div className="text-xs text-gray-500 mb-1">{t('market.currentProbability')}</div>
               {price.loading ? (
-                <div className="text-5xl font-bold text-orange-500 leading-none animate-pulse">
-                  ---%
-                </div>
+                <PercentagePriceSkeleton />
               ) : (
                 <div className="text-5xl font-bold text-orange-500 leading-none">
                   {price.probability.toFixed(0)}%

@@ -48,11 +48,11 @@ export default function CLOBTradePage() {
   }, [marketId]);
   
   if (loading) {
+    const { LUMILoader } = require('@/components/Loading');
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-gray-600">加载市场数据...</div>
+          <LUMILoader size="lg" text="加载市场数据..." />
         </div>
       </div>
     );

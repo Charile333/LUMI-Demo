@@ -9,6 +9,29 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  
+  /* 🎨 LUMI 颜色系统优化 */
+  /* 主色调 */
+  --color-primary: #facc15;        /* 金色 */
+  --color-success: #22c55e;        /* 绿色 */
+  --color-danger: #ef4444;         /* 红色 */
+  --color-info: #3b82f6;           /* 蓝色 */
+  
+  /* 背景渐变 */
+  --bg-gradient: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
+  
+  /* 卡片背景 */
+  --card-bg: rgba(26, 26, 26, 0.8);
+  --card-border: rgba(250, 204, 21, 0.2);
+  
+  /* 📏 间距系统优化 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +46,71 @@ body {
   color: rgb(var(--foreground-rgb));
   background: #ffffff;
   overflow: visible;
+  
+  /* 🎨 应用背景渐变（深色模式） */
+  background: var(--bg-gradient);
+  min-height: 100vh;
+}
+
+/* 📝 字体优化 */
+@layer base {
+  /* 标题字体 - Inter */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  /* 数字字体 - JetBrains Mono */
+  .font-mono,
+  [class*="font-mono"],
+  code,
+  pre,
+  .price,
+  .number,
+  .quantity,
+  [data-price],
+  [data-quantity],
+  [data-amount] {
+    font-family: var(--font-jetbrains-mono), 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums; /* 等宽数字 */
+  }
+  
+  /* 默认字体 - Inter */
+  body {
+    font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+}
+
+/* 🎨 工具类 - 颜色系统 */
+@layer utilities {
+  .bg-lumi-gradient {
+    background: var(--bg-gradient);
+  }
+  
+  .bg-card {
+    background: var(--card-bg);
+  }
+  
+  .border-card {
+    border-color: var(--card-border);
+  }
+  
+  .text-primary {
+    color: var(--color-primary);
+  }
+  
+  .text-success {
+    color: var(--color-success);
+  }
+  
+  .text-danger {
+    color: var(--color-danger);
+  }
+  
+  .text-info {
+    color: var(--color-info);
+  }
 }
 
 @layer utilities {
@@ -182,4 +270,36 @@ body {
   background-size: 100% 4px;
   pointer-events: none;
   z-index: 10;
+}
+
+/* ════════════════════════════════════════════════════ */
+/* Loading Animation Styles - 加载动画样式              */
+/* ════════════════════════════════════════════════════ */
+
+/* Shimmer 闪烁动画 - 用于骨架屏 */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* 反向旋转动画 - 用于 LUMI Loader */
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 3s linear infinite;
 }

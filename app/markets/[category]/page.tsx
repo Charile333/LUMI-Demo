@@ -242,14 +242,13 @@ function MarketsListContent({
         </div>
       )} */}
       
-      {/* 加载状态 */}
+      {/* 加载状态 - 使用骨架屏 */}
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <FontAwesomeIcon icon={config.icon} className="text-6xl text-amber-400 mb-4 animate-pulse" />
-            <p className="text-xl text-white font-semibold">{t('common.loading')}</p>
-            <p className="text-sm text-gray-500 mt-2">{t('common.loadingData')}</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(() => {
+            const { MarketCardSkeleton } = require('@/components/Loading');
+            return <MarketCardSkeleton count={6} />;
+          })()}
         </div>
       )}
 
