@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
     // 0. 校验市场是否存在，避免外键错误
     const { data: marketRow, error: marketCheckError } = await supabaseAdmin
       .from('markets')
-      .select('id, status')
+      .select('id, status, condition_id')
       .eq('id', marketId)
       .maybeSingle();
 
