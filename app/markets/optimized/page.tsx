@@ -131,7 +131,7 @@ export default function OptimizedMarketsPage() {
         
         const { data, error } = await supabase
           .from('markets')
-          .select('id, title, description, blockchain_status, main_category, priority_level, question_id')
+          .select('id, title, description, blockchain_status, main_category, priority_level, question_id, condition_id')
           .eq('blockchain_status', 'active')
           .order('activity_score', { ascending: false })
           .limit(50); // 限制数量

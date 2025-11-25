@@ -18,6 +18,7 @@ interface MarketCardOptimizedProps {
     main_category?: string;
     priority_level?: string;
     question_id?: string;
+    condition_id?: string | null;
   };
 }
 
