@@ -5,7 +5,11 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
-import { convertToCTFOrder, type CTFOrder } from '@/lib/ctf-exchange/service';
+import {
+  convertToCTFOrder,
+  type CTFOrder,
+  serializeCTFOrder
+} from '@/lib/ctf-exchange/utils';
 import { signCTFOrder } from '@/lib/ctf-exchange/signing';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
@@ -47,20 +51,6 @@ export default function QuickTradeModal({
 
   const conditionIdFromMarket = market.conditionId || market.condition_id;
 
-  const serializeCTFOrder = (ctfOrder: CTFOrder) => ({
-    salt: ctfOrder.salt.toString(),
-    maker: ctfOrder.maker,
-    signer: ctfOrder.signer,
-    taker: ctfOrder.taker,
-    tokenId: ctfOrder.tokenId.toString(),
-    makerAmount: ctfOrder.makerAmount.toString(),
-    takerAmount: ctfOrder.takerAmount.toString(),
-    expiration: ctfOrder.expiration.toString(),
-    nonce: ctfOrder.nonce.toString(),
-    feeRateBps: ctfOrder.feeRateBps.toString(),
-    side: ctfOrder.side,
-    signatureType: ctfOrder.signatureType
-  });
   const getPendingUsdcAmount = () => {
     if (!pendingOnChainExecution?.onChainExecution) return null;
     const oc = pendingOnChainExecution.onChainExecution;

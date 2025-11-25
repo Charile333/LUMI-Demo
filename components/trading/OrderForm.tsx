@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { useWallet } from '@/app/provider-wagmi';
 import { signOrder, generateSalt, generateOrderId } from '@/lib/clob/signing';
@@ -10,10 +10,19 @@ import { Order } from '@/lib/clob/types';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/components/Toast';
 import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
+import { CTF_CONFIG, ERC20_ABI, USDC_DECIMALS } from '@/lib/ctf/config';
+import {
+  calculateTokenId,
+  convertToCTFOrder,
+  serializeCTFOrder
+} from '@/lib/ctf-exchange/utils';
+import { signCTFOrder } from '@/lib/ctf-exchange/signing';
+import { splitPosition, getPositionBalance } from '@/lib/ctf/split-position';
 
 interface OrderFormProps {
   marketId: number;
   questionId: string;
+  conditionId?: string | null;
   currentPriceYes?: number;
   currentPriceNo?: number;
   bestBid?: number;  // 最佳买价（用户可以卖出的价格）
@@ -25,6 +34,7 @@ interface OrderFormProps {
 export default function OrderForm({ 
   marketId, 
   questionId,
+  conditionId,
   currentPriceYes = 0.5,
   currentPriceNo = 0.5,
   bestBid = 0.49,
@@ -39,6 +49,16 @@ export default function OrderForm({
   const [outcome, setOutcome] = useState(1); // 1 = YES, 0 = NO
   const [amount, setAmount] = useState('10');
   const [submitting, setSubmitting] = useState(false);
+  const [usdcBalance, setUsdcBalance] = useState('0');
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [positionBalances, setPositionBalances] = useState<{ yes: string; no: string }>({
+    yes: '0',
+    no: '0'
+  });
+  const [positionLoading, setPositionLoading] = useState(false);
+  const [positionError, setPositionError] = useState<string | null>(null);
+  const [splitLoading, setSplitLoading] = useState(false);
   
   // 根据买卖方向获取市场价格（不可修改）
   const marketPrice = side === 'buy' ? bestAsk : bestBid;
@@ -61,6 +81,130 @@ export default function OrderForm({
     return null;
   };
   
+  const fetchUsdcBalance = useCallback(async () => {
+    if (!account || !isConnected) {
+      setUsdcBalance('0');
+      return;
+    }
+    
+    const injectedProvider = getActiveProvider();
+    if (!injectedProvider) {
+      return;
+    }
+    
+    try {
+      setBalanceLoading(true);
+      const provider = new ethers.providers.Web3Provider(injectedProvider);
+      const usdcContract = new ethers.Contract(
+        CTF_CONFIG.contracts.usdc,
+        ERC20_ABI,
+        provider
+      );
+      const balance = await usdcContract.balanceOf(account);
+      setUsdcBalance(ethers.utils.formatUnits(balance, USDC_DECIMALS));
+      setBalanceError(null);
+    } catch (error: any) {
+      console.error('[OrderForm] 获取 USDC 余额失败:', error);
+      setBalanceError(error.message || '获取 USDC 余额失败');
+    } finally {
+      setBalanceLoading(false);
+    }
+  }, [account, isConnected]);
+  
+  useEffect(() => {
+    fetchUsdcBalance();
+  }, [fetchUsdcBalance]);
+
+  const fetchPositionBalances = useCallback(async () => {
+    if (!account || !isConnected || !conditionId) {
+      setPositionBalances({ yes: '0', no: '0' });
+      return;
+    }
+
+    const injectedProvider = getActiveProvider();
+    if (!injectedProvider) {
+      return;
+    }
+
+    try {
+      setPositionLoading(true);
+      const provider = new ethers.providers.Web3Provider(injectedProvider);
+      const [yesId, noId] = [
+        calculateTokenId(conditionId, 1),
+        calculateTokenId(conditionId, 0)
+      ];
+      const [yesBalance, noBalance] = await Promise.all([
+        getPositionBalance(provider, account, yesId),
+        getPositionBalance(provider, account, noId)
+      ]);
+      setPositionBalances({
+        yes: ethers.utils.formatEther(yesBalance),
+        no: ethers.utils.formatEther(noBalance)
+      });
+      setPositionError(null);
+    } catch (error: any) {
+      console.error('[OrderForm] 获取 Position Tokens 余额失败:', error);
+      setPositionError(error.message || '获取 Position Tokens 失败');
+    } finally {
+      setPositionLoading(false);
+    }
+  }, [account, conditionId, isConnected]);
+
+  useEffect(() => {
+    fetchPositionBalances();
+  }, [fetchPositionBalances]);
+  
+  const amountNumber = parseFloat(amount || '0') || 0;
+  const estimatedCost = (marketPrice * amountNumber).toFixed(2);
+  const spread = ((bestAsk - bestBid) * 100).toFixed(2);
+  const potentialProfit = side === 'buy'
+    ? ((1 - marketPrice) * amountNumber).toFixed(2)
+    : (marketPrice * amountNumber).toFixed(2);
+  const requiredCollateral = side === 'buy' ? marketPrice * amountNumber : 0;
+  const hasSufficientBalance =
+    side === 'buy'
+      ? parseFloat(usdcBalance || '0') + 1e-6 >= requiredCollateral
+      : true;
+  const yesPosition = parseFloat(positionBalances.yes || '0');
+  const noPosition = parseFloat(positionBalances.no || '0');
+  const targetPositionBalance = outcome === 1 ? yesPosition : noPosition;
+  const hasSufficientPosition =
+    side === 'sell'
+      ? targetPositionBalance + 1e-6 >= amountNumber
+      : true;
+  
+  const handleSplitPosition = async () => {
+    if (!conditionId) {
+      toast.error('该市场暂无 conditionId，无法铸造 Position Tokens');
+      return;
+    }
+    if (!amountNumber || amountNumber <= 0) {
+      toast.warning('请输入需要铸造的 USDC 数量');
+      return;
+    }
+
+    const injectedProvider = getActiveProvider();
+    if (!injectedProvider) {
+      toast.warning(t('orderForm.installMetaMask'));
+      return;
+    }
+
+    try {
+      setSplitLoading(true);
+      const provider = new ethers.providers.Web3Provider(injectedProvider);
+      const signer = provider.getSigner();
+      await splitPosition(signer, conditionId, amountNumber);
+      toast.success('Position Tokens 铸造成功');
+      await fetchPositionBalances();
+      await fetchUsdcBalance();
+    } catch (error: any) {
+      console.error('[OrderForm] 铸造 Position Tokens 失败:', error);
+      toast.error(error.message || '铸造失败，请稍后重试');
+    } finally {
+      setSplitLoading(false);
+    }
+  };
+
   // 提交订单
   const handleSubmit = async () => {
     const injectedProvider = getActiveProvider();
@@ -140,6 +284,7 @@ export default function OrderForm({
         if (onSuccess) {
           onSuccess();
         }
+        await fetchUsdcBalance();
         
         setSubmitting(false);
         return;
@@ -174,6 +319,49 @@ export default function OrderForm({
       
       const address = account; // 使用 hook 提供的 address
       
+      // 2.a 校验 USDC 余额（仅买单）
+      if (side === 'buy') {
+        try {
+          const usdcContract = new ethers.Contract(
+            CTF_CONFIG.contracts.usdc,
+            ERC20_ABI,
+            provider
+          );
+          const balance = await usdcContract.balanceOf(address);
+          const requiredUnits = ethers.utils.parseUnits(
+            requiredCollateral.toFixed(USDC_DECIMALS),
+            USDC_DECIMALS
+          );
+          
+          if (balance.lt(requiredUnits)) {
+            toast.error(
+              `USDC 余额不足，需 ${requiredCollateral.toFixed(2)} USDC`
+            );
+            await fetchUsdcBalance();
+            setSubmitting(false);
+            return;
+          }
+        } catch (balanceError) {
+          console.error('[OrderForm] 检查 USDC 余额失败:', balanceError);
+          toast.error('无法获取 USDC 余额，请稍后重试');
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      if (side === 'sell') {
+        if (!conditionId) {
+          toast.error('该市场缺少 conditionId，无法验证 Position Tokens');
+          setSubmitting(false);
+          return;
+        }
+        if (!hasSufficientPosition) {
+          toast.error('Position Tokens 余额不足，无法卖出该数量');
+          setSubmitting(false);
+          return;
+        }
+      }
+      
       // 2. 构造订单（使用市场价）
       const order: Order = {
         orderId: generateOrderId(),
@@ -196,12 +384,44 @@ export default function OrderForm({
       order.signature = signature;
       
       console.log('[OrderForm] 订单已签名');
+
+      let ctfOrderPayload: ReturnType<typeof serializeCTFOrder> | null = null;
+      let ctfSignature: string | null = null;
+
+      if (conditionId) {
+        try {
+          const ctfOrderRaw = convertToCTFOrder(
+            {
+              maker: address.toLowerCase(),
+              marketId,
+              outcome,
+              side,
+              price: order.price,
+              amount: order.amount,
+              expiration: order.expiration,
+              nonce: order.nonce,
+              salt: order.salt
+            },
+            conditionId
+          );
+          ctfOrderPayload = serializeCTFOrder(ctfOrderRaw);
+          ctfSignature = await signCTFOrder(ctfOrderRaw, signer);
+        } catch (ctfError) {
+          console.warn('[OrderForm] 准备 CTF 订单失败:', ctfError);
+        }
+      }
       
       // 4. 提交到链下匹配引擎
+      const requestBody = {
+        ...order,
+        conditionId,
+        ctfOrder: ctfOrderPayload,
+        ctfSignature
+      };
       const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order)
+        body: JSON.stringify(requestBody)
       });
       
       const result = await response.json();
@@ -222,6 +442,9 @@ export default function OrderForm({
         if (onSuccess) {
           onSuccess();
         }
+        
+        await fetchUsdcBalance();
+        await fetchPositionBalances();
       } else {
         throw new Error(result.error);
       }
@@ -240,17 +463,6 @@ export default function OrderForm({
     }
   };
   
-  // 计算预估成本（使用市场价）
-  const estimatedCost = (marketPrice * parseFloat(amount || '0')).toFixed(2);
-  
-  // 显示价差
-  const spread = ((bestAsk - bestBid) * 100).toFixed(2);
-  
-  // 潜在收益（如果预测正确）
-  const potentialProfit = side === 'buy' 
-    ? ((1 - marketPrice) * parseFloat(amount || '0')).toFixed(2)
-    : (marketPrice * parseFloat(amount || '0')).toFixed(2);
-  
   return (
     <div>
       {/* 钱包状态提示 */}
@@ -261,10 +473,81 @@ export default function OrderForm({
           </p>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
+        <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg space-y-1">
           <div className="text-sm text-gray-300">
             {t('wallet.connect', 'Connected')}: {account?.substring(0, 6)}...{account?.substring(38)}
           </div>
+          <div className="text-sm text-gray-300 flex items-center justify-between">
+            <span>USDC {t('orderForm.balance', 'Balance')}:</span>
+            <span className="font-semibold text-amber-300">
+              {balanceLoading ? '...' : `${Number(usdcBalance || '0').toFixed(2)} USDC`}
+            </span>
+          </div>
+          {side === 'buy' && (
+            <div className="text-xs text-gray-400">
+              {t('orderForm.requiredCollateral', 'Required')}:{' '}
+              {requiredCollateral > 0 ? `${requiredCollateral.toFixed(2)} USDC` : '--'}
+            </div>
+          )}
+          {balanceError && (
+            <div className="text-xs text-amber-400">{balanceError}</div>
+          )}
+          {side === 'buy' && !hasSufficientBalance && !balanceLoading && (
+            <div className="text-xs text-red-400">
+              {t('orderForm.insufficientUsdc', 'USDC 余额不足，无法下单')}
+            </div>
+          )}
+        </div>
+      )}
+      {conditionId ? (
+        <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg space-y-2">
+          <div className="flex items-center justify-between text-sm text-gray-300">
+            <span>Position Tokens (YES / NO)</span>
+            <span className="text-xs text-gray-400">
+              condition: {conditionId.slice(0, 6)}...{conditionId.slice(-4)}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm font-semibold text-amber-300">
+            <div>
+              YES:{' '}
+              {positionLoading
+                ? '...'
+                : `${Number(positionBalances.yes || '0').toFixed(2)} PT`}
+            </div>
+            <div>
+              NO:{' '}
+              {positionLoading
+                ? '...'
+                : `${Number(positionBalances.no || '0').toFixed(2)} PT`}
+            </div>
+          </div>
+          {positionError && (
+            <div className="text-xs text-amber-400">{positionError}</div>
+          )}
+          {side === 'sell' && !hasSufficientPosition && !positionLoading && (
+            <div className="text-xs text-red-400">
+              Position Tokens 余额不足，无法卖出 {outcome === 1 ? 'YES' : 'NO'} 该数量
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleSplitPosition}
+            disabled={
+              splitLoading ||
+              !isConnected ||
+              amountNumber <= 0 ||
+              balanceLoading
+            }
+            className="w-full py-2 text-sm bg-amber-500/20 border border-amber-400/50 text-amber-100 rounded-lg hover:bg-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {splitLoading
+              ? '铸造中...'
+              : `用 ${amountNumber || '--'} USDC 铸造 Position Tokens`}
+          </button>
+        </div>
+      ) : (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-200">
+          该市场尚未同步 conditionId，暂无法铸造 Position Tokens
         </div>
       )}
       
@@ -421,7 +704,12 @@ export default function OrderForm({
       {/* 提交按钮 */}
       <button
         onClick={handleSubmit}
-        disabled={submitting || !isConnected}
+        disabled={
+          submitting ||
+          !isConnected ||
+          (side === 'buy' && !hasSufficientBalance) ||
+          (side === 'sell' && !hasSufficientPosition)
+        }
         className={`w-full py-3 rounded-lg font-bold text-white transition-colors ${
           side === 'buy'
             ? 'bg-green-500 hover:bg-green-600'
@@ -432,7 +720,11 @@ export default function OrderForm({
           ? t('orderForm.submitting')
           : !isConnected 
             ? t('orderForm.connectWalletFirst')
-            : `${side === 'buy' ? t('orderForm.confirmBuy') : t('orderForm.confirmSell')} ${outcome === 1 ? 'YES' : 'NO'}`
+            : side === 'buy' && !hasSufficientBalance
+              ? t('orderForm.insufficientUsdc', 'USDC 余额不足')
+              : side === 'sell' && !hasSufficientPosition
+                ? 'Position Tokens 余额不足'
+                : `${side === 'buy' ? t('orderForm.confirmBuy') : t('orderForm.confirmSell')} ${outcome === 1 ? 'YES' : 'NO'}`
         }
       </button>
       

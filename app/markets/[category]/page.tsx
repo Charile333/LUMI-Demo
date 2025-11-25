@@ -55,6 +55,13 @@ import {
 // 分类配置
 const getCategoryConfig = (category: string, t: any) => {
   const configs: Record<string, any> = {
+    'hot': {
+      icon: faFire,
+      subCategories: [
+        { id: 'all', name: t('categories.all') }
+      ],
+      categoryMapping: {}
+    },
     'automotive': {
       icon: faCar,
       subCategories: [
@@ -207,7 +214,7 @@ const getCategoryConfig = (category: string, t: any) => {
     }
   };
 
-  return configs[category] || configs['automotive'];
+  return configs[category] || configs['hot'];
 };
 
 // 内部组件：使用 MarketDataContext

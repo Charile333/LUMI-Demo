@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 import OrderForm from '@/components/trading/OrderForm';
 import OrderBook from '@/components/trading/OrderBook';
 import MyOrders from '@/components/trading/MyOrders';
+import RedeemButton from '@/components/ctf/RedeemButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
 import { useMarketPrice } from '@/hooks/useMarketPrice';
@@ -58,6 +59,8 @@ interface Market {
   participants: number;
   status: string;
   question_id: string;
+  condition_id?: string;
+  blockchain_status?: string;
 }
 
 export default function MarketDetailPage() {
@@ -879,6 +882,44 @@ export default function MarketDetailPage() {
               <h2 className="text-lg font-semibold text-white mb-4">{t('marketDetail.myOrders')}</h2>
               <MyOrders />
             </div>
+
+            {/* 提取奖励 - 市场解析后显示 */}
+            {market.condition_id && market.status === 'resolved' && (
+              <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 rounded-xl shadow-lg border border-green-500/30 p-6">
+                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <span className="text-green-400">💰</span>
+                  提取奖励
+                </h2>
+                <p className="text-sm text-gray-300 mb-4">
+                  市场已解析，您可以提取您的 Position Tokens 奖励
+                </p>
+                <div className="space-y-3">
+                  <RedeemButton
+                    conditionId={market.condition_id}
+                    outcomeIndex={1} // YES
+                    marketTitle={market.title}
+                    onSuccess={(result) => {
+                      console.log('✅ 提取成功！', result);
+                      // 可以添加 toast 通知
+                    }}
+                    onError={(error) => {
+                      console.error('❌ 提取失败：', error);
+                    }}
+                  />
+                  <RedeemButton
+                    conditionId={market.condition_id}
+                    outcomeIndex={0} // NO
+                    marketTitle={market.title}
+                    onSuccess={(result) => {
+                      console.log('✅ 提取成功！', result);
+                    }}
+                    onError={(error) => {
+                      console.error('❌ 提取失败：', error);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 右侧：交易面板 */}
@@ -888,6 +929,7 @@ export default function MarketDetailPage() {
               <OrderForm
                 marketId={parseInt(marketId)}
                 questionId={market.question_id}
+                conditionId={market.condition_id}
                 currentPriceYes={price.yes}
                 currentPriceNo={price.no}
                 bestBid={price.bestBid}

@@ -583,7 +583,7 @@ export default function BlackSwanPage() {
       {/* 终端风格顶部导航 */}
       <div className="bg-gradient-to-r from-zinc-900/98 via-neutral-900/98 to-zinc-900/98 border-b border-amber-600/30 backdrop-blur-md sticky top-0 z-50 shadow-2xl shadow-black/40">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between font-mono">
-          <Link href="/markets/automotive" className="flex items-center gap-2 text-amber-400/90 hover:text-amber-300 transition-colors text-sm group">
+          <Link href="/markets/hot" className="flex items-center gap-2 text-amber-400/90 hover:text-amber-300 transition-colors text-sm group">
             <span className="group-hover:translate-x-[-4px] transition-transform">[←</span>
             <span>{t('nav.backToMarkets').toUpperCase()}]</span>
           </Link>

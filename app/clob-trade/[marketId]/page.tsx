@@ -175,6 +175,7 @@ export default function CLOBTradePage() {
             <OrderForm 
               marketId={marketId} 
               questionId={marketData.questionId}
+              conditionId={marketData.conditionId || marketData.condition_id}
             />
           </div>
 

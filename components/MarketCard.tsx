@@ -255,7 +255,8 @@ export function MarketCard({ market: initialMarket, showPrice = true }: MarketCa
         market={{
           id: market.id,
           title: market.title,
-          questionId: market.question_id || `market-${market.id}`
+          questionId: market.question_id || `market-${market.id}`,
+          conditionId: market.condition_id || null
         }}
         initialOutcome={initialOutcome}
       />

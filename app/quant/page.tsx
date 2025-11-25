@@ -25,7 +25,7 @@ export default function QuantPage() {
 
       {/* 返回按钮 - 左上角 */}
       <a
-        href="/markets/automotive"
+        href="/markets/hot"
         className="fixed top-8 left-8 z-20 flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-all group backdrop-blur-sm bg-blue-950/30 px-4 py-2 rounded-lg border border-blue-500/30 hover:border-blue-400/50"
       >
         <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>

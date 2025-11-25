@@ -55,7 +55,7 @@ interface NavbarProps {
 }
 
 const Navbar = ({ 
-  activeCategory = 'automotive', 
+  activeCategory = 'hot', 
   onCategoryChange,
   subCategories = [],
   activeSubCategory = 'all',
@@ -76,6 +76,7 @@ const Navbar = ({
 
   // 六大赛道分类数据
   const categories = [
+    { id: 'hot', name: t('categories.hot') },
     { id: 'automotive', name: t('categories.automotive') },
     { id: 'smart-devices', name: t('categories.smartDevices') },
     { id: 'tech-ai', name: t('categories.techAi') },
@@ -135,7 +136,7 @@ const Navbar = ({
           <div className="flex items-center">
             {/* Logo with Image */}
             <button 
-              onClick={() => handleCategoryClick('automotive')}
+              onClick={() => handleCategoryClick('hot')}
               className="w-[250px] h-[70px] hover:opacity-80 transition-opacity"
               style={{overflow: 'hidden', display: 'block', position: 'relative'}}
             >
@@ -204,7 +205,7 @@ const Navbar = ({
           <div className="flex items-center justify-center gap-6 overflow-x-auto">
             {/* 预测市场 */}
             <Link 
-              href="/markets/automotive" 
+              href="/markets/hot" 
               className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-amber-500/8 to-yellow-500/8 border border-amber-500/25 rounded-xl hover:border-amber-500/50 hover:bg-amber-500/12 transition-all duration-200 group min-w-[240px]"
             >
               <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">

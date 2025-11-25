@@ -220,7 +220,8 @@ export function MarketCardOptimized({ market }: MarketCardOptimizedProps) {
         market={{
           id: market.id,
           title: market.title,
-          questionId: market.question_id || `market-${market.id}`
+          questionId: market.question_id || `market-${market.id}`,
+          conditionId: market.condition_id || null
         }}
         initialOutcome={initialOutcome}
       />

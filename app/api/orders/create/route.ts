@@ -5,23 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
 import { globalCache, cacheKeys } from '@/lib/cache/cache-manager';
 import { tradingCache } from '@/lib/cache/trading-cache';
-import { convertToCTFOrder, type CTFOrder } from '@/lib/ctf-exchange/service';
+import {
+  convertToCTFOrder,
+  type CTFOrder,
+  serializeCTFOrder
+} from '@/lib/ctf-exchange/utils';
 import { ethers } from 'ethers';
-
-const serializeCTFOrder = (ctfOrder: CTFOrder) => ({
-  salt: ctfOrder.salt.toString(),
-  maker: ctfOrder.maker,
-  signer: ctfOrder.signer,
-  taker: ctfOrder.taker,
-  tokenId: ctfOrder.tokenId.toString(),
-  makerAmount: ctfOrder.makerAmount.toString(),
-  takerAmount: ctfOrder.takerAmount.toString(),
-  expiration: ctfOrder.expiration.toString(),
-  nonce: ctfOrder.nonce.toString(),
-  feeRateBps: ctfOrder.feeRateBps.toString(),
-  side: ctfOrder.side,
-  signatureType: ctfOrder.signatureType
-});
+import { CTF_CONFIG, ERC20_ABI, USDC_DECIMALS } from '@/lib/ctf/config';
 
 /**
  * 准备链上执行数据
@@ -133,6 +123,37 @@ async function prepareOnChainExecution(
   }
 }
 
+async function hasSufficientUsdcBalance(
+  userAddress: string,
+  requiredAmount: number
+): Promise<boolean> {
+  if (!requiredAmount || requiredAmount <= 0) {
+    return true;
+  }
+  
+  try {
+    const rpcUrl =
+      process.env.POLYGON_AMOY_RPC_URL ||
+      process.env.NEXT_PUBLIC_POLYGON_AMOY_RPC_URL ||
+      CTF_CONFIG.rpcUrl;
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const usdcContract = new ethers.Contract(
+      CTF_CONFIG.contracts.usdc,
+      ERC20_ABI,
+      provider
+    );
+    const balance = await usdcContract.balanceOf(userAddress);
+    const requiredUnits = ethers.utils.parseUnits(
+      requiredAmount.toFixed(USDC_DECIMALS),
+      USDC_DECIMALS
+    );
+    return balance.gte(requiredUnits);
+  } catch (error) {
+    console.error('USDC 余额校验失败:', error);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -150,12 +171,16 @@ export async function POST(request: NextRequest) {
         : 0;
     const orderIdValue = body.orderId || body.order_id || `order-${Date.now()}`;
     const questionId = body.questionId || body.question_id || null;
-    const salt = body.salt || null;
-    const nonce = body.nonce || null;
-    const expiration = body.expiration || null;
+    const salt = body.salt ?? null;
+    const nonce = body.nonce ?? null;
+    const expiration = body.expiration ?? null;
     const ctfOrderPayload = body.ctfOrder || null;
     const ctfSignature = body.ctfSignature || null;
     const conditionIdFromBody = body.conditionId || null;
+    const resolvedSalt = salt ?? ethers.utils.hexlify(ethers.utils.randomBytes(16));
+    const resolvedNonce = nonce ?? Date.now();
+    const resolvedExpiration =
+      expiration ?? Math.floor(Date.now() / 1000) + 86400 * 7;
 
     // 验证输入
     if (!side || !price || !quantity) {
@@ -203,7 +228,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const finalConditionId = conditionIdFromBody || marketRow.condition_id || null;
+
+    if (side === 'buy') {
+      const requiredCollateral = price * quantity;
+      const enoughBalance = await hasSufficientUsdcBalance(
+        userAddress,
+        requiredCollateral
+      );
+      if (!enoughBalance) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `USDC 余额不足，至少需要 ${requiredCollateral.toFixed(2)} USDC`
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // 1. 创建订单记录（保存签名，如果提供）
+    let orderCtfPayload = ctfOrderPayload;
+
+    if (!orderCtfPayload && finalConditionId) {
+      const fallbackOrder = convertToCTFOrder(
+        {
+          maker: userAddress,
+          marketId,
+          outcome,
+          side,
+          price: price.toString(),
+          amount: quantity.toString(),
+          expiration: resolvedExpiration,
+          nonce: resolvedNonce,
+          salt: resolvedSalt
+        },
+        finalConditionId
+      );
+      orderCtfPayload = serializeCTFOrder(fallbackOrder);
+    }
+
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -218,11 +282,11 @@ export async function POST(request: NextRequest) {
         status: 'open',
         signature: body.signature || null,
         ctf_signature: ctfSignature || null,
-        salt,
-        nonce,
-        expiration,
-        condition_id: conditionIdFromBody,
-        ctf_order_data: ctfOrderPayload ? JSON.stringify(ctfOrderPayload) : null
+        salt: resolvedSalt,
+        nonce: resolvedNonce,
+        expiration: resolvedExpiration,
+        condition_id: finalConditionId,
+        ctf_order_data: orderCtfPayload ? JSON.stringify(orderCtfPayload) : null
       })
       .select()
       .single();

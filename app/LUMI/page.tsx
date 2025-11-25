@@ -8,8 +8,8 @@ const LUMIPage = () => {
   const router = useRouter()
 
   useEffect(() => {
-    // 直接重定向到 automotive 分类
-    router.replace('/markets/automotive')
+    // 直接重定向到热门分类
+    router.replace('/markets/hot')
   }, [router])
 
   // 显示加载状态

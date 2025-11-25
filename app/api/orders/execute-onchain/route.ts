@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
-import { convertToCTFOrder, calculateTokenId } from '@/lib/ctf-exchange/service';
+import { convertToCTFOrder, calculateTokenId } from '@/lib/ctf-exchange/utils';
 import { ethers } from 'ethers';
 
 export async function POST(request: NextRequest) {

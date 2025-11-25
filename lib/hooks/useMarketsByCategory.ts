@@ -39,18 +39,33 @@ export function useMarketsByCategory(category: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const isHotCategory = category === 'hot';
+
     const fetchMarkets = async () => {
       try {
         setLoading(true);
         setError(null);
 
         // #vercel环境禁用 - 从 Supabase 加载指定分类的市场（使用单例客户端）
-        const { data, error: queryError } = await supabase
+        let query = supabase
           .from('markets')
           .select('*')
-          .eq('main_category', category) // 按分类过滤
-          .neq('status', 'cancelled') // 排除已取消的市场，其他都显示（包括草稿、活跃、待结算）
-          .order('id', { ascending: false }); // 使用 id 排序，避免字段名问题
+          .neq('status', 'cancelled'); // 排除已取消的市场，其他都显示（包括草稿、活跃、待结算）
+
+        if (isHotCategory) {
+          query = query
+            .eq('status', 'active')
+            .order('activity_score', { ascending: false, nullsFirst: false })
+            .order('interested_users', { ascending: false, nullsFirst: false })
+            .order('views', { ascending: false, nullsFirst: false })
+            .limit(40);
+        } else {
+          query = query
+            .eq('main_category', category) // 按分类过滤
+            .order('id', { ascending: false }); // 使用 id 排序，避免字段名问题
+        }
+
+        const { data, error: queryError } = await query;
 
         if (queryError) {
           console.error(`[${category}页面] 查询失败:`, queryError);
@@ -103,107 +118,112 @@ export function useMarketsByCategory(category: string) {
     fetchMarkets();
 
     // 🔥 订阅新市场创建事件（实时更新）
-    const channel = supabase
-      .channel(`markets_category:${category}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'markets',
-          filter: `main_category=eq.${category}`
-        },
-        (payload) => {
-          console.log('🔥 新市场创建:', payload.new);
-          const newMarket = payload.new as any;
-          
-          // 检查市场状态是否为 active
-          if (newMarket.status === 'active') {
-            // 格式化新市场数据
-            const formattedMarket: Market = {
-              id: newMarket.id,
-              questionId: newMarket.question_id,
-              question_id: newMarket.question_id, // 同时设置 question_id 以兼容
-              title: newMarket.title,
-              description: newMarket.description || '暂无描述',
-              category: newMarket.sub_category || '未分类',
-              probability: 50, // 默认值，将由 WebSocket 更新
-              endDate: newMarket.end_time 
-                ? new Date(newMarket.end_time).toLocaleDateString('zh-CN')
-                : '2025-12-31',
-              volume: `$${newMarket.volume || 0}`,
-              participants: `${newMarket.participants || 0}人参与`,
-              trend: 'up' as const,
-              change: '0%',
-              image_url: newMarket.image_url,
-              resolutionCriteria: newMarket.description,
-              relatedMarkets: [],
-              priorityLevel: newMarket.priority_level || 'normal',
-              source: newMarket.source || 'custom',
-              blockchain_status: newMarket.blockchain_status || 'not_created',
-              interested_users: newMarket.interested_users || 0,
-              views: newMarket.views || 0,
-              activity_score: newMarket.activity_score || 0,
-              condition_id: newMarket.condition_id,
-              main_category: newMarket.main_category,
-              volumeNum: parseFloat(newMarket.volume) || 0
-            };
+    let channel: any = null;
+    if (!isHotCategory) {
+      channel = supabase
+        .channel(`markets_category:${category}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'markets',
+            filter: `main_category=eq.${category}`
+          },
+          (payload) => {
+            console.log('🔥 新市场创建:', payload.new);
+            const newMarket = payload.new as any;
             
-            // 添加到列表开头（最新市场在前）
-            setMarkets(prev => [formattedMarket, ...prev]);
-            console.log(`✅ 新市场已添加到列表: ${newMarket.title}`);
+            // 检查市场状态是否为 active
+            if (newMarket.status === 'active') {
+              // 格式化新市场数据
+              const formattedMarket: Market = {
+                id: newMarket.id,
+                questionId: newMarket.question_id,
+                question_id: newMarket.question_id, // 同时设置 question_id 以兼容
+                title: newMarket.title,
+                description: newMarket.description || '暂无描述',
+                category: newMarket.sub_category || '未分类',
+                probability: 50, // 默认值，将由 WebSocket 更新
+                endDate: newMarket.end_time 
+                  ? new Date(newMarket.end_time).toLocaleDateString('zh-CN')
+                  : '2025-12-31',
+                volume: `$${newMarket.volume || 0}`,
+                participants: `${newMarket.participants || 0}人参与`,
+                trend: 'up' as const,
+                change: '0%',
+                image_url: newMarket.image_url,
+                resolutionCriteria: newMarket.description,
+                relatedMarkets: [],
+                priorityLevel: newMarket.priority_level || 'normal',
+                source: newMarket.source || 'custom',
+                blockchain_status: newMarket.blockchain_status || 'not_created',
+                interested_users: newMarket.interested_users || 0,
+                views: newMarket.views || 0,
+                activity_score: newMarket.activity_score || 0,
+                condition_id: newMarket.condition_id,
+                main_category: newMarket.main_category,
+                volumeNum: parseFloat(newMarket.volume) || 0
+              };
+              
+              // 添加到列表开头（最新市场在前）
+              setMarkets(prev => [formattedMarket, ...prev]);
+              console.log(`✅ 新市场已添加到列表: ${newMarket.title}`);
+            }
           }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'markets',
-          filter: `main_category=eq.${category}`
-        },
-        (payload) => {
-          console.log('🔥 市场数据更新:', payload.new);
-          const updatedMarket = payload.new as any;
-          
-          // 更新现有市场数据
-          setMarkets(prev => {
-            const updated = prev.map(market => 
-              market.id === updatedMarket.id
-                ? {
-                    ...market,
-                    title: updatedMarket.title || market.title,
-                    description: updatedMarket.description || market.description,
-                    volume: `$${updatedMarket.volume || 0}`,
-                    participants: `${updatedMarket.participants || 0}人参与`,
-                    volumeNum: parseFloat(updatedMarket.volume) || 0,
-                    blockchain_status: updatedMarket.blockchain_status || market.blockchain_status,
-                    interested_users: updatedMarket.interested_users || market.interested_users,
-                    views: updatedMarket.views || market.views,
-                    activity_score: updatedMarket.activity_score || market.activity_score
-                  }
-                : market
-            );
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'markets',
+            filter: `main_category=eq.${category}`
+          },
+          (payload) => {
+            console.log('🔥 市场数据更新:', payload.new);
+            const updatedMarket = payload.new as any;
             
-            // 如果市场状态变为非 active，从列表中移除
-            return updated.filter(market => {
-              if (market.id === updatedMarket.id && updatedMarket.status !== 'active') {
-                return false; // 移除非 active 的市场
-              }
-              return true;
+            // 更新现有市场数据
+            setMarkets(prev => {
+              const updated = prev.map(market => 
+                market.id === updatedMarket.id
+                  ? {
+                      ...market,
+                      title: updatedMarket.title || market.title,
+                      description: updatedMarket.description || market.description,
+                      volume: `$${updatedMarket.volume || 0}`,
+                      participants: `${updatedMarket.participants || 0}人参与`,
+                      volumeNum: parseFloat(updatedMarket.volume) || 0,
+                      blockchain_status: updatedMarket.blockchain_status || market.blockchain_status,
+                      interested_users: updatedMarket.interested_users || market.interested_users,
+                      views: updatedMarket.views || market.views,
+                      activity_score: updatedMarket.activity_score || market.activity_score
+                    }
+                  : market
+              );
+              
+              // 如果市场状态变为非 active，从列表中移除
+              return updated.filter(market => {
+                if (market.id === updatedMarket.id && updatedMarket.status !== 'active') {
+                  return false; // 移除非 active 的市场
+                }
+                return true;
+              });
             });
-          });
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`✅ 已订阅分类 ${category} 的市场实时更新`);
-        }
-      });
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log(`✅ 已订阅分类 ${category} 的市场实时更新`);
+          }
+        });
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [category]);
 

@@ -503,7 +503,7 @@ export default function CreateMarketPage() {
               📋 管理市场
             </button>
             <button
-              onClick={() => router.push('/markets/automotive')}
+              onClick={() => router.push('/markets/hot')}
               className="text-blue-600 hover:text-blue-800 font-semibold"
             >
               👁️ 前台预览

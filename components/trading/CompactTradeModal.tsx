@@ -1,7 +1,7 @@
 // 🎯 紧凑交易弹窗 - 重新设计的小卡片样式
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { ethers } from 'ethers';
 import { signOrder, generateSalt, generateOrderId, type Order } from '@/lib/clob/signing';
@@ -13,6 +13,10 @@ import { useWallet } from '@/app/provider-wagmi';
 import { getBrowserWalletProvider } from '@/lib/wallet/getBrowserWalletProvider';
 import { useLUMIPolymarket } from '@/hooks/useLUMIPolymarket';
 import WalletConnect from '@/components/WalletConnect';
+import { useBalance } from 'wagmi';
+import type { Address } from 'viem';
+import { CTF_CONFIG } from '@/lib/ctf/config';
+import { splitPosition } from '@/lib/ctf/split-position';
 
 interface CompactTradeModalProps {
   isOpen: boolean;
@@ -21,6 +25,7 @@ interface CompactTradeModalProps {
     id: number;
     title: string;
     questionId: string;
+    conditionId?: string | null;
   };
   initialOutcome?: 'yes' | 'no'; // 初始选择的结果
 }
@@ -45,6 +50,22 @@ export default function CompactTradeModal({
   const [mounted, setMounted] = useState(false);
   const [pendingOnChainExecution, setPendingOnChainExecution] = useState<any>(null);
   const [isExecutingOnChain, setIsExecutingOnChain] = useState(false);
+  const typedAccount = account ? (account as Address) : undefined;
+  const usdcTokenAddress = useMemo(() => CTF_CONFIG.contracts.usdc as Address, []);
+  const {
+    data: usdcBalanceData,
+    isFetching: isUsdcBalanceFetching,
+    refetch: refetchUsdcBalance,
+    error: usdcBalanceError
+  } = useBalance({
+    address: typedAccount,
+    token: usdcTokenAddress,
+    chainId: CTF_CONFIG.chainId,
+    enabled: Boolean(isConnected && typedAccount),
+    watch: true,
+    scopeKey: 'compact-trade-usdc'
+  });
+  const usdcBalance = parseFloat(usdcBalanceData?.formatted || '0');
   
   // 🔥 使用统一的 useMarketPrice hook 获取实时价格（和市场卡片、详情页一致）
   const price = useMarketPrice(market.id, true);
@@ -89,6 +110,23 @@ export default function CompactTradeModal({
   const currentPrice = side === 'buy' 
     ? (outcome === 'yes' ? price.bestAsk : price.bestAsk) // 买入使用卖价
     : (outcome === 'yes' ? price.bestBid : price.bestBid); // 卖出使用买价
+  const normalizedPrice =
+    typeof currentPrice === 'number' && Number.isFinite(currentPrice) && currentPrice > 0
+      ? currentPrice
+      : 0;
+  const numericAmount = Number(amount) || 0;
+  const requiredCollateral = side === 'buy' ? normalizedPrice * numericAmount : 0;
+  const insufficientBalance =
+    side === 'buy' &&
+    isConnected &&
+    requiredCollateral > 0 &&
+    usdcBalance + 1e-8 < requiredCollateral;
+  const balanceStatusMessage =
+    side === 'buy' && isConnected
+      ? insufficientBalance
+        ? `余额不足，至少需要 ${requiredCollateral.toFixed(2)} USDC`
+        : `需要锁定 ${requiredCollateral.toFixed(2)} USDC`
+      : '';
 
   const getActiveProvider = () => {
     const candidate = walletProvider ?? getBrowserWalletProvider();
@@ -155,6 +193,36 @@ export default function CompactTradeModal({
       }
       
       const userAddress = account;
+      const collateralToLock = requiredCollateral;
+      if (side === 'buy') {
+        if (!market.conditionId) {
+          toast.error('该市场尚未上链，无法锁定 USDC。');
+          setIsSubmitting(false);
+          return;
+        }
+        if (collateralToLock <= 0) {
+          toast.error('请输入有效的数量和价格');
+          setIsSubmitting(false);
+          return;
+        }
+        if (insufficientBalance) {
+          toast.error(`USDC 余额不足，至少需要 ${collateralToLock.toFixed(2)} USDC`);
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          toast.info('正在链上锁定 USDC，请在钱包中确认交易', { duration: 7000 });
+          await splitPosition(signer, market.conditionId, collateralToLock);
+          toast.success('USDC 已锁定，准备提交订单', { duration: 4000 });
+          await refetchUsdcBalance?.();
+        } catch (lockError: any) {
+          console.error('锁定 USDC 失败:', lockError);
+          toast.error(`锁定 USDC 失败：${lockError?.message || '未知错误'}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
       // 3. 创建订单
       const outcomeValue = outcome === 'yes' ? 1 : 0;
@@ -529,6 +597,39 @@ export default function CompactTradeModal({
                 </button>
               ))}
             </div>
+          {isConnected && side === 'buy' && (
+            <div className="mt-3 space-y-1">
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>USDC 余额</span>
+                <button
+                  type="button"
+                  onClick={() => refetchUsdcBalance?.()}
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                  disabled={isUsdcBalanceFetching}
+                >
+                  {isUsdcBalanceFetching ? '同步中...' : '刷新'}
+                </button>
+              </div>
+              <div
+                className={`text-sm font-semibold ${
+                  insufficientBalance ? 'text-rose-400' : 'text-emerald-400'
+                }`}
+              >
+                {usdcBalanceError
+                  ? '余额查询失败，请确认 RPC'
+                  : `${usdcBalance.toFixed(2)} USDC`}
+              </div>
+              {balanceStatusMessage && (
+                <p
+                  className={`text-xs ${
+                    insufficientBalance ? 'text-rose-400' : 'text-gray-400'
+                  }`}
+                >
+                  {balanceStatusMessage}
+                </p>
+              )}
+            </div>
+          )}
           </div>
 
           {/* 钱包连接状态 */}
@@ -596,7 +697,13 @@ export default function CompactTradeModal({
                 /* 交易按钮 */
                 <button
                   onClick={handleTrade}
-                  disabled={isSubmitting || !amount || parseFloat(amount) <= 0 || price.loading}
+                  disabled={
+                    isSubmitting ||
+                    !amount ||
+                    parseFloat(amount) <= 0 ||
+                    price.loading ||
+                    (side === 'buy' && insufficientBalance)
+                  }
                   className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform
                     ${side === 'buy'
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg hover:shadow-emerald-500/30'

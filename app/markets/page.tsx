@@ -11,8 +11,8 @@ export default function MarketsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // 重定向到默认分类页（汽车市场）
-    router.replace('/markets/automotive');
+    // 重定向到默认分类页（热门市场）
+    router.replace('/markets/hot');
   }, [router]);
 
   // 显示加载状态（重定向过程中）
