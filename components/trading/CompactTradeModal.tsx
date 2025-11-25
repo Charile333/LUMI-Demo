@@ -61,9 +61,11 @@ export default function CompactTradeModal({
     address: typedAccount,
     token: usdcTokenAddress,
     chainId: CTF_CONFIG.chainId,
-    enabled: Boolean(isConnected && typedAccount),
     watch: true,
-    scopeKey: 'compact-trade-usdc'
+    scopeKey: 'compact-trade-usdc',
+    query: {
+      enabled: Boolean(isConnected && typedAccount)
+    }
   });
   const usdcBalance = parseFloat(usdcBalanceData?.formatted || '0');
   
